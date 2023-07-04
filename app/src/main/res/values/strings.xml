@@ -11,4 +11,9 @@
     <string name="login_failed">"Login failed"</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_activity_game_view">GameViewActivity</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="bottom_bar_home_label">Home</string>
+    <string name="bottom_bar_profile_label">Profile</string>
 </resources>

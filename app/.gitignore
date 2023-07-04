@@ -1,1 +1,5 @@
 /build
+google-services.json
+secrets.properties
+src/main/cpp
+src/main/java/**/Secrets.kt
