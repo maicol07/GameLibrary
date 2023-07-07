@@ -1,3 +1,6 @@
+val versionCode by extra(2)
+val versionName by extra("0.1")
+
 buildscript {
     val compose_version by extra("1.2.0")
 }
