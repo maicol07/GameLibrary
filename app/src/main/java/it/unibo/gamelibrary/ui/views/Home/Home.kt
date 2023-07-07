@@ -1,5 +1,6 @@
 package it.unibo.gamelibrary.ui.views.Home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -17,8 +18,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -28,9 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.api.igdb.utils.ImageSize
-import com.api.igdb.utils.ImageType
-import com.api.igdb.utils.imageBuilder
+import com.api.igdb.apicalypse.APICalypse
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -74,24 +71,26 @@ fun Post(id: Int) {
 
 //esempio section 'new games'
 @Composable
-fun HomeSection(title: String, list: MutableList<Game>, navigator: DestinationsNavigator) {
-    Column() {//non so se serve la colummmmm
+fun HomeSection(title: String,
+                list: MutableList<Game>,
+                navigator: DestinationsNavigator,
+                viewModel: HomeViewModel = hiltViewModel())
+{
+    Column() {
         Text(
             text = title,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold
         )
-        val listOfGames = remember { mutableStateListOf<Game>() };
         LazyRow {
             items(list) { game ->
+                Log.d("HomeSection", game.getArtworks(0).id.toString())
                 Column {
                     GlideImage(
                         {
-                            imageBuilder(
-                                game.getArtworks(0).imageId,
-                                ImageSize.SCREENSHOT_HUGE,
-                                ImageType.PNG
-                            )
+                            if(game.hasCover()) {
+                                viewModel.getCoverUrl(APICalypse().where("id =" + game.cover.imageId))
+                            }
                         },
                         imageOptions = ImageOptions(contentScale = ContentScale.FillBounds),
                         previewPlaceholder = R.drawable.ffviirebirth,
