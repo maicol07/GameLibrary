@@ -38,6 +38,7 @@ import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
 import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
 import it.unibo.gamelibrary.ui.views.startAppDestination
+import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -89,6 +90,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Scaffold(
+                        snackbarHost = {
+                            SnackbarHost(snackbarHostState)
+                        },
                         bottomBar = {
                             //if (currentDestination != SignupPageDestination) {  // currentDestination != LoginPageDestination
                                 BottomBar(navController = navController)
