@@ -11,12 +11,10 @@ import android.location.Location
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -36,6 +34,7 @@ import it.unibo.gamelibrary.MainActivity
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
+import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -80,7 +79,6 @@ class SignupViewModel @Inject constructor(
     var isLocalizationStarted = mutableStateOf(false)
     var isLocalizationFailed = mutableStateOf(false)
     var isSignupButtonPressed = mutableStateOf(false)
-    var isUserSigned = mutableStateOf(false)
 
     var isPasswordHidden = mutableStateOf(true)
     var isPasswordConfirmHidden = mutableStateOf(true)
@@ -165,48 +163,35 @@ class SignupViewModel @Inject constructor(
     }
 
     fun signUp(navController: NavController) {
-        isSignupButtonPressed.value = true
-
-        for ((key, value) in fields.entries) {
-            fieldsErrors[key] = validate(value) { f ->
-                when (key) {
-                    "email" -> !"^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*$".toRegex()
-                        .matches(f)
-
-                    "password" -> f.isEmpty() || f.length < 6
-                    "confirmPassword" -> f.isEmpty() || f != fields["password"]
-                    else -> f.isEmpty()
-                }
-            }
-        }
-
-        if (!fieldsErrors["name"]!! && !fieldsErrors["surname"]!! && !fieldsErrors["username"]!! && !fieldsErrors["address"]!! &&
-            !fieldsErrors["email"]!! && !fieldsErrors["password"]!! && !fieldsErrors["confirmPassword"]!!
-        ) {
-
-            auth.createUserWithEmailAndPassword(fields["email"]!!, fields["password"]!!)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        isUserSigned.value = false
-                        Log.d("AuthEmail", "createUserWithEmail:success")
-                        val user = User(
-                            auth.currentUser?.uid!!,
-                            fields["name"]!!,
-                            fields["surname"]!!,
-                            fields["username"]!!,
-                            "${address?.latitude} ${address?.longitude}"
-                        )
-                        insertUser(user)
-                        navController.navigate(HomeDestination())
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("SignupFirebase", "createUserWithEmail:failure", task.exception)
-                        isUserSigned.value = true
+        if (!isSignupButtonPressed.value) {
+            Log.i("Signup", "Signup pressed")
+            isSignupButtonPressed.value = true
+            if (checkErrors()) {
+                auth.createUserWithEmailAndPassword(fields["email"]!!, fields["password"]!!)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("AuthEmail", "createUserWithEmail:success")
+                            val user = User(
+                                auth.currentUser?.uid!!,
+                                fields["name"]!!,
+                                fields["surname"]!!,
+                                fields["username"]!!,
+                                "${address?.latitude} ${address?.longitude}"
+                            )
+                            insertUser(user)
+                            navController.navigate(HomeDestination())
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("SignupFirebase", "createUserWithEmail:failure", task.exception)
+                            viewModelScope.launch {
+                                snackbarHostState.showSnackbar("User already registered")
+                            }
+                        }
                     }
-                }
+            }
+            isSignupButtonPressed.value = false
         }
-        isSignupButtonPressed.value = false
     }
 
     private fun insertUser(user: User) = viewModelScope.launch {
@@ -217,7 +202,7 @@ class SignupViewModel @Inject constructor(
         return validate(field)
     }
 
-    private fun checkErrors() {
+    private fun checkErrors(): Boolean {
         for ((key, value) in fields.entries) {
             fieldsErrors[key] = validate(value) { f ->
                 when (key) {
@@ -230,5 +215,12 @@ class SignupViewModel @Inject constructor(
                 }
             }
         }
+
+        for (value in fieldsErrors.values) {
+            if (value){
+                return false
+            }
+        }
+        return true
     }
 }
