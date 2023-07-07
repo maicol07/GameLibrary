@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
                         })
                     {
                         Column(modifier = Modifier.padding(it)) {
-                            Log.i("user id", auth.currentUser?.uid ?: "utente non loggato")
+                            Log.w("user id", auth.currentUser?.uid ?: "utente non loggato")
                             DestinationsNavHost(
                                 navController = navController,
                                 navGraph = NavGraphs.root,
