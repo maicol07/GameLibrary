@@ -86,83 +86,23 @@ class SignupViewModel @Inject constructor(
     var isPasswordConfirmHidden = mutableStateOf(true)
 
     var isPermissionGranted = mutableStateOf(false)
-    var isDialogOpen = mutableStateOf(false);
+    var isDialogOpen = mutableStateOf(false)
 
     fun getCurrentPosition(@ActivityContext activityContext: Context) {
         val activity = activityContext.findActivity() as MainActivity
         isLocalizationStarted.value = true
-        Toast.makeText(activityContext, "OK", Toast.LENGTH_SHORT).show()
-        // Register the permissions callback, which handles the user's response to the
-        // system permissions dialog. Save the return value, an instance of
-        // ActivityResultLauncher. You can use either a val, as shown in this snippet,
-        // or a lateinit var in your onAttach() or onCreate() method.
-        val requestPermissionLauncher =
-            activity.registerForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { isGranted: Boolean ->
-                if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                    // app.
-                    isPermissionGranted.value = true
-                } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // feature requires a permission that the user has denied. At the
-                    // same time, respect the user's decision. Don't link to system
-                    // settings in an effort to convince the user to change their
-                    // decision.
-                    isPermissionGranted.value = false
-                    isDialogOpen.value = true
-                }
-            }
-        when {
-            ContextCompat.checkSelfPermission(
-                activityContext,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(
-                        activityContext,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED -> {
-                // You can use the API that requires the permission.
-                isPermissionGranted.value = true
-            }
-
-            shouldShowRequestPermissionRationale(
+        Toast.makeText(activityContext, "Start Location", Toast.LENGTH_SHORT).show()
+        if (ActivityCompat.checkSelfPermission(
                 activity,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) ||
-                    shouldShowRequestPermissionRationale(
-                        activity,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) -> {
-                // In an educational UI, explain to the user why your app requires this
-                // permission for a specific feature to behave as expected, and what
-                // features are disabled if it's declined. In this UI, include a
-                // "cancel" or "no thanks" button that lets the user continue
-                // using your app without granting the permission.
-                isPermissionGranted.value = false
-                isDialogOpen.value = true
-                //showInContextUI() // Dialog?
-            }
-
-            else -> {
-                // You can directly ask for the permission.
-                // The registered ActivityResultCallback gets the result of this request.
-                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-            }
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(activityContext, "Permissions denied", Toast.LENGTH_SHORT).show()
+            return
         }
-//        if (ActivityCompat.checkSelfPermission(
-//                baseContext,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                baseContext,
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            Toast.makeText(baseContext, "Permissions denied", Toast.LENGTH_SHORT).show()
-//            return
-//        }
         fusedLocationClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
@@ -172,7 +112,7 @@ class SignupViewModel @Inject constructor(
                 override fun isCancellationRequested() = false
             }).addOnSuccessListener { location: Location? ->
             if (location == null) {
-                Toast.makeText(activityContext, "Cannot get location.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "Cannot get location.", Toast.LENGTH_SHORT).show()
             } else {
                 addressField.clear()
                 addressField.addAll(listOf(location.latitude, location.longitude))

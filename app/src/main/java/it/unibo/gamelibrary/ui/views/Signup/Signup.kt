@@ -46,6 +46,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.LocationServices
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -151,7 +153,10 @@ fun SignupPage(
                             if (viewModel.isLocalizationStarted.value) {
                                 CircularProgressIndicator(modifier = Modifier.size(28.dp))
                             } else {
-                                IconButton(onClick = { viewModel.getCurrentPosition(context) }) {
+                                IconButton(onClick = {
+                                        //viewModel.getCurrentPosition(context)
+                                        viewModel.isDialogOpen.value = true
+                                    }) {
                                     Icon(
                                         Icons.Outlined.MyLocation,
                                         contentDescription = "address"
@@ -241,48 +246,66 @@ fun SignupPage(
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                         Text(text = "Signup")
                     }
-                    //TODO: tenere?
-                    if (viewModel.isSignupButtonPressed.value) {
-                        CircularProgressIndicator(modifier = Modifier.size(28.dp))
-                    }
                 }
-                if (viewModel.isUserSigned.value) {
-                    //TODO: snackBar
-                    Spacer(modifier = Modifier.size(16.dp))
-                    Text(
-                        text = "Impossible signup the user. User already signup",
-                        color = MaterialTheme.colorScheme.error
-                    )
+                if (viewModel.isDialogOpen.value){
+                   CheckPermission()
                 }
-                PermissionDialog()
             }
         }
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun PermissionDialog(viewModel: SignupViewModel = hiltViewModel()) {
-    if (viewModel.isDialogOpen.value) {
+private fun CheckPermission(viewModel: SignupViewModel = hiltViewModel()){
+    val locationPermissionsState = rememberMultiplePermissionsState(
+        listOf(
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+        )
+    )
+
+    if (locationPermissionsState.allPermissionsGranted) {
+        viewModel.getCurrentPosition(LocalContext.current)
+    } else {
+        val allPermissionsRevoked =
+            locationPermissionsState.permissions.size ==
+                    locationPermissionsState.revokedPermissions.size
+
+        val textToShow = if (!allPermissionsRevoked) {
+            // If not all the permissions are revoked, it's because the user accepted the COARSE
+            // location permission, but not the FINE one.
+            "You have granted permissions only for the approximate location but not the exact one. Please grant permissions for the exact location as well"
+        } else if (locationPermissionsState.shouldShowRationale) {
+            // Both location permissions have been denied
+            "Getting your exact location is important for this app. " +
+                    "Please grant us fine location."
+        } else {
+            // First time the user sees this feature or the user doesn't want to be asked again
+            "This feature requires location permission"
+        }
+        val buttonText = if (!allPermissionsRevoked) "Allow precise location" else "Request permissions"
         AlertDialog(
             onDismissRequest = {
-                // Dismiss the dialog when the user clicks outside the dialog or on the back
-                // button. If you want to disable that functionality, simply use an empty
-                // onDismissRequest.
+            // Dismiss the dialog when the user clicks outside the dialog or on the back
+            // button. If you want to disable that functionality, simply use an empty
+            // onDismissRequest.
                 viewModel.isDialogOpen.value = false
             },
             title = {
                 Text(text = "Permissions required")
             },
             text = {
-                Text(text = "We need your location to get your address")
+                Text(text = textToShow)
             },
             confirmButton = {
                 TextButton(
                     onClick = {
+                        locationPermissionsState.launchMultiplePermissionRequest()
                         viewModel.isDialogOpen.value = false
                     }
                 ) {
-                    Text("Confirm")
+                    Text(buttonText)
                 }
             },
             dismissButton = {
@@ -298,7 +321,5 @@ private fun PermissionDialog(viewModel: SignupViewModel = hiltViewModel()) {
     }
 }
 
-//  TODO: Se permessi per geo sono negati, mettere messaggio d'errore (Dialog) + dialog per GPS disattivato
-//      Se utente già registrato prova a fare signup, messaggio d'errore (SnackBar) (X)
-//      [POSSIBILE BUG] Verificare se premendo signup più volte si creano più utenti (o comunque se viene chiamato più volte il metodo)
+//  TODO: [POSSIBILE BUG] Verificare se premendo signup più volte si creano più utenti (o comunque se viene chiamato più volte il metodo)
 //      [LOW PRIORITY] Vedere se c'è qualche design migliore per la pagina di signup
