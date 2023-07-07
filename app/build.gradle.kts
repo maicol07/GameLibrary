@@ -119,6 +119,8 @@ dependencies {
     implementation("io.github.raamcosta.compose-destinations:core:1.9.42-beta")
     ksp("io.github.raamcosta.compose-destinations:ksp:1.9.42-beta")
 
+    implementation("com.github.TutorialsAndroid:crashx:v6.0.19")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.46.1")
     kapt("com.google.dagger:hilt-android-compiler:2.46.1")
