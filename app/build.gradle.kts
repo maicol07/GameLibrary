@@ -129,6 +129,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
 
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
 
 // Allow references to generated code
