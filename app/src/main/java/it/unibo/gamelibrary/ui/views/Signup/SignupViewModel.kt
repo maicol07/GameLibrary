@@ -1,42 +1,26 @@
 package it.unibo.gamelibrary.ui.views.Signup
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
-import android.os.Build
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.app.ActivityCompat
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationToken
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.qualifiers.ApplicationContext
-import it.unibo.gamelibrary.MainActivity
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
 
 fun Context.findActivity(): Activity {
@@ -53,14 +37,14 @@ class SignupViewModel @Inject constructor(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    lateinit var fusedLocationClient: FusedLocationProviderClient
+    //lateinit var fusedLocationClient: FusedLocationProviderClient
     private val auth: FirebaseAuth = Firebase.auth
-    val addressField = mutableStateListOf<Double>()
+    //val addressField = mutableStateListOf<Double>()
     var fieldsErrors = mutableStateMapOf(
         Pair("name", false),
         Pair("surname", false),
         Pair("username", false),
-        Pair("address", false),
+        //Pair("address", false),
         Pair("email", false),
         Pair("password", false),
         Pair("confirmPassword", false)
@@ -69,24 +53,24 @@ class SignupViewModel @Inject constructor(
         Pair("name", ""),
         Pair("surname", ""),
         Pair("username", ""),
-        Pair("address", ""),
+        //Pair("address", ""),
         Pair("email", ""),
         Pair("password", ""),
         Pair("confirmPassword", "")
     )
-    var address: Address? = null
+    //var address: Address? = null
 
-    var isLocalizationStarted = mutableStateOf(false)
-    var isLocalizationFailed = mutableStateOf(false)
-    var isSignupButtonPressed = mutableStateOf(false)
+    //var isLocalizationStarted = mutableStateOf(false)
+    //var isLocalizationFailed = mutableStateOf(false)
+    var isSignupButtonPressed by mutableStateOf(false)
 
-    var isPasswordHidden = mutableStateOf(true)
-    var isPasswordConfirmHidden = mutableStateOf(true)
+    var isPasswordHidden by mutableStateOf(true)
+    var isPasswordConfirmHidden by mutableStateOf(true)
 
-    var isPermissionGranted = mutableStateOf(false)
-    var isDialogOpen = mutableStateOf(false)
+    //var isPermissionGranted = mutableStateOf(false)
+    //var isDialogOpen = mutableStateOf(false)
 
-    fun getCurrentPosition(@ActivityContext activityContext: Context) {
+    /*fun getCurrentPosition(@ActivityContext activityContext: Context) {
         val activity = activityContext.findActivity() as MainActivity
         isLocalizationStarted.value = true
         Toast.makeText(activityContext, "Start Location", Toast.LENGTH_SHORT).show()
@@ -119,9 +103,9 @@ class SignupViewModel @Inject constructor(
             isLocalizationStarted.value = false
             isLocalizationFailed.value = false
         }
-    }
+    }*/
 
-    fun getLocation(
+    /*fun getLocation(
         @ApplicationContext context: Context,
         onGeocode: (addressName: Address) -> Unit
     ) {
@@ -160,13 +144,14 @@ class SignupViewModel @Inject constructor(
                 onGeocode.invoke(address)
             }
         }
-    }
+    }*/
 
     fun signUp(navController: NavController) {
-        if (!isSignupButtonPressed.value) {
+        if (!isSignupButtonPressed) {
             Log.i("Signup", "Signup pressed")
-            isSignupButtonPressed.value = true
+            isSignupButtonPressed = true
             if (checkErrors()) {
+                Log.i("Signup firebase", "${fields["email"]!!}, ${fields["password"]!!}" )
                 auth.createUserWithEmailAndPassword(fields["email"]!!, fields["password"]!!)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -177,7 +162,8 @@ class SignupViewModel @Inject constructor(
                                 fields["name"]!!,
                                 fields["surname"]!!,
                                 fields["username"]!!,
-                                "${address?.latitude} ${address?.longitude}"
+                                fields["email"]!!
+                                //"${address?.latitude} ${address?.longitude}"
                             )
                             insertUser(user)
                             navController.navigate(HomeDestination())
@@ -190,7 +176,7 @@ class SignupViewModel @Inject constructor(
                         }
                     }
             }
-            isSignupButtonPressed.value = false
+            isSignupButtonPressed = false
         }
     }
 
@@ -206,9 +192,8 @@ class SignupViewModel @Inject constructor(
         for ((key, value) in fields.entries) {
             fieldsErrors[key] = validate(value) { f ->
                 when (key) {
-                    "email" -> !"^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*$".toRegex()
+                    "email" -> !"^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])\$".toRegex()
                         .matches(f)
-
                     "password" -> f.isEmpty() || f.length < 6
                     "confirmPassword" -> f.isEmpty() || f != fields["password"]
                     else -> f.isEmpty()

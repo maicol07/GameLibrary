@@ -29,10 +29,7 @@ fun Profile(
     var showDialog by remember { mutableStateOf(false) }
 
     Column() {
-        Text(
-            //text = "your surname is ${user.surname}"
-            text = "profilo"
-        )
+
         Button(onClick = { viewModel.reviewText = ""; showDialog = true }
         ) {
             Text(text = "Write a Review")

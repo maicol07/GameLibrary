@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import it.unibo.gamelibrary.data.dao.UserDao
 import it.unibo.gamelibrary.data.model.User
 
-@Database(entities = [User::class], version = 1)
+@Database(entities = [User::class], version = 2)
 abstract class GameLibraryDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
 

@@ -51,7 +51,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.LocationServices
 import com.ramcosta.composedestinations.annotation.Destination
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+//@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Destination
 @Composable
 fun SignupPage(
@@ -59,7 +59,7 @@ fun SignupPage(
     navController: NavController
 ) {
     val context = LocalContext.current
-    viewModel.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    //viewModel.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState()),
@@ -116,14 +116,10 @@ fun SignupPage(
                         )
                     },
                     isError = viewModel.fieldsErrors["username"]!!,
-                    supportingText = {
-                        if (viewModel.isLocalizationFailed.value) Text(text = "Impossible get localization") else if (viewModel.fieldsErrors["username"]!!) Text(
-                            text = "Username field is required"
-                        ) else Unit
-                    }
+                    supportingText = { if (viewModel.fieldsErrors["username"]!!) Text(text = "Username field is required") else Unit }
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                Row {
+                /*Row {
                     if (viewModel.addressField.isNotEmpty()) {
                         viewModel.getLocation(context) {
                             viewModel.address = it
@@ -168,7 +164,7 @@ fun SignupPage(
                         supportingText = { if (viewModel.fieldsErrors["address"]!!) Text(text = "Address field is required") else Unit }
                     )
                 }
-                Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.size(16.dp))*/
                 TextField(
                     value = viewModel.fields["email"]!!,
                     onValueChange = { viewModel.fields["email"] = it },
@@ -191,7 +187,7 @@ fun SignupPage(
                     onValueChange = { viewModel.fields["password"] = it },
                     label = { Text("Password") },
                     singleLine = true,
-                    visualTransformation = if (viewModel.isPasswordHidden.value) PasswordVisualTransformation() else VisualTransformation.None,
+                    visualTransformation = if (viewModel.isPasswordHidden) PasswordVisualTransformation() else VisualTransformation.None,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     leadingIcon = {
                         Icon(
@@ -200,10 +196,10 @@ fun SignupPage(
                         )
                     },
                     trailingIcon = {
-                        IconButton(onClick = { viewModel.isPasswordHidden.value = !viewModel.isPasswordHidden.value }) {
+                        IconButton(onClick = { viewModel.isPasswordHidden = !viewModel.isPasswordHidden }) {
                             Icon(
-                                imageVector = if (viewModel.isPasswordHidden.value) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
-                                contentDescription = if (viewModel.isPasswordHidden.value) "hide password" else "show password"
+                                imageVector = if (viewModel.isPasswordHidden) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+                                contentDescription = if (viewModel.isPasswordHidden) "hide password" else "show password"
                             )
                         }
                     },
@@ -216,7 +212,7 @@ fun SignupPage(
                     onValueChange = { viewModel.fields["confirmPassword"] = it },
                     label = { Text("Confirm Password") },
                     singleLine = true,
-                    visualTransformation = if (viewModel.isPasswordConfirmHidden.value) PasswordVisualTransformation() else VisualTransformation.None,
+                    visualTransformation = if (viewModel.isPasswordConfirmHidden) PasswordVisualTransformation() else VisualTransformation.None,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     leadingIcon = {
                         Icon(
@@ -226,11 +222,11 @@ fun SignupPage(
                     },
                     trailingIcon = {
                         IconButton(onClick = {
-                            viewModel.isPasswordConfirmHidden.value = !viewModel.isPasswordConfirmHidden.value
+                            viewModel.isPasswordConfirmHidden = !viewModel.isPasswordConfirmHidden
                         }) {
                             Icon(
-                                imageVector = if (viewModel.isPasswordConfirmHidden.value) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
-                                contentDescription = if (viewModel.isPasswordConfirmHidden.value) "hide password" else "show password"
+                                imageVector = if (viewModel.isPasswordConfirmHidden) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+                                contentDescription = if (viewModel.isPasswordConfirmHidden) "hide password" else "show password"
                             )
                         }
                     },
@@ -238,7 +234,7 @@ fun SignupPage(
                     supportingText = { if (viewModel.fieldsErrors["confirmPassword"]!!) Text(text = "Passwords are different") else Unit }
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                Row(horizontalArrangement = Arrangement.Center) {
+                //Row(horizontalArrangement = Arrangement.Center) {
                     Button(onClick = {
                         viewModel.signUp(navController)
                     }) {
@@ -246,16 +242,16 @@ fun SignupPage(
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                         Text(text = "Signup")
                     }
-                }
-                if (viewModel.isDialogOpen.value){
+                //}
+                /*if (viewModel.isDialogOpen.value){
                    CheckPermission()
-                }
+                }*/
             }
         }
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
+/*@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun CheckPermission(viewModel: SignupViewModel = hiltViewModel()){
     val locationPermissionsState = rememberMultiplePermissionsState(
@@ -319,7 +315,7 @@ private fun CheckPermission(viewModel: SignupViewModel = hiltViewModel()){
             }
         )
     }
-}
+}*/
 
 //  TODO: [POSSIBILE BUG] Verificare se premendo signup più volte si creano più utenti (o comunque se viene chiamato più volte il metodo)
 //      [LOW PRIORITY] Vedere se c'è qualche design migliore per la pagina di signup

@@ -3,12 +3,16 @@ package it.unibo.gamelibrary.data.repository
 import androidx.annotation.WorkerThread
 import it.unibo.gamelibrary.data.dao.UserDao
 import it.unibo.gamelibrary.data.model.User
-import kotlinx.coroutines.flow.Flow
 
 class UserRepository(private val userDao: UserDao) {
-    val allUser: Flow<List<User>> = userDao.getAll()
+    //val allUser: List<User> = userDao.getAll()
+    @WorkerThread
+    suspend fun getAll(): List<User>{
+        return userDao.getAll()
+    }
 
-    fun getUserByUsername(username : String): User {
+    @WorkerThread
+    suspend fun getUserByUsername(username : String): User? {
         return userDao.getUserByUsername(username)
     }
 

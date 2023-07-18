@@ -12,11 +12,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
 ): ViewModel() {
-
-    var reviewText by mutableStateOf("")
-
+    private val auth: FirebaseAuth = Firebase.auth
     //var user: User
-    //userName = database locale( Firebase.auth.currentUser.uid ) // per ora non c'è locale
+    var username = auth.currentUser?.displayName
 
 
+    //maybe move this feature to gameView
+    var reviewText by mutableStateOf("")
 }
