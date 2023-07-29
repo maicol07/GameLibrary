@@ -216,7 +216,7 @@ fun SignupPage(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     leadingIcon = {
                         Icon(
-                            painterResource(id = it.unibo.gamelibrary.R.drawable.lock_check_outline),
+                            painterResource(id = R.drawable.lock_check_outline),
                             contentDescription = "confirm password"
                         )
                     },
