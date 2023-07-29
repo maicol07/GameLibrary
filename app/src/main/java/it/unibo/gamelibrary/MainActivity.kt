@@ -114,8 +114,7 @@ class MainActivity : ComponentActivity() {
                             }
                         })
                     {
-                        Column(modifier = Modifier.padding(it)) {
-                            Log.w("user id", auth.currentUser?.uid ?: "utente non loggato")
+                        Column(modifier = Modifier.fillMaxSize().padding(it)) {
                             DestinationsNavHost(
                                 navController = navController,
                                 navGraph = NavGraphs.root,
