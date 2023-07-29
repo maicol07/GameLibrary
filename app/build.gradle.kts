@@ -1,4 +1,5 @@
 @file:Suppress("UnstableApiUsage")
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 
 plugins {
     id("com.android.application")
@@ -12,7 +13,7 @@ plugins {
 
 android {
     namespace = "it.unibo.gamelibrary"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "it.unibo.gamelibrary"
@@ -71,8 +72,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material:1.4.3")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha04")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.annotation:annotation:1.6.0")
@@ -80,7 +80,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-    implementation("com.github.skydoves:landscapist-glide:2.2.2")
+    implementation("com.github.skydoves:landscapist-glide:2.2.3")
+    implementation("com.github.skydoves:landscapist-animation:2.2.3")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("io.github.husnjak:igdb-api-jvm:1.0.11")//                IGDB API dependency
@@ -122,7 +123,7 @@ dependencies {
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.47")
-    kapt("com.google.dagger:hilt-android-compiler:2.46.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.47")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
