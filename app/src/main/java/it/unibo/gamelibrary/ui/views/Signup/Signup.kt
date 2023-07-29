@@ -1,40 +1,21 @@
 package it.unibo.gamelibrary.ui.views.Signup
 
-import android.os.Build
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.size
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,10 +27,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.location.LocationServices
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.navigate
+import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.ui.views.Login.LoginViewModel
+import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
+import kotlinx.coroutines.launch
 
 //@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Destination
@@ -58,8 +41,12 @@ fun SignupPage(
     viewModel: SignupViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val loginViewModel: LoginViewModel = hiltViewModel()
     val context = LocalContext.current
-    //viewModel.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    val scope = rememberCoroutineScope()
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        loginViewModel.signInWithGoogle(result, context, navController)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -237,17 +224,39 @@ fun SignupPage(
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 //Row(horizontalArrangement = Arrangement.Center) {
-                    Button(onClick = {
-                        viewModel.signUp(navController)
-                    }) {
-                        Icon(Icons.Outlined.Send, contentDescription = "signup")
-                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                        Text(text = "Signup")
+                Button(onClick = {
+                    viewModel.signUp(navController)
+                }) {
+                    Icon(Icons.Outlined.Send, contentDescription = "signup")
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(text = "Signup")
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                Text("Or signup with:")
+                Spacer(modifier = Modifier.size(16.dp))
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            loginViewModel.launchSignInWithGoogle(
+                                context = context,
+                                launcher = launcher
+                            )
+                        }
                     }
-                //}
-                /*if (viewModel.isDialogOpen.value){
-                   CheckPermission()
-                }*/
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.google),
+                        contentDescription = "sign in"
+                    )
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(text = "Google")
+                }
+                //Spacer(modifier = Modifier.size(4.dp))
+                TextButton(
+                    onClick = { navController.navigate(LoginPageDestination()) }
+                ) {
+                    Text("Do you already have an account? Sign in")
+                }
             }
         }
     }
