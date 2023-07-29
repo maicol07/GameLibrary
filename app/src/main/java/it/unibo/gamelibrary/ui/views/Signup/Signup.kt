@@ -62,8 +62,10 @@ fun SignupPage(
     //viewModel.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
             Column(
