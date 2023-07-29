@@ -34,10 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
 import it.unibo.gamelibrary.ui.views.NavGraphs
 import it.unibo.gamelibrary.ui.views.appCurrentDestinationAsState
-import it.unibo.gamelibrary.ui.views.destinations.Destination
-import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
-import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
-import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
+import it.unibo.gamelibrary.ui.views.destinations.*
 import it.unibo.gamelibrary.ui.views.startAppDestination
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.snackbarHostState
@@ -105,10 +102,10 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         topBar = {
-                            if (currentDestination != SignupPageDestination) {  // currentDestination != LoginPageDestination
+                            if (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination) {
                                 TopBar(
                                     currentScreen = "Game Library",
-                                    canNavigateBack = navController.previousBackStackEntry != null,
+                                    canNavigateBack = navController.previousBackStackEntry != null && currentDestination != HomeDestination,
                                     navigateUp = { navController.navigateUp() }
                                 )
                             }
@@ -118,7 +115,7 @@ class MainActivity : ComponentActivity() {
                             DestinationsNavHost(
                                 navController = navController,
                                 navGraph = NavGraphs.root,
-                                startRoute = if (auth.currentUser === null) SignupPageDestination else HomeDestination
+                                startRoute = if (auth.currentUser === null) LoginPageDestination else HomeDestination
                             )
                         }
                     }

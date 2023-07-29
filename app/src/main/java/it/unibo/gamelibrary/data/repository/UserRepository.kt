@@ -17,6 +17,11 @@ class UserRepository(private val userDao: UserDao) {
     }
 
     @WorkerThread
+    suspend fun getUserByUid(uid : String): User? {
+        return userDao.getUserByUid(uid)
+    }
+
+    @WorkerThread
     suspend fun insertUser(user: User){
         userDao.insertUser(user)
     }
