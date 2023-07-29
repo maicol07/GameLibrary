@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    public val auth: FirebaseAuth = Firebase.auth
+    val auth: FirebaseAuth = Firebase.auth
 
     // Just a state to trigger recomposition
     private val loggedIn = mutableStateOf(false)
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
             val prefs = SecurePreferences(this@MainActivity)
             var token = prefs.getString("token", "")
             if (prefs.getString("token", "") == "") {
-                Log.i("TwitchAuthenticator", "Token is null")
+                Log.i("TwitchAuthenticator", "Local Token is null")
                 //in a real application it is better to use twitchAuthenticator only once, serverside.
                 val twitchToken = TwitchAuthenticator.requestTwitchToken(
                     secrets.getIGDBClientId(packageName),
