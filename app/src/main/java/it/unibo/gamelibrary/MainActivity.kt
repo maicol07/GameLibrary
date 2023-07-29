@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
@@ -38,7 +39,9 @@ import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
 import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
 import it.unibo.gamelibrary.ui.views.startAppDestination
+import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.snackbarHostState
+import it.unibo.gamelibrary.utils.TopAppBarState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,9 +97,12 @@ class MainActivity : ComponentActivity() {
                             SnackbarHost(snackbarHostState)
                         },
                         bottomBar = {
-                            //if (currentDestination != SignupPageDestination) {  // currentDestination != LoginPageDestination
-                                BottomBar(navController = navController)
-                            //}
+                            if (currentDestination in NavBarDestinations.values().map { it.direction }) {
+                                NavBar(navController = navController)
+                                BottomBar = {}
+                            } else {
+                                BottomBar()
+                            }
                         },
                         topBar = {
                             if (currentDestination != SignupPageDestination) {  // currentDestination != LoginPageDestination
@@ -131,7 +137,7 @@ class MainActivity : ComponentActivity() {
         modifier: Modifier = Modifier
     ) {
         TopAppBar(
-            title = { Text(currentScreen) },
+            title = { Text(text = TopAppBarState.title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
             modifier = modifier,
             navigationIcon = {
                 //se si può navigare indietro (non home screen) allora appare la freccetta
@@ -143,7 +149,8 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-            }
+            },
+            actions = TopAppBarState.actions
         )
     }
 
@@ -157,7 +164,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun BottomBar(
+    fun NavBar(
         navController: NavController
     ) {
         val currentDestination: Destination = (navController.currentDestinationAsState().value
