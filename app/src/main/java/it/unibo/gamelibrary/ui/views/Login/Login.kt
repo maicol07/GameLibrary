@@ -164,7 +164,6 @@ fun ResetPasswordDialog(viewModel: LoginViewModel = hiltViewModel()) {
     val focusManager = LocalFocusManager.current
     CustomDialog(
         onDismissRequest = { viewModel.openResetPasswordDialog = false },
-        modifier = Modifier.padding(16.dp),
         buttons = {
             TextButton(
                 onClick = {
@@ -187,7 +186,6 @@ fun ResetPasswordDialog(viewModel: LoginViewModel = hiltViewModel()) {
     ){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp)
         ) {
             Text("Insert your email to receive a mail to reset the password")
             Spacer(modifier = Modifier.size(16.dp))
