@@ -30,4 +30,34 @@ class UserRepository(private val userDao: UserDao) {
     suspend fun deleteUser(user: User){
         userDao.delete(user)
     }
+
+    @WorkerThread
+    suspend fun setEmail(uid: String, email: String){
+        userDao.setEmail(uid, email)
+    }
+
+    @WorkerThread
+    suspend fun setLocation(uid: String, location: String){
+        userDao.setLocation(uid, location)
+    }
+
+    @WorkerThread
+    suspend fun setImage(uid: String, image: String){
+        userDao.setImage(uid, image)
+    }
+
+    @WorkerThread
+    suspend fun setUsername(uid: String, username: String){
+        userDao.setUsername(uid, username)
+    }
+
+    @WorkerThread
+    suspend fun setBio(uid: String, bio: String){
+        userDao.setBio(uid, bio)
+    }
+
+    @WorkerThread
+    suspend fun updateUser(user: User){
+        userDao.update(user)
+    }
 }

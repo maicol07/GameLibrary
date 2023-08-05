@@ -23,4 +23,9 @@ interface UserDao {
     @Delete
     suspend fun delete(user: User)
 
+    @Query("UPDATE users SET email = :email WHERE uid = :uid")
+    suspend fun setEmail(uid: String, email: String)
+
+    @Query("UPDATE users SET address = :address WHERE uid = :uid")
+    suspend fun setLocation(uid: String, address: String)
 }
