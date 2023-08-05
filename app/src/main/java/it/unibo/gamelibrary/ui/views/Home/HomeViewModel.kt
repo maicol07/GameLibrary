@@ -8,37 +8,40 @@ import com.api.igdb.apicalypse.APICalypse
 import com.api.igdb.apicalypse.Sort
 import com.api.igdb.exceptions.RequestException
 import com.api.igdb.request.IGDBWrapper
-import com.api.igdb.request.covers
 import com.api.igdb.request.games
 import dagger.hilt.android.lifecycle.HiltViewModel
+import it.unibo.gamelibrary.data.model.LibraryEntry
+import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.utils.IGDBApiRequest
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import proto.Cover
 import proto.Game
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val libraryRepository: LibraryRepository
 ): ViewModel() {
 
     var newGames = mutableStateListOf<Game>()
     var popularGames = mutableStateListOf<Game>()
+    var posts = mutableStateListOf<LibraryEntry>()
 
     init {
         fetchNewGames()
-        fetchPopularGames()
+        //fetchPopularGames()
+        fetchPosts()
+//        posts.sortedByDescending { it. }
     }
-    fun fetchPopularGames() { //TODO la query è la stessa di new, cambiala
-        fetchList(
-            APICalypse()
-                .fields("*,cover.image_id")
-                .sort("", Sort.DESCENDING)
-                .limit(25),
-            popularGames
-        )
-    }
+
+//    fun fetchPopularGames() { //TODO la query è la stessa di new, cambiala
+//        fetchList(
+//            APICalypse()
+//                .fields("*,cover.image_id")
+//                .sort("", Sort.DESCENDING)
+//                .limit(25),
+//            popularGames
+//        )
+//    }
 
     fun fetchNewGames() {
         fetchList( //fields *; where game.platforms = 48 & date < 1538129354; sort date desc;
@@ -63,19 +66,24 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getCoverUrl(query: APICalypse): String{
-        var url = ""
+    private fun fetchPosts(){
         viewModelScope.launch {
-            try {
-                url = APIImage(query)[0].url
-            } catch (e: RequestException) {
-                Log.e("ERR_FETCH_IMAGE_LIST_HOME", "${e.statusCode} , ${e.message}")
-            }
+            posts.addAll(libraryRepository.getAll())
         }
-        return url;
     }
 
-    suspend fun APIImage(query: APICalypse): List<Cover> = withContext(Dispatchers.IO) {
-        IGDBWrapper.covers(query)
-    }
 }
+//    suspend fun APIImage(query: APICalypse): List<Cover> = withContext(Dispatchers.IO) {
+//        IGDBWrapper.covers(query)
+//    }
+//    fun getCoverUrl(query: APICalypse): String{
+//        var url = ""
+//        viewModelScope.launch {
+//            try {
+//                url = APIImage(query)[0].url
+//            } catch (e: RequestException) {
+//                Log.e("ERR_FETCH_IMAGE_LIST_HOME", "${e.statusCode} , ${e.message}")
+//            }
+//        }
+//        return url;
+//    }

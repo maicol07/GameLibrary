@@ -20,5 +20,7 @@ data class User (
     @ColumnInfo var surname: String,
     @ColumnInfo var username: String,
     @ColumnInfo var email: String,
-    @ColumnInfo var address: String? = null
+    @ColumnInfo var address: String? = null,
+    @ColumnInfo var image: String? = null,
+    @ColumnInfo var bio: String? = null,
 )

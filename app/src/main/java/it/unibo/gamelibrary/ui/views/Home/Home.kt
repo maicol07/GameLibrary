@@ -1,17 +1,17 @@
 package it.unibo.gamelibrary.ui.views.Home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +23,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.api.igdb.utils.ImageSize
 import com.api.igdb.utils.ImageType
 import com.api.igdb.utils.imageBuilder
@@ -33,6 +32,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
 import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
@@ -44,11 +44,11 @@ import proto.Game
 @Composable
 fun Home(
     navigator: DestinationsNavigator,
-    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     TopAppBarState.actions = {}
     TopAppBarState.title = "Home"
+
     LazyColumn() {
         item {
             Button(onClick = { navigator.navigate(LoginPageDestination()) }) {
@@ -64,42 +64,18 @@ fun Home(
                 navigator
             )
         }
-        items(count = 2) { index -> //quando avrò dei post puoi mettere items(lista di post)
-            Post(index)
+
+        //post nella homepage????? WOW! //se crasha commentate qui
+       items(
+            viewModel.posts,
+            key = {it.id})
+        {
+            UserReview(it, navigator, showUser = true)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Post(postId: Int) {
-    Card(
-        onClick = {},
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .wrapContentHeight()
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .fillMaxWidth()
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.AccountCircle,//TODO placeholder post
-                    contentDescription = "user profile image"
-                )
-                Text(text = "Username")
-            }
-            Image(
-                imageVector = Icons.Filled.Photo,
-                contentDescription = "post main image"
-            )
-            Text(text = "post example text: $postId")
-        }
-    }
-}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
