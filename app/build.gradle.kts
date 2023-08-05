@@ -80,8 +80,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-    implementation("com.github.skydoves:landscapist-glide:2.2.3")
-    implementation("com.github.skydoves:landscapist-animation:2.2.3")
+    implementation("com.github.skydoves:landscapist-glide:2.2.5")
+    implementation("com.github.skydoves:landscapist-animation:2.2.5")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("io.github.husnjak:igdb-api-jvm:1.0.11")//                IGDB API dependency
@@ -109,15 +109,15 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
 
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-auth-ktx:22.1.0")
+    implementation("com.google.firebase:firebase-auth-ktx:22.1.1")
 
     //Navigation library
-    implementation("io.github.raamcosta.compose-destinations:core:1.9.42-beta")
-    ksp("io.github.raamcosta.compose-destinations:ksp:1.9.42-beta")
+    implementation("io.github.raamcosta.compose-destinations:core:1.9.51")
+    ksp("io.github.raamcosta.compose-destinations:ksp:1.9.51")
 
     implementation("com.github.TutorialsAndroid:crashx:v6.0.19")
 
@@ -128,8 +128,8 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
 
     implementation("me.vponomarenko:compose-shimmer:1.0.0")
