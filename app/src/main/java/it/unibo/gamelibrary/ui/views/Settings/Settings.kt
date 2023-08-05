@@ -2,7 +2,11 @@ package it.unibo.gamelibrary.ui.views.Settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,7 +16,12 @@ import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -71,14 +80,15 @@ fun SettingsPage(
 
         items(viewModel.settingsList) {
             if (it.type === SettingsTypeEnum.Switch) {
+                val state = it.switchState!!();
                 SettingsSwitch(
                     icon = it.icon,
                     title = { Text(text = it.title) },
                     subtitle = { Text(text = it.subtitle) },
-                    state = it.switchState!!(),
+                    state = state,
                     modifier = Modifier.height(if (it.subtitle.isEmpty()) 72.dp else 88.dp),
                     enabled = it.enabled(viewModel, context),
-                    onCheckedChange = { value -> it.onCheckedChange!!(viewModel, context, it.switchState!!()) }
+                    onCheckedChange = { value -> it.onCheckedChange!!(viewModel, context, state) }
                 )
             } else {
                 SettingsMenuLink(
