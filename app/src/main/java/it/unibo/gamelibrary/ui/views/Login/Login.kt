@@ -29,6 +29,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
+import it.unibo.gamelibrary.ui.common.components.PasswordTextfield
 import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
 import kotlinx.coroutines.launch
 
@@ -82,37 +83,16 @@ fun LoginPage(
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                TextField(
+                PasswordTextfield(
                     value = viewModel.fields["password"]!!,
-                    onValueChange = {
+                    onChange = {
                         viewModel.fields["password"] = it
                         viewModel.isError = false
                     },
-                    label = { Text("Password") },
-                    singleLine = true,
-                    visualTransformation = if (viewModel.isPasswordHidden.value) PasswordVisualTransformation() else VisualTransformation.None,
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Password
-                    ),
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Lock,
-                            contentDescription = "password"
-                        )
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            viewModel.isPasswordHidden.value = !viewModel.isPasswordHidden.value
-                        }) {
-                            Icon(
-                                imageVector = if (viewModel.isPasswordHidden.value) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
-                                contentDescription = if (viewModel.isPasswordHidden.value) "hide password" else "show password"
-                            )
-                        }
-                    },
-                    isError = viewModel.isError,
+                    label = "Password",
+                    isHidden = viewModel.isPasswordHidden.value,
+                    onPasswordVisible = { viewModel.isPasswordHidden.value = !viewModel.isPasswordHidden.value },
+                    isError = viewModel.isError
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 Button(onClick = {

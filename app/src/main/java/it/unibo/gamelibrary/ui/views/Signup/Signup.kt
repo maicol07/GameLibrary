@@ -11,8 +11,6 @@ import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Send
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,14 +20,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.ui.common.components.PasswordTextfield
 import it.unibo.gamelibrary.ui.views.Login.LoginViewModel
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
 import kotlinx.coroutines.launch
@@ -73,7 +70,7 @@ fun SignupPage(
                     },
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     isError = viewModel.fieldsErrors["name"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["name"]!!) Text(text = "Name field is required") else Unit }
+                    supportingText = { if (viewModel.fieldsErrors["name"]!!) Text(text = "Name field is required") }
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 TextField(
@@ -89,7 +86,7 @@ fun SignupPage(
                     },
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     isError = viewModel.fieldsErrors["surname"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["surname"]!!) Text(text = "Surname field is required") else Unit }
+                    supportingText = { if (viewModel.fieldsErrors["surname"]!!) Text(text = "Surname field is required") }
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 TextField(
@@ -104,7 +101,7 @@ fun SignupPage(
                         )
                     },
                     isError = viewModel.fieldsErrors["username"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["username"]!!) Text(text = "Username field is required") else Unit }
+                    supportingText = { if (viewModel.fieldsErrors["username"]!!) Text(text = "Username field is required") }
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 TextField(
@@ -121,10 +118,25 @@ fun SignupPage(
                         )
                     },
                     isError = viewModel.fieldsErrors["email"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["email"]!!) Text(text = "Email field is not a mail") else Unit }
+                    supportingText = { if (viewModel.fieldsErrors["email"]!!) Text(text = "Email field is not a mail") }
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                TextField(
+                PasswordTextfield(
+                    value = viewModel.fields["password"]!!,
+                    onChange = { viewModel.fields["password"] = it },
+                    label = "Password",
+                    isHidden = viewModel.isPasswordHidden,
+                    onPasswordVisible = { viewModel.isPasswordHidden = !viewModel.isPasswordHidden },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.Lock,
+                            contentDescription = "password"
+                        )
+                    },
+                    isError = viewModel.fieldsErrors["password"]!!,
+                    supportingText = { if (viewModel.fieldsErrors["password"]!!) Text(text = "Password field has less than 6 characters") }
+                )
+                /*TextField(
                     value = viewModel.fields["password"]!!,
                     onValueChange = { viewModel.fields["password"] = it },
                     label = { Text("Password") },
@@ -147,9 +159,24 @@ fun SignupPage(
                     },
                     isError = viewModel.fieldsErrors["password"]!!,
                     supportingText = { if (viewModel.fieldsErrors["password"]!!) Text(text = "Password field has less than 6 characters") else Unit }
-                )
+                )*/
                 Spacer(modifier = Modifier.size(16.dp))
-                TextField(
+                PasswordTextfield(
+                    value = viewModel.fields["confirmPassword"]!!,
+                    onChange = { viewModel.fields["confirmPassword"] = it },
+                    label = "Confirm password",
+                    isHidden = viewModel.isPasswordConfirmHidden,
+                    onPasswordVisible = { viewModel.isPasswordConfirmHidden = !viewModel.isPasswordConfirmHidden },
+                    leadingIcon = {
+                        Icon(
+                            painterResource(id = R.drawable.lock_check_outline),
+                            contentDescription = "confirm password"
+                        )
+                    },
+                    isError = viewModel.fieldsErrors["confirmPassword"]!!,
+                    supportingText = { if (viewModel.fieldsErrors["confirmPassword"]!!) Text(text = "Passwords are different") }
+                )
+                /*TextField(
                     value = viewModel.fields["confirmPassword"]!!,
                     onValueChange = { viewModel.fields["confirmPassword"] = it },
                     label = { Text("Confirm Password") },
@@ -174,9 +201,8 @@ fun SignupPage(
                     },
                     isError = viewModel.fieldsErrors["confirmPassword"]!!,
                     supportingText = { if (viewModel.fieldsErrors["confirmPassword"]!!) Text(text = "Passwords are different") else Unit }
-                )
+                )*/
                 Spacer(modifier = Modifier.size(16.dp))
-                //Row(horizontalArrangement = Arrangement.Center) {
                 Button(onClick = {
                     viewModel.signUp(navController)
                 }) {
@@ -204,7 +230,6 @@ fun SignupPage(
                     Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                     Text(text = "Google")
                 }
-                //Spacer(modifier = Modifier.size(4.dp))
                 TextButton(
                     onClick = { navController.navigate(LoginPageDestination()) }
                 ) {
@@ -214,72 +239,6 @@ fun SignupPage(
         }
     }
 }
-
-/*@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-private fun CheckPermission(viewModel: SignupViewModel = hiltViewModel()){
-    val locationPermissionsState = rememberMultiplePermissionsState(
-        listOf(
-            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-        )
-    )
-
-    if (locationPermissionsState.allPermissionsGranted) {
-        viewModel.getCurrentPosition(LocalContext.current)
-    } else {
-        val allPermissionsRevoked =
-            locationPermissionsState.permissions.size ==
-                    locationPermissionsState.revokedPermissions.size
-
-        val textToShow = if (!allPermissionsRevoked) {
-            // If not all the permissions are revoked, it's because the user accepted the COARSE
-            // location permission, but not the FINE one.
-            "You have granted permissions only for the approximate location but not the exact one. Please grant permissions for the exact location as well"
-        } else if (locationPermissionsState.shouldShowRationale) {
-            // Both location permissions have been denied
-            "Getting your exact location is important for this app. " +
-                    "Please grant us fine location."
-        } else {
-            // First time the user sees this feature or the user doesn't want to be asked again
-            "This feature requires location permission"
-        }
-        val buttonText = if (!allPermissionsRevoked) "Allow precise location" else "Request permissions"
-        AlertDialog(
-            onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onDismissRequest.
-                viewModel.isDialogOpen.value = false
-            },
-            title = {
-                Text(text = "Permissions required")
-            },
-            text = {
-                Text(text = textToShow)
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        locationPermissionsState.launchMultiplePermissionRequest()
-                        viewModel.isDialogOpen.value = false
-                    }
-                ) {
-                    Text(buttonText)
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.isDialogOpen.value = false
-                    }
-                ) {
-                    Text("Dismiss")
-                }
-            }
-        )
-    }
-}*/
 
 //  TODO: [POSSIBILE BUG] Verificare se premendo signup più volte si creano più utenti (o comunque se viene chiamato più volte il metodo)
 //      [LOW PRIORITY] Vedere se c'è qualche design migliore per la pagina di signup
