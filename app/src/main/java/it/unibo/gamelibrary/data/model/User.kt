@@ -1,7 +1,17 @@
 package it.unibo.gamelibrary.data.model
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Relation
+
+data class UserWithLibraryEntries(
+    @Embedded val user: User,
+    @Relation(
+        parentColumn = "uid",
+        entityColumn = "uid"
+    ) val libraryEntryEntries: List<LibraryEntry>
+)
 
 @Entity(primaryKeys = ["uid"], tableName = "users")
 data class User (

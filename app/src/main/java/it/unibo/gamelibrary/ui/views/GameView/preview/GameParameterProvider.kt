@@ -1,4 +1,4 @@
-package it.unibo.gamelibrary.ui.views.GameView
+package it.unibo.gamelibrary.ui.views.GameView.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.google.protobuf.Timestamp
@@ -9,7 +9,7 @@ import proto.Genre
 import proto.InvolvedCompany
 import proto.PlayerPerspective
 
-class GameViewParameterPreviewProvider : PreviewParameterProvider<Game> {
+class GameParameterProvider : PreviewParameterProvider<Game> {
     override val values: Sequence<Game>
         get() = sequenceOf(
             Game.newBuilder()
