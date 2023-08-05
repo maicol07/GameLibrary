@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
                             if (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination) {
                                 TopBar(
                                     currentScreen = "Game Library",
-                                    canNavigateBack = navController.previousBackStackEntry != null && currentDestination != HomeDestination,
+                                    canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values().map {it.direction}.contains(currentDestination),
                                     navigateUp = { navController.navigateUp() }
                                 )
                             }
