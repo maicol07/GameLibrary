@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreIntSettingState
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.TwitchAuthenticator
 import com.google.firebase.auth.FirebaseAuth
@@ -76,11 +79,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
             IGDBWrapper.setCredentials(secrets.getIGDBClientId(packageName), token)
-            Log.i("TwitchAuthenticator", "Token is $token")
         }
 
         setContent {
-            GameLibraryTheme {
+            val theme = rememberPreferenceDataStoreIntSettingState(key = "dark theme", defaultValue = 0)
+            val darkTheme = when (theme.value) {
+                0 -> isSystemInDarkTheme()
+                1 -> true
+                else -> false
+            }
+            GameLibraryTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
                 navController.addOnDestinationChangedListener { controller, destination, arguments ->
                     TopAppBarState.title = "";
@@ -161,7 +169,8 @@ class MainActivity : ComponentActivity() {
         @StringRes val label: Int
     ) {
         Home(HomeDestination, Icons.Default.Home, R.string.bottom_bar_home_label),
-        Profile(ProfileDestination, Icons.Default.AccountCircle, R.string.bottom_bar_profile_label)
+        Profile(ProfileDestination, Icons.Default.AccountCircle, R.string.bottom_bar_profile_label),
+        Settings(SettingsPageDestination, Icons.Default.Settings, R.string.bottom_bar_settings_label),
     }
 
     @Composable

@@ -136,6 +136,13 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-auth:20.6.0")
+
+    implementation("com.github.alorma:compose-settings-ui-m3:0.27.0")
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("com.github.alorma:compose-settings-storage-datastore:0.27.0")
+    implementation("com.github.MhmoudAlim:Compose-Ratingbar-library:0.1.0")
+
     implementation("androidx.biometric:biometric:1.1.0")
 }
 
