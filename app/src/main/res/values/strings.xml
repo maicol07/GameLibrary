@@ -16,4 +16,7 @@
     <string name="title_activity_main2">MainActivity2</string>
     <string name="bottom_bar_home_label">Home</string>
     <string name="bottom_bar_profile_label">Profile</string>
+    <string name="bottom_bar_settings_label">Settings</string>
+    <string name="game_library_intent_filter">Game</string>
+    <string name="game_library_intent_filter_http">Game HTTP</string>
 </resources>
