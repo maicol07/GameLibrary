@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 
 object TopAppBarState {
     var title by mutableStateOf("Game Library")
+    var customTitle by mutableStateOf<(@Composable () -> Unit)?>(null)
     var actions by mutableStateOf<@Composable RowScope.() -> Unit>({})
 }
 

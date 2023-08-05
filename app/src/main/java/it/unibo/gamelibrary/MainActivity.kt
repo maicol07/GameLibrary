@@ -37,8 +37,8 @@ import it.unibo.gamelibrary.ui.views.appCurrentDestinationAsState
 import it.unibo.gamelibrary.ui.views.destinations.*
 import it.unibo.gamelibrary.ui.views.startAppDestination
 import it.unibo.gamelibrary.utils.BottomBar
-import it.unibo.gamelibrary.utils.snackbarHostState
 import it.unibo.gamelibrary.utils.TopAppBarState
+import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,6 +82,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             GameLibraryTheme {
                 val navController = rememberNavController()
+                navController.addOnDestinationChangedListener { controller, destination, arguments ->
+                    TopAppBarState.title = "";
+                    TopAppBarState.customTitle = null
+                    TopAppBarState.actions = {}
+                }
                 val currentDestination: Destination =
                     navController.appCurrentDestinationAsState().value
                         ?: NavGraphs.root.startAppDestination
@@ -133,7 +138,7 @@ class MainActivity : ComponentActivity() {
         modifier: Modifier = Modifier
     ) {
         TopAppBar(
-            title = { Text(text = TopAppBarState.title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+            title = TopAppBarState.customTitle ?: { Text(text = TopAppBarState.title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
             modifier = modifier,
             navigationIcon = {
                 //se si può navigare indietro (non home screen) allora appare la freccetta
