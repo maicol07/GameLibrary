@@ -34,7 +34,6 @@ import it.unibo.gamelibrary.ui.views.Login.LoginViewModel
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
 import kotlinx.coroutines.launch
 
-//@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Destination
 @Composable
 fun SignupPage(
@@ -108,52 +107,6 @@ fun SignupPage(
                     supportingText = { if (viewModel.fieldsErrors["username"]!!) Text(text = "Username field is required") else Unit }
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                /*Row {
-                    if (viewModel.addressField.isNotEmpty()) {
-                        viewModel.getLocation(context) {
-                            viewModel.address = it
-                            viewModel.fields["address"] = viewModel.address?.getAddressLine(0) ?: ""
-                        }
-                    }
-                    TextField(
-                        value = if (viewModel.address != null) viewModel.fields["address"]!! else "",
-                        onValueChange = {
-                            Toast.makeText(
-                                context,
-                                "Value changed",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        modifier = Modifier.requiredWidth(280.dp),
-                        readOnly = true,
-                        label = { Text("Address") },
-                        singleLine = false,
-                        leadingIcon = {
-                            Icon(
-                                Icons.Outlined.LocationOn,
-                                contentDescription = "address"
-                            )
-                        },
-                        trailingIcon = {
-                            if (viewModel.isLocalizationStarted.value) {
-                                CircularProgressIndicator(modifier = Modifier.size(28.dp))
-                            } else {
-                                IconButton(onClick = {
-                                        //viewModel.getCurrentPosition(context)
-                                        viewModel.isDialogOpen.value = true
-                                    }) {
-                                    Icon(
-                                        Icons.Outlined.MyLocation,
-                                        contentDescription = "address"
-                                    )
-                                }
-                            }
-                        },
-                        isError = viewModel.fieldsErrors["address"]!!,
-                        supportingText = { if (viewModel.fieldsErrors["address"]!!) Text(text = "Address field is required") else Unit }
-                    )
-                }
-                Spacer(modifier = Modifier.size(16.dp))*/
                 TextField(
                     value = viewModel.fields["email"]!!,
                     onValueChange = { viewModel.fields["email"] = it },
