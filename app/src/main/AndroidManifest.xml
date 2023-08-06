@@ -19,6 +19,16 @@
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
         <activity
+            android:name=".CrashActivity"
+            android:exported="false"
+            android:label="@string/title_activity_crash"
+            android:process=":error_activity"
+            android:theme="@style/Theme.GameLibrary">
+            <intent-filter>
+                <action android:name="cat.ereza.customactivityoncrash.ERROR" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.GameLibrary">
