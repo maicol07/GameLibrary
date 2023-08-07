@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
             val prefs = SecurePreferences(this@MainActivity)
             var token = prefs.getString("twitch_token", "")
             val tokenExpiration = prefs.getString("twitch_token_expiration", "")
-            if (token == "" || tokenExpiration == "" || Instant.ofEpochSecond(tokenExpiration.toLong()).isBefore(Instant.now())) {
+            if (token == "" || tokenExpiration == "" || Instant.parse(tokenExpiration).isBefore(Instant.now())) {
                 Log.i("TwitchAuthenticator", "Local Token is null")
                 //in a real application it is better to use twitchAuthenticator only once, serverside.
                 val twitchToken = TwitchAuthenticator.requestTwitchToken(
