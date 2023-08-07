@@ -66,8 +66,6 @@ import java.time.Instant
 class MainActivity : ComponentActivity() {
     val auth: FirebaseAuth = Firebase.auth
 
-    // Just a state to trigger recomposition
-    private val loggedIn = mutableStateOf(false)
     private val secrets = Secrets()
 
     override fun onCreate(savedInstanceState: Bundle?) {

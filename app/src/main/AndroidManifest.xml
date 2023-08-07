@@ -10,13 +10,13 @@
         android:name=".GameLibraryApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GameLibrary"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
         <activity
             android:name=".CrashActivity"
@@ -39,23 +39,27 @@
             </intent-filter>
             <intent-filter android:label="@string/game_library_intent_filter">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="app"
-                      android:host="game-library"
-                      android:pathPrefix="/game" />
-                <!-- note that the leading "/" is required for pathPrefix-->
+                <data
+                    android:host="game-library"
+                    android:pathPrefix="/game"
+                    android:scheme="app" />
+                <!-- note that the leading "/" is required for pathPrefix -->
             </intent-filter>
             <intent-filter android:label="@string/game_library_intent_filter_http">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="https"
-                      android:host="game-library.app"
-                      android:pathPrefix="/game" />
-                <!-- note that the leading "/" is required for pathPrefix-->
+                <data
+                    android:host="game-library.app"
+                    android:pathPrefix="/game"
+                    android:scheme="https" />
+                <!-- note that the leading "/" is required for pathPrefix -->
             </intent-filter>
         </activity>
     </application>

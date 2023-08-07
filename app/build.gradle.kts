@@ -54,6 +54,11 @@ android {
             path("src/main/cpp/CMakeLists.txt")
         }
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
@@ -108,8 +113,6 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
-//    implementation("androidx.annotation:annotation:1.6.0")
-//    implementation("com.github.TutorialsAndroid:crashx:v6.0.19")
 }
 
 // Allow references to generated code
