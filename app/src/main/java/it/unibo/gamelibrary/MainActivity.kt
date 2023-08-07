@@ -15,9 +15,18 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -37,7 +46,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
 import it.unibo.gamelibrary.ui.views.NavGraphs
 import it.unibo.gamelibrary.ui.views.appCurrentDestinationAsState
-import it.unibo.gamelibrary.ui.views.destinations.*
+import it.unibo.gamelibrary.ui.views.destinations.Destination
+import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
+import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
+import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
+import it.unibo.gamelibrary.ui.views.destinations.SettingsPageDestination
+import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
 import it.unibo.gamelibrary.ui.views.startAppDestination
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.TopAppBarState
@@ -45,6 +59,7 @@ import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 
 @AndroidEntryPoint
@@ -61,8 +76,9 @@ class MainActivity : ComponentActivity() {
         // Start coroutine to get token from Twitch
         CoroutineScope(Dispatchers.IO).launch {
             val prefs = SecurePreferences(this@MainActivity)
-            var token = prefs.getString("token", "")
-            if (prefs.getString("token", "") == "") {
+            var token = prefs.getString("twitch_token", "")
+            val tokenExpiration = prefs.getString("twitch_token_expiration", "")
+            if (token == "" || tokenExpiration == "" || Instant.ofEpochSecond(tokenExpiration.toLong()).isBefore(Instant.now())) {
                 Log.i("TwitchAuthenticator", "Local Token is null")
                 //in a real application it is better to use twitchAuthenticator only once, serverside.
                 val twitchToken = TwitchAuthenticator.requestTwitchToken(
@@ -72,8 +88,10 @@ class MainActivity : ComponentActivity() {
 
                 // The instance stores the token in the object until a new one is requested
                 if (twitchToken != null) {
-                    prefs.putString("token", twitchToken.access_token)
+                    prefs.putString("twitch_token", twitchToken.access_token)
+                    prefs.putString("twitch_token_expiration", Instant.now().plusSeconds(twitchToken.expires_in).toString())
                     token = twitchToken.access_token
+                    Log.i("TwitchAuthenticator", "Got new token")
                 } else {
                     Log.e("TwitchAuthenticator", "Token is null")
                 }
