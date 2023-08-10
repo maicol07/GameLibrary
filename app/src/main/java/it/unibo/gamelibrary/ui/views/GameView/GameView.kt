@@ -101,7 +101,6 @@ import proto.Game
 
 private val dateFormatter = SimpleDateFormat.getDateInstance()
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Destination(
     deepLinks = [
         DeepLink(
@@ -123,7 +122,7 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
             .shimmer()
     }
     GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
-    if(viewModel.openNotificationDialog){
+    if(viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
         NotificationPermissionDialog()
     }
 }
