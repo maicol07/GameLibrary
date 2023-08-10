@@ -18,13 +18,12 @@ import javax.inject.Inject
 class UserReviewViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
-
     var game = mutableStateMapOf<Int, Game?>()
     var user = mutableStateMapOf<String, User?>()
 
     fun getUser(uid: String) {
         viewModelScope.launch {
-            user.set( uid, userRepository.getUserByUid(uid) )
+            user[uid] = userRepository.getUserByUid(uid)
         }
     }
 
