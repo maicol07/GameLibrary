@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.api.igdb.apicalypse.APICalypse
@@ -118,8 +119,7 @@ class GameViewViewModel @Inject constructor(
     private fun enableNotification() {
         val releaseDate = game!!.firstReleaseDate
         val secondDate = Instant.ofEpochSecond(releaseDate.seconds).minusSeconds(Instant.now().epochSecond)
-        Log.d("Diff seconds", secondDate.epochSecond.toString())
-        Log.d("GameId ViewModel", libraryEntry.entry?.gameId!!.toString())
+        Log.i("GameId", libraryEntry.entry?.gameId!!.toString())
         if (secondDate.epochSecond >= 0){
             val notificationWorker = OneTimeWorkRequestBuilder<NotificationWorker>()
                 .setInitialDelay(Duration.ofSeconds(releaseDate.seconds))
@@ -132,7 +132,12 @@ class GameViewViewModel @Inject constructor(
                 .build()
             WorkManager
                 .getInstance(context)
-                .enqueue(notificationWorker)
+                .enqueueUniqueWork(
+                    libraryEntry.entry?.gameId!!.toString(),
+                    ExistingWorkPolicy.REPLACE,
+                    notificationWorker
+                )
+
         }
     }
 }

@@ -488,7 +488,6 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel()){
-    val context = LocalContext.current
     val notificationPermissionsState = rememberPermissionState(
         Manifest.permission.POST_NOTIFICATIONS
     )
