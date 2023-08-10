@@ -21,8 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Casino
@@ -31,10 +29,8 @@ import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Mouse
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.OutlinedFlag
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SportsBaseball
@@ -55,7 +51,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -326,35 +322,19 @@ fun GameViewBottomBar(viewModel: GameViewViewModel) {
                     contentDescription = "Share"
                 )
             }
-            IconButton(onClick = {
-                viewModel.libraryEntry.status = LibraryEntryStatus.WANTED;
-                viewModel.saveGameToLibrary()
-            }) {
-                Icon(
-                    if (viewModel.libraryEntry.status === LibraryEntryStatus.WANTED) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                    contentDescription = "Wanted",
-                    tint = if (viewModel.libraryEntry.status === LibraryEntryStatus.WANTED) MaterialTheme.colorScheme.primary else LocalContentColor.current
-                )
-            }
-            IconButton(onClick = {
-                viewModel.libraryEntry.status = LibraryEntryStatus.PLAYING;
-                viewModel.saveGameToLibrary()
-            }) {
-                Icon(
-                    if (viewModel.libraryEntry.status === LibraryEntryStatus.PLAYING) Icons.Default.VideogameAsset else Icons.Outlined.VideogameAsset,
-                    contentDescription = "Playing",
-                    tint = if (viewModel.libraryEntry.status === LibraryEntryStatus.PLAYING) MaterialTheme.colorScheme.primary else LocalContentColor.current
-                )
-            }
-            IconButton(onClick = {
-                viewModel.libraryEntry.status = LibraryEntryStatus.FINISHED;
-                viewModel.saveGameToLibrary()
-            }) {
-                Icon(
-                    if (viewModel.libraryEntry.status === LibraryEntryStatus.FINISHED) Icons.Default.Flag else Icons.Default.OutlinedFlag,
-                    contentDescription = "Finished",
-                    tint = if (viewModel.libraryEntry.status === LibraryEntryStatus.FINISHED) MaterialTheme.colorScheme.primary else LocalContentColor.current
-                )
+
+            for (status in LibraryEntryStatus.entries) {
+                IconToggleButton(
+                    checked = viewModel.libraryEntry.status === status,
+                    onCheckedChange = {
+                        viewModel.libraryEntry.status = status
+                        viewModel.saveGameToLibrary()
+                    }) {
+                    Icon(
+                        if (viewModel.libraryEntry.status === status) status.selectedIcon else status.unselectedIcon,
+                        contentDescription = status.text,
+                    )
+                }
             }
         },
         floatingActionButton = {

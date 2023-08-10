@@ -1,11 +1,27 @@
 package it.unibo.gamelibrary.data.model
 
-import androidx.room.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.VideogameAsset
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.VideogameAsset
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
-enum class LibraryEntryStatus {
-    WANTED,
-    PLAYING,
-    FINISHED
+enum class LibraryEntryStatus(
+    val unselectedIcon: ImageVector,
+    val selectedIcon: ImageVector,
+    val text: String
+) {
+    WANTED(Icons.Outlined.BookmarkBorder, Icons.Filled.Bookmark, "Wanted"),
+    PLAYING(Icons.Outlined.VideogameAsset, Icons.Filled.VideogameAsset, "Playing"),
+    FINISHED(Icons.Outlined.Flag, Icons.Filled.Flag, "Finished"),
 }
 
 @Entity(
