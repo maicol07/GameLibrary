@@ -1,21 +1,69 @@
 package it.unibo.gamelibrary.ui.views.GameView
 
+import android.Manifest
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
-import androidx.compose.foundation.layout.*
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Diamond
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Mouse
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.OutlinedFlag
+import androidx.compose.material.icons.filled.QuestionAnswer
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.SportsBaseball
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.SportsMma
+import androidx.compose.material.icons.filled.SportsMotorsports
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.VideogameAsset
+import androidx.compose.material.icons.filled.ViewInAr
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.OutlinedFlag
 import androidx.compose.material.icons.outlined.VideogameAsset
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Modifier
@@ -29,8 +77,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.mahmoudalim.compose_rating_bar.RatingBarView
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
@@ -50,6 +101,7 @@ import proto.Game
 
 private val dateFormatter = SimpleDateFormat.getDateInstance()
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Destination(
     deepLinks = [
         DeepLink(
@@ -71,6 +123,9 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
             .shimmer()
     }
     GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
+    if(viewModel.openNotificationDialog){
+        NotificationPermissionDialog()
+    }
 }
 
 @Composable
@@ -428,3 +483,63 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel()){
+    val notificationPermissionsState = rememberPermissionState(
+        Manifest.permission.POST_NOTIFICATIONS
+    )
+    if (notificationPermissionsState.status.isGranted){
+        viewModel.openNotificationDialog = false
+    } else {
+        val textToShow = if (notificationPermissionsState.status.shouldShowRationale) {
+            // If the user has denied the permission but the rationale can be shown,
+            // then gently explain why the app requires this permission
+            "The notification is important for this app. Please grant the permission."
+        } else {
+            // If it's the first time the user lands on this feature, or the user
+            // doesn't want to be asked again for this permission, explain that the
+            // permission is required
+            "Notification permission required for this feature to be available. " +
+                    "Please grant the permission"
+        }
+        AlertDialog(
+            onDismissRequest = {
+                // Dismiss the dialog when the user clicks outside the dialog or on the back
+                // button. If you want to disable that functionality, simply use an empty
+                // onDismissRequest.
+                viewModel.openNotificationDialog = false
+            },
+            title = {
+                Text(text = "Permissions required")
+            },
+            text = {
+                Text(text = textToShow)
+            },
+            confirmButton = {
+                if (notificationPermissionsState.status.shouldShowRationale) {
+                    TextButton(
+                        onClick = {
+                            notificationPermissionsState.launchPermissionRequest()
+                            viewModel.openNotificationDialog = false
+                        }
+                    ) {
+                        Text("Request permission")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.openNotificationDialog = false
+                    }
+                ) {
+                    Text( if(notificationPermissionsState.status.shouldShowRationale) "Dismiss" else "Ok")
+                }
+            }
+        )
+    }
+}
+

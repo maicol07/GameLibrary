@@ -1,6 +1,10 @@
 package it.unibo.gamelibrary
 
 import SecurePreferences
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -105,6 +109,7 @@ class MainActivity : FragmentActivity() {
             }
             IGDBWrapper.setCredentials(secrets.getIGDBClientId(packageName), token)
         }
+            createNotificationChannel()
 
         setContent {
             val theme = rememberPreferenceDataStoreIntSettingState(key = "dark theme", defaultValue = 0)
@@ -278,4 +283,22 @@ class MainActivity : FragmentActivity() {
             }
         }
     }
+
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Prova"
+            val descriptionText = "Questa è una prova"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel("channel_id", name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
 }

@@ -8,6 +8,8 @@ import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Build
+import android.os.CancellationSignal
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -306,94 +308,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private val authenticationCallback: android.hardware.biometrics.BiometricPrompt.AuthenticationCallback =
-        @RequiresApi(Build.VERSION_CODES.P)
-        object : android.hardware.biometrics.BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: android.hardware.biometrics.BiometricPrompt.AuthenticationResult?) {
-                super.onAuthenticationSucceeded(result)
-                Toast.makeText(context, "Authentication Succeeded", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                Toast.makeText(context, "Authentication Error code: $errorCode", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-            }
-        }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun toggleBiometrics(context: Context, state: GenericPreferenceDataStoreSettingValueState<Boolean>) {
-        val biometricPrompt = android.hardware.biometrics.BiometricPrompt.Builder(context)
-            .apply {
-                setTitle("${if (state.value) "Disable" else "Enable"} biometric protection")
-                setConfirmationRequired(false)
-                setNegativeButton("Use app password", context.mainExecutor) { _, _, ->
-                    Toast.makeText(context, "Authentication Cancelled", Toast.LENGTH_SHORT).show()
-                }
-            }.build()
-
-        val cancellationSignal = CancellationSignal()
-        cancellationSignal.setOnCancelListener {
-            state.value = !state.value
-            Toast.makeText(context, "Authentication Cancelled Signal", Toast.LENGTH_SHORT).show()
-        }
-
-        biometricPrompt.authenticate(cancellationSignal, context.mainExecutor, authenticationCallback)
-    }
-
-    fun isBiometricAvailable(context: Context): Int = BiometricManager.from(context)
-        .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)/*) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                Log.d("GameLibrary", "App can authenticate using biometrics.")
-                return true
-            }
-
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-                Log.e("GameLibrary", "No biometric features available on this device.")
-                return false
-            }
-
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-                Log.e("GameLibrary", "Biometric features are currently unavailable.")
-                return false
-            }
-
-            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                // Prompts the user to create credentials that your app accepts.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
-                        putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                            BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-                    }
-                    context.startActivity(enrollIntent)
-                } else {
-                    val enrollIntent = Intent(Settings.ACTION_SECURITY_SETTINGS)
-                    context.startActivity(enrollIntent)
-                }
-                return false
-            }
-
-            BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> {
-                Log.e("GameLibrary", "Biometric features are currently unavailable due to missing security updates.")
-                return false
-            }
-
-            BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
-                Log.e("GameLibrary", "Biometric features are unsupported.")
-                return false
-            }
-
-            BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
-                Log.e("GameLibrary", "Biometric features are unknown.")
-                return false
-            }
-
-            else -> false
-        }*/
-
     private fun reauthenticateAndChange(credentials: AuthCredential, field: String, error: String, change: (field: String) -> Unit){
         auth.currentUser?.reauthenticate(credentials)
             ?.addOnCompleteListener { task ->
@@ -418,15 +332,24 @@ class SettingsViewModel @Inject constructor(
             onError = { errorCode, errorMessage ->
                 state.value = !state.value
                 Toast.makeText(
-                    context,
-                    "Authentication Error ($errorCode): $errorMessage",
-                    Toast.LENGTH_SHORT
+                        context,
+                        "Authentication Error ($errorCode): $errorMessage",
+                        Toast.LENGTH_SHORT
                 ).show()
             },
             onCancel = {
                 state.value = !state.value
                 Toast.makeText(context, "Authentication Cancelled", Toast.LENGTH_SHORT).show()
-            })
+            }
+        )
+    }
+            
+    fun goToNotificationSettings(){
+        val intent = Intent()
+        intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }
 
