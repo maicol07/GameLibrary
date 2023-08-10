@@ -53,8 +53,9 @@ class HomeViewModel @Inject constructor(
     fun fetchNewGames() {
         fetchList( //fields *; where game.platforms = 48 & date < 1538129354; sort date desc;
             APICalypse()
-                .fields("*,cover.image_id, version_parent")
+                .fields("*,cover.image_id")
                 .sort("first_release_date", Sort.DESCENDING)
+                .where("parent_game = null & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000)
                 .limit(25),
             newGames
         )
