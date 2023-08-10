@@ -110,6 +110,7 @@ class MainActivity : ComponentActivity() {
                     TopAppBarState.title = "";
                     TopAppBarState.customTitle = null
                     TopAppBarState.actions = {}
+                    TopAppBarState.hide = false
                 }
                 val currentDestination: Destination =
                     navController.appCurrentDestinationAsState().value
@@ -131,7 +132,7 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         topBar = {
-                            if (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination) {
+                            if (TopAppBarState.hide || (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
                                 TopBar(
                                     currentScreen = "Game Library",
                                     canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values().map {it.direction}.contains(currentDestination),
