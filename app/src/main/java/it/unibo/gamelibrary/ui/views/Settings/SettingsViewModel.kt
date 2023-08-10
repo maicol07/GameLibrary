@@ -4,20 +4,19 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Build
-import android.os.CancellationSignal
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import androidx.annotation.RequiresApi
-import androidx.biometric.BiometricManager
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,19 +42,20 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import it.unibo.gamelibrary.MainActivity
 import it.unibo.gamelibrary.Secrets
 import it.unibo.gamelibrary.data.repository.UserRepository
+import it.unibo.gamelibrary.interfaces.HasBiometrics
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
 import it.unibo.gamelibrary.utils.findActivity
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: UserRepository,
     @ApplicationContext private val context: Context
-) : ViewModel() {
+) : ViewModel(), HasBiometrics {
     val auth: FirebaseAuth = Firebase.auth
     val settingsList = SettingsEnum.values()
     //Change email
@@ -406,6 +406,27 @@ class SettingsViewModel @Inject constructor(
                     }
                 }
             }
+    }
+
+    fun toggleBiometrics(
+        context: Context,
+        state: GenericPreferenceDataStoreSettingValueState<Boolean>
+    ) {
+        showBiometricPrompt(
+            context,
+            "${if (state.value) "Enable" else "Disable"} biometric protection",
+            onError = { errorCode, errorMessage ->
+                state.value = !state.value
+                Toast.makeText(
+                    context,
+                    "Authentication Error ($errorCode): $errorMessage",
+                    Toast.LENGTH_SHORT
+                ).show()
+            },
+            onCancel = {
+                state.value = !state.value
+                Toast.makeText(context, "Authentication Cancelled", Toast.LENGTH_SHORT).show()
+            })
     }
 }
 

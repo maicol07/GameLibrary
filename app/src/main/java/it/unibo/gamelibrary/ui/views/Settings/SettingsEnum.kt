@@ -1,18 +1,20 @@
 package it.unibo.gamelibrary.ui.views.Settings
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.EditLocation
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.LockReset
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import com.alorma.compose.settings.storage.datastore.GenericPreferenceDataStoreSettingValueState
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import it.unibo.gamelibrary.R
@@ -75,7 +77,6 @@ enum class SettingsEnum(
             }
         }
     }),
-    @RequiresApi(Build.VERSION_CODES.Q)
     BiometricLogin(SettingsTypeEnum.Switch, {
         Icon(
             Icons.Default.Fingerprint,

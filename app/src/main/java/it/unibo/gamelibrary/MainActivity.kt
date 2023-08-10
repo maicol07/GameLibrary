@@ -3,7 +3,6 @@ package it.unibo.gamelibrary
 import SecurePreferences
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -27,13 +26,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import com.alorma.compose.settings.storage.base.getValue
+import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreIntSettingState
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.TwitchAuthenticator
@@ -41,11 +47,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import dagger.hilt.android.AndroidEntryPoint
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
 import it.unibo.gamelibrary.ui.views.NavGraphs
 import it.unibo.gamelibrary.ui.views.appCurrentDestinationAsState
+import it.unibo.gamelibrary.ui.views.destinations.BiometricLockScreenDestination
 import it.unibo.gamelibrary.ui.views.destinations.Destination
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
@@ -63,10 +71,11 @@ import java.time.Instant
 
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     val auth: FirebaseAuth = Firebase.auth
 
     private val secrets = Secrets()
+    private var biometricStarted = false;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,6 +121,54 @@ class MainActivity : ComponentActivity() {
                     TopAppBarState.actions = {}
                     TopAppBarState.hide = false
                 }
+
+                var startRoute = if (auth.currentUser === null) LoginPageDestination else HomeDestination
+
+                val biometricLockEnabled by rememberPreferenceDataStoreBooleanSettingState(key = "biometric", defaultValue = false)
+                if (biometricLockEnabled && !biometricStarted) {
+                    startRoute = BiometricLockScreenDestination
+                    biometricStarted = true
+                }
+
+                val lifecycleOwner = LocalLifecycleOwner.current
+
+                DisposableEffect(lifecycleOwner) {
+                    var locked = false;
+                    val lifecycleEventObserver = LifecycleEventObserver { _, event ->
+                        when (event) {
+                            Lifecycle.Event.ON_STOP -> {
+                                locked = true
+                            }
+                            Lifecycle.Event.ON_CREATE -> {
+                                locked = true
+                            }
+                            Lifecycle.Event.ON_RESUME -> {
+                                if (biometricLockEnabled && locked && biometricStarted) {
+                                    try {
+                                        navController.navigate(BiometricLockScreenDestination) {
+                                            if (navController.currentDestination?.route != null) {
+                                                popUpTo(navController.currentDestination!!.route!!) {
+                                                    inclusive = true
+                                                }
+                                            }
+                                            locked = false
+                                            biometricStarted = false
+                                        }
+                                    } catch (exception: IllegalArgumentException) {
+                                        // Do nothing (navigation graph not initialized)
+                                    }
+                                }
+                            }
+                            else -> {}
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(lifecycleEventObserver)
+
+                    onDispose {
+                        lifecycleOwner.lifecycle.removeObserver(lifecycleEventObserver)
+                    }
+                }
+
                 val currentDestination: Destination =
                     navController.appCurrentDestinationAsState().value
                         ?: NavGraphs.root.startAppDestination
@@ -141,11 +198,13 @@ class MainActivity : ComponentActivity() {
                             }
                         })
                     {
-                        Column(modifier = Modifier.fillMaxSize().padding(it)) {
+                        Column(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(it)) {
                             DestinationsNavHost(
                                 navController = navController,
                                 navGraph = NavGraphs.root,
-                                startRoute = if (auth.currentUser === null) LoginPageDestination else HomeDestination
+                                startRoute = startRoute
                             )
                         }
                     }
