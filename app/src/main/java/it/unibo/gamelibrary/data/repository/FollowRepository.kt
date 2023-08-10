@@ -13,4 +13,13 @@ class FollowRepository(private val followDao: FollowDao) {
     suspend fun getFollowers(uid: String): List<Follow> {
         return followDao.getFollowers(uid)
     }
+
+    @WorkerThread
+    suspend fun follow(uid1: String, uid2: String){
+        followDao.follow(uid1, uid2)
+    }
+    @WorkerThread
+    suspend fun unfollow(uid1: String, uid2: String){
+        followDao.unfollow(uid1, uid2)
+    }
 }

@@ -1,7 +1,10 @@
 package it.unibo.gamelibrary.ui.views.Profile
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,79 +18,106 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PersonAddAlt1
+import androidx.compose.material.icons.outlined.PersonRemoveAlt1
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
+import it.unibo.gamelibrary.BuildConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Objects
 
 @Destination
-@Composable
+@Composable()
 fun Profile(
     viewModel: ProfileViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
-    uid: String? //se uid = null è il profilo dell'utente loggato
+    userID: String?,
 ) {
-    TopAppBarState.customTitle ={ //TODO a volte l'immagine si vede a volte no?? Errore di permessi strani (Glide): java.lang.SecurityException: Calling uid ( 10585 ) does not have permission to access picker uri: content://media/picker/0/com.android.providers.media.photopicker/media/1000014111
-        // https://oguzhanaslann.medium.com/new-photo-picker-api-no-permissions-5c500aa2391e-
+    var uid = userID?: Firebase.auth.currentUser!!.uid
+    viewModel.getUser(uid)
+    viewModel.getLibrary(uid)
+    viewModel.getFollowers(uid)
+    viewModel.getFollowed(uid)
+
+    TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
+    TopAppBarState.customTitle ={
         Row(
             verticalAlignment = Alignment.CenterVertically
         ){
-            Log.i("Profile", "image: ${viewModel.user?.image}")
+
             if(viewModel.user?.image != null) {
                 GlideImage(
                     {
                         Uri.parse(viewModel.user?.image)
                     },
-                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(24.dp))
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(24.dp))
                 )
             }
             else {
                 Image(
                     Icons.Outlined.AccountCircle,
                     "profile image is not set",
-                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(24.dp))
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(24.dp))
                 )
             }
-            Text(text= viewModel.user?.username ?: "??")
+            Spacer(Modifier.size(16.dp))
+            Text(text = viewModel.user?.username ?: "??")
         }
     }
 
-    TopAppBarState.actions = {if(uid != null && Firebase.auth.currentUser?.uid != uid){ EditButton(viewModel) } }
-    //uid = uid == null ?
-    if(uid != null){
-        viewModel.getUser(uid)
-    }
     LazyColumn() {
-        item {
+        item {//bio, follow
             Row {
-
-                Column {
-                    Text(viewModel.user?.bio.toString(), modifier = Modifier.padding(8.dp))
-                }
+                    Text(viewModel.user?.bio.toString(), modifier = Modifier.padding(24.dp))
             }
-            if(uid != null && Firebase.auth.currentUser?.uid != uid){
-                FollowButton(viewModel, Firebase.auth.currentUser!!.uid, uid)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ){
+                Text(text = viewModel.followers.count().toString() + " followers")
+                Text(text = viewModel.followed.count().toString() + " following")
+
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ){
+                if(Firebase.auth.currentUser?.uid != uid){
+                    FollowButton(viewModel, Firebase.auth.currentUser!!.uid, uid)
+                }
             }
 
             Spacer(Modifier.size(16.dp))
         }
         //reviews di questo user
-        //Log.i("PROFILE USER REVIEW", viewModel.userLibrary.toString())
-
-        items(
-            viewModel.userLibrary,
-            key = {it.id})
+        items(viewModel.userLibrary)
         {
             UserReview(it, navigator, showUser = false)
         }
@@ -98,29 +128,29 @@ fun Profile(
 private fun FollowButton(
     viewModel: ProfileViewModel,
     me: String,
-    other: String) {
-    Button(
+    other: String)
+{
+    TextButton(
         onClick = {
-            if(viewModel.followed?.contains(other) == true){
-                //TODO
+            if(viewModel.amIFollowing()){//seguo già, se clicco = unfollow
+                viewModel.toggleFollow(me, other)//unfollow
             }
             else{
-
+                viewModel.toggleFollow(me, other)//follow
             }
-        },
-        Modifier.size(128.dp)
+        }
     ){
-        if(viewModel.followed?.contains(other) == true){
-            Text(text = "Stop following")
+        if(viewModel.amIFollowing()){
+            Text(text = "Unfollow ")
+            Icon(Icons.Outlined.PersonRemoveAlt1, null)
         }
         else{
-            Text(text = "Follow")
-
+            Text(text = "Follow ")
+            Icon(Icons.Outlined.PersonAddAlt1, null)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditButton(
     viewModel: ProfileViewModel
@@ -222,9 +252,6 @@ private fun EditButton(
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
-
-
-
             }
         }
     }

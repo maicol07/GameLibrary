@@ -5,16 +5,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import it.unibo.gamelibrary.data.dao.FollowDao
+import it.unibo.gamelibrary.data.model.Follow
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.FollowRepository
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,24 +30,14 @@ class ProfileViewModel @Inject constructor(
 
 ): ViewModel() {
     var user by mutableStateOf<User?>(null)
-//     var userLibrary: List<LibraryEntry> = listOf()
     var userLibrary = mutableStateListOf<LibraryEntry>()
     var newImage = mutableStateOf("")
     var newBio = mutableStateOf("")
     var newUsername = mutableStateOf("")
-    var followed: List<String>? = null
-    var followers: List<String>? = null
+    var followed = mutableStateListOf<String>()//seguaci e seguiti dell'utente di cui si viualizza il profilo
+    var followers = mutableStateListOf<String>()
 
     var showProfileEditDialog by mutableStateOf(false)
-
-    init {
-        if (Firebase.auth.currentUser != null){
-            getUser(Firebase.auth.currentUser!!.uid)
-            getLibrary(Firebase.auth.currentUser!!.uid)
-        }
-        getFollowed(Firebase.auth.currentUser!!.uid)//sono i seguiti e i seguaci di currentuser!!
-        getFollowers(Firebase.auth.currentUser!!.uid)
-    }
 
     fun getUser(uid: String) {
         viewModelScope.launch {
@@ -56,6 +50,7 @@ class ProfileViewModel @Inject constructor(
 
     fun getLibrary(uid: String) {
         viewModelScope.launch {
+            userLibrary.clear()
             userLibrary.addAll(libraryRepository.getUserLibraryEntries(uid))
         }
     }
@@ -84,14 +79,33 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun getFollowed(uid: String){
-        viewModelScope.launch {
-            followed = followRepository.getFollowed(uid).map { it.followed }
+    fun getFollowed(uid: String): Job {
+        return viewModelScope.launch {
+            followed.clear()
+            followed.addAll(followRepository.getFollowed(uid).map { it.followed })
         }
     }
-    fun getFollowers(uid: String){
-        viewModelScope.launch {
-            followers = followRepository.getFollowers(uid).map { it.follower }
+    fun getFollowers(uid: String): Job {
+        return viewModelScope.launch {
+            followers.clear()
+            followers.addAll(followRepository.getFollowers(uid).map { it.follower })
         }
     }
+
+    fun toggleFollow(uid1: String, uid2: String){
+        viewModelScope.launch {
+            if(amIFollowing()) {
+                followRepository.unfollow(uid1, uid2)
+            }
+            else{
+                followRepository.follow(uid1, uid2)
+            }
+            getFollowers(uid2)
+        }
+    }
+
+    fun amIFollowing(): Boolean{
+        return followers.contains(Firebase.auth.currentUser?.uid)
+    }
+
 }
