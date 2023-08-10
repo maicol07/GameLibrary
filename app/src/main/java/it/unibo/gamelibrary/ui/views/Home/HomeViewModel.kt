@@ -11,7 +11,9 @@ import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.games
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.LibraryEntry
+import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.LibraryRepository
+import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBApiRequest
 import kotlinx.coroutines.launch
 import proto.Game
@@ -19,36 +21,41 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val libraryRepository: LibraryRepository
+    private val libraryRepository: LibraryRepository,
+    private val userRepository: UserRepository,
 ): ViewModel() {
 
     var newGames = mutableStateListOf<Game>()
     var popularGames = mutableStateListOf<Game>()
     var posts = mutableStateListOf<LibraryEntry>()
 
+    //"users" used in testing.
+    var users = mutableStateListOf<User>()
+
     init {
         fetchNewGames()
         //fetchPopularGames()
         fetchPosts()
-//        posts.sortedByDescending { it. }
+        fetchUsers()
     }
 
-//    fun fetchPopularGames() { //TODO la query è la stessa di new, cambiala
-//        fetchList(
-//            APICalypse()
-//                .fields("*,cover.image_id")
-//                .sort("", Sort.DESCENDING)
-//                .limit(25),
-//            popularGames
-//        )
-//    }
+    fun fetchPopularGames() { //TODO la query è la stessa di new, cambiala
+        fetchList(
+            APICalypse()
+                .fields("*,cover.image_id, version_parent")
+                .sort("rating", Sort.DESCENDING)
+                .where("parent_game = null & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000)
+                .limit(25),
+            popularGames
+        )
+    }
 
     fun fetchNewGames() {
         fetchList( //fields *; where game.platforms = 48 & date < 1538129354; sort date desc;
             APICalypse()
                 .fields("*,cover.image_id")
-                .where("first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000)//TODO filtra per edizoni per togliere le deluxe, premium ecc
                 .sort("first_release_date", Sort.DESCENDING)
+                .where("parent_game = null & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000)
                 .limit(25),
             newGames
         )
@@ -72,18 +79,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun fetchUsers(){
+        viewModelScope.launch {
+            users.addAll(userRepository.getAll())
+        }
+    }
+
 }
-//    suspend fun APIImage(query: APICalypse): List<Cover> = withContext(Dispatchers.IO) {
-//        IGDBWrapper.covers(query)
-//    }
-//    fun getCoverUrl(query: APICalypse): String{
-//        var url = ""
-//        viewModelScope.launch {
-//            try {
-//                url = APIImage(query)[0].url
-//            } catch (e: RequestException) {
-//                Log.e("ERR_FETCH_IMAGE_LIST_HOME", "${e.statusCode} , ${e.message}")
-//            }
-//        }
-//        return url;
-//    }

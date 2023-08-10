@@ -17,15 +17,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mahmoudalim.compose_rating_bar.RatingBarView
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.data.model.LibraryEntry
+import it.unibo.gamelibrary.ui.common.Game.GameArtwork
+import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
+import it.unibo.gamelibrary.ui.views.GameView.GameView
+import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -47,42 +53,61 @@ fun UserReview(
         viewModel.getGame(review.gameId)
         viewModel.getUser(review.uid)
 
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
             if(showUser) {
                 Row( //user image and username
                     modifier = Modifier
-                        .padding(24.dp)
+                        .padding(8.dp)
                         .fillMaxWidth()
                         .combinedClickable(
                             onClick = { navigator.navigate(ProfileDestination(review.uid)) },
-                        )
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (viewModel.user[review.uid]?.image != null) {
                         GlideImage(
                             {
                                 Uri.parse(viewModel.user[review.uid]?.image)
                             },
-                            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(24.dp))
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(24.dp))
                         )
                     } else {
                         Image(
                             Icons.Outlined.AccountCircle,
                             "profile image is not set",
-                            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(24.dp))
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(24.dp))
                         )
                     }
+                    Spacer(Modifier.size(8.dp))
                     Text(
                         text = viewModel.user[review.uid]?.username ?: "loading...",
-
                     )
                 }
             }
-            Image(
-                imageVector = Icons.Filled.Photo,
-                contentDescription = "post main image"
+            //game name
+            Text(
+                text = viewModel.game[review.gameId]?.name ?: "",
+                modifier = Modifier.padding(4.dp),
+                fontWeight = FontWeight.Bold
             )
 
-            Text(text = viewModel.game[review.gameId]?.name ?: "")
+            //game image
+            if(viewModel.game[review.gameId] != null){
+                GameCoverImage(
+                    viewModel.game[review.gameId]!!,
+                    Modifier
+                        .combinedClickable(
+                            onClick = { navigator.navigate(GameViewNavDestination(review.gameId)) },
+                        )
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            }
+
             var rating = remember { mutableStateOf(review.rating ?: 0) }
             RatingBarView(
                 rating = rating,
@@ -94,7 +119,11 @@ fun UserReview(
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                 starSize = 26.dp
             )
-            Text(text = review.notes ?: "" )
+            Row (
+                modifier = Modifier.padding(8.dp)
+            ){
+                Text(text = review.notes ?: "" )
+            }
         }
     }
 }
