@@ -7,6 +7,11 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera.any"/>
+
+
+
     <application
         android:name=".GameLibraryApplication"
         android:allowBackup="true"
@@ -19,6 +24,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GameLibrary"
         tools:targetApi="33">
+        <!-- necessary for camera usage -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/path_provider" />
+        </provider>
+
         <activity
             android:name=".CrashActivity"
             android:exported="false"
