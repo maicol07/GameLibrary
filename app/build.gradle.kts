@@ -103,6 +103,7 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
     implementation(libs.security.crypto)
+    implementation(libs.androidx.work.runtime.ktx)
 
 
     // Test

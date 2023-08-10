@@ -1,15 +1,26 @@
 package it.unibo.gamelibrary.ui.views.GameView
 
+import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.*
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.api.igdb.apicalypse.APICalypse
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.games
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import it.unibo.gamelibrary.NotificationWorker
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.data.repository.LibraryRepository
@@ -17,11 +28,14 @@ import it.unibo.gamelibrary.utils.IGDBApiRequest
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.launch
 import proto.Game
+import java.time.Duration
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
 class GameViewViewModel @Inject constructor(
-    private val libraryRepository: LibraryRepository
+    private val libraryRepository: LibraryRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     interface LibraryEntryDetails {
         var status: LibraryEntryStatus?
@@ -39,6 +53,8 @@ class GameViewViewModel @Inject constructor(
         override var entry by mutableStateOf<LibraryEntry?>(null)
     }
 
+    var openNotificationDialog by mutableStateOf(true)
+
     fun getGame(gameId: Int) = viewModelScope.launch {
         val games = IGDBApiRequest {
             IGDBWrapper.games(
@@ -48,6 +64,7 @@ class GameViewViewModel @Inject constructor(
                             "name",
                             "artworks.image_id",
                             "cover.image_id",
+                            "first_release_date",
                             "involved_companies.*",
                             "involved_companies.company.name",
                             "genres.name",
@@ -56,7 +73,7 @@ class GameViewViewModel @Inject constructor(
                             "summary",
                             "release_dates.human",
                             "release_dates.platform.name",
-                            "release_dates.platform.platform_logo.url"
+                            "release_dates.platform.platform_logo.url",
                         ).joinToString(",")
                     )
                     .where("id = $gameId")
@@ -93,7 +110,34 @@ class GameViewViewModel @Inject constructor(
             getUserLibraryEntry(game!!.id.toInt(), Firebase.auth.currentUser!!.uid)
             viewModelScope.launch { snackbarHostState.showSnackbar("Game added to library!") }
         }
+
+        enableNotification()
         isGameLibraryEditOpen = false
 //        Log.d("GameViewViewModel AFTER", libraryEntry.entry.toString())
+    }
+
+    private fun enableNotification() {
+        val releaseDate = game!!.firstReleaseDate
+        val secondDate = Instant.ofEpochSecond(releaseDate.seconds).minusSeconds(Instant.now().epochSecond)
+        Log.i("GameId", libraryEntry.entry?.gameId!!.toString())
+        if (secondDate.epochSecond >= 0){
+            val notificationWorker = OneTimeWorkRequestBuilder<NotificationWorker>()
+                .setInitialDelay(Duration.ofSeconds(releaseDate.seconds))
+                .setInputData(
+                    Data.Builder()
+                    .putInt("gameId", libraryEntry.entry?.gameId!!)
+                    .putString("gameName", game?.name)
+                    .build()
+                )
+                .build()
+            WorkManager
+                .getInstance(context)
+                .enqueueUniqueWork(
+                    libraryEntry.entry?.gameId!!.toString(),
+                    ExistingWorkPolicy.REPLACE,
+                    notificationWorker
+                )
+
+        }
     }
 }

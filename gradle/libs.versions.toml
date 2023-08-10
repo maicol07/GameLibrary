@@ -42,9 +42,11 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 activity-compose = "1.7.2"
 compose-bom = "2023.06.01"
+work-runtime-ktx = "2.8.1"
 
 [libraries]
 # Dependencies
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work-runtime-ktx" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
