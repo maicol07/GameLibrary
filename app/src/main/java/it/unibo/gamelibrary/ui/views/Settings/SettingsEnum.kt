@@ -91,18 +91,13 @@ enum class SettingsEnum(
             defaultValue = false
         )
     }),
-    Notification(SettingsTypeEnum.Switch, {
+    Notification(SettingsTypeEnum.MenuLink, {
         Icon(
             Icons.Default.Notifications,
             contentDescription = "Enable Notifications"
         )
     }, "Notifications", "Enable notifications", { viewModel ->
-        //TODO
-    }, switchState = {
-        rememberPreferenceDataStoreBooleanSettingState(
-            key = "notification",
-            defaultValue = true
-        )
+        viewModel.goToNotificationSettings()
     }),
     Logout(SettingsTypeEnum.MenuLink, {
         Icon(

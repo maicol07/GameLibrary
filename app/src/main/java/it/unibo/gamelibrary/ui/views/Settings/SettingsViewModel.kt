@@ -4,12 +4,12 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.CancellationSignal
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -330,7 +330,7 @@ class SettingsViewModel @Inject constructor(
             .apply {
                 setTitle("${if (state.value) "Disable" else "Enable"} biometric protection")
                 setConfirmationRequired(false)
-                setNegativeButton("Use app password", context.mainExecutor) { _, _, ->
+                setNegativeButton("Use app password", context.mainExecutor) { _, _ ->
                     Toast.makeText(context, "Authentication Cancelled", Toast.LENGTH_SHORT).show()
                 }
             }.build()
@@ -406,6 +406,14 @@ class SettingsViewModel @Inject constructor(
                     }
                 }
             }
+    }
+
+    fun goToNotificationSettings(){
+        val intent = Intent()
+        intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }
 
