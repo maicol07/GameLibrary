@@ -393,52 +393,28 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "Status: ")
             SingleChoiceSegmentedButtonRow {
-                SegmentedButton(
-                    shape = RoundedCornerShape(16.dp, 0.dp, 0.dp, 16.dp),
-                    selected = viewModel.libraryEntry.status == LibraryEntryStatus.WANTED,
-                    onClick = { viewModel.libraryEntry.status = LibraryEntryStatus.WANTED },
-                    icon = {
-                        SegmentedButtonDefaults.SegmentedButtonIcon(viewModel.libraryEntry.status == LibraryEntryStatus.WANTED) {
-                            Icon(
-                                Icons.Outlined.BookmarkBorder,
-                                contentDescription = null,
-                                modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
-                            )
+                for ((index, status) in LibraryEntryStatus.entries.withIndex()) {
+                    SegmentedButton(
+                        shape = RoundedCornerShape(
+                            if (index == 0) 16.dp else 0.dp,
+                            if (index == LibraryEntryStatus.entries.lastIndex) 16.dp else 0.dp,
+                            if (index == LibraryEntryStatus.entries.lastIndex) 16.dp else 0.dp,
+                            if (index == 0) 16.dp else 0.dp
+                        ),
+                        selected = viewModel.libraryEntry.status == status,
+                        onClick = { viewModel.libraryEntry.status = status },
+                        icon = {
+                            SegmentedButtonDefaults.SegmentedButtonIcon(viewModel.libraryEntry.status == status) {
+                                Icon(
+                                    status.unselectedIcon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
+                                )
+                            }
                         }
+                    ) {
+                        Text(text = status.text)
                     }
-                ) {
-                    Text(text = "Wanted")
-                }
-                SegmentedButton(
-                    selected = viewModel.libraryEntry.status == LibraryEntryStatus.PLAYING,
-                    onClick = { viewModel.libraryEntry.status = LibraryEntryStatus.PLAYING },
-                    icon = {
-                        SegmentedButtonDefaults.SegmentedButtonIcon(viewModel.libraryEntry.status == LibraryEntryStatus.PLAYING) {
-                            Icon(
-                                Icons.Outlined.VideogameAsset,
-                                contentDescription = null,
-                                modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
-                            )
-                        }
-                    }
-                ) {
-                    Text(text = "Playing")
-                }
-                SegmentedButton(
-                    shape = RoundedCornerShape(0.dp, 16.dp, 16.dp, 0.dp),
-                    selected = viewModel.libraryEntry.status == LibraryEntryStatus.FINISHED,
-                    onClick = { viewModel.libraryEntry.status = LibraryEntryStatus.FINISHED },
-                    icon = {
-                        SegmentedButtonDefaults.SegmentedButtonIcon(viewModel.libraryEntry.status == LibraryEntryStatus.FINISHED) {
-                            Icon(
-                                Icons.Outlined.OutlinedFlag,
-                                contentDescription = null,
-                                modifier = Modifier.size(SegmentedButtonDefaults.IconSize)
-                            )
-                        }
-                    }
-                ) {
-                    Text(text = "Finished")
                 }
             }
             val icon = rememberVectorPainter(Icons.Rounded.Star)
