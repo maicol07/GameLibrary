@@ -70,8 +70,7 @@ fun Home(
 fun HomeSection(
     title: String,
     list: MutableList<Game>,
-    navigator: DestinationsNavigator,
-    viewModel: HomeViewModel = hiltViewModel()
+    navigator: DestinationsNavigator
 ) {
     Column {
         Text(
