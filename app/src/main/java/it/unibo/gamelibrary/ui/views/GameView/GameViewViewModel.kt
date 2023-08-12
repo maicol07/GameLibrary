@@ -83,7 +83,7 @@ class GameViewViewModel @Inject constructor(
         getUserLibraryEntry(gameId, Firebase.auth.currentUser!!.uid)
     }
 
-    fun getUserLibraryEntry(gameId: Int, userId: String) = viewModelScope.launch {
+    private fun getUserLibraryEntry(gameId: Int, userId: String) = viewModelScope.launch {
         libraryEntry.entry =
             libraryRepository.getLibraryEntryByUserAndGame(userId, gameId.toString())
         libraryEntry.status = libraryEntry.entry?.status
@@ -91,28 +91,34 @@ class GameViewViewModel @Inject constructor(
         libraryEntry.notes = libraryEntry.entry?.notes ?: ""
     }
 
-    fun saveGameToLibrary() = viewModelScope.launch {
-        if (libraryEntry.entry?.id != null && libraryEntry.entry?.id != 0) {
-            libraryEntry.entry!!.status = libraryEntry.status
-            libraryEntry.entry!!.rating = libraryEntry.rating.intValue
-            libraryEntry.entry!!.notes = libraryEntry.notes
-            libraryRepository.updateEntry(libraryEntry.entry!!)
-            viewModelScope.launch { snackbarHostState.showSnackbar("Game in library updated!") }
-        } else {
-            libraryEntry.entry = LibraryEntry(
-                uid = Firebase.auth.currentUser!!.uid,
-                gameId = game!!.id.toInt(),
-                status = libraryEntry.status,
-                rating = libraryEntry.rating.intValue,
-                notes = libraryEntry.notes
-            )
-            libraryRepository.insertEntry(libraryEntry.entry!!)
-            getUserLibraryEntry(game!!.id.toInt(), Firebase.auth.currentUser!!.uid)
-            viewModelScope.launch { snackbarHostState.showSnackbar("Game added to library!") }
+    fun saveGameToLibrary() {
+        if (libraryEntry.status === null) {
+            viewModelScope.launch { snackbarHostState.showSnackbar("Please select a status!") }
+            return
         }
+        viewModelScope.launch {
+            if (libraryEntry.entry?.id != null && libraryEntry.entry?.id != 0) {
+                libraryEntry.entry!!.status = libraryEntry.status!!
+                libraryEntry.entry!!.rating = libraryEntry.rating.intValue
+                libraryEntry.entry!!.notes = libraryEntry.notes
+                libraryRepository.updateEntry(libraryEntry.entry!!)
+                viewModelScope.launch { snackbarHostState.showSnackbar("Game in library updated!") }
+            } else {
+                libraryEntry.entry = LibraryEntry(
+                    uid = Firebase.auth.currentUser!!.uid,
+                    gameId = game!!.id.toInt(),
+                    status = libraryEntry.status!!,
+                    rating = libraryEntry.rating.intValue,
+                    notes = libraryEntry.notes
+                )
+                libraryRepository.insertEntry(libraryEntry.entry!!)
+                getUserLibraryEntry(game!!.id.toInt(), Firebase.auth.currentUser!!.uid)
+                viewModelScope.launch { snackbarHostState.showSnackbar("Game added to library!") }
+            }
 
-        enableNotification()
-        isGameLibraryEditOpen = false
+            enableNotification()
+            isGameLibraryEditOpen = false
+        }
     }
 
     fun removeGameFromLibrary() = viewModelScope.launch {
