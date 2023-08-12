@@ -3,14 +3,32 @@ package it.unibo.gamelibrary.ui.views.Login
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.LockReset
+import androidx.compose.material.icons.outlined.Login
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -19,9 +37,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -42,9 +57,10 @@ fun LoginPage(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        viewModel.signInWithGoogle(result, context, navController)
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            viewModel.signInWithGoogle(result, context, navController)
+        }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,7 +107,9 @@ fun LoginPage(
                     },
                     label = "Password",
                     isHidden = viewModel.isPasswordHidden.value,
-                    onPasswordVisible = { viewModel.isPasswordHidden.value = !viewModel.isPasswordHidden.value },
+                    onPasswordVisible = {
+                        viewModel.isPasswordHidden.value = !viewModel.isPasswordHidden.value
+                    },
                     isError = viewModel.isError
                 )
                 Spacer(modifier = Modifier.size(16.dp))
@@ -163,7 +181,7 @@ fun ResetPasswordDialog(viewModel: LoginViewModel = hiltViewModel()) {
                 style = MaterialTheme.typography.headlineMedium
             )
         }
-    ){
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

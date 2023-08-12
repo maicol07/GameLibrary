@@ -54,7 +54,7 @@ class SignupViewModel @Inject constructor(
             Log.i("Signup", "Signup pressed")
             isSignupButtonPressed = true
             if (checkErrors()) {
-                Log.i("Signup firebase", "${fields["email"]!!}, ${fields["password"]!!}" )
+                Log.i("Signup firebase", "${fields["email"]!!}, ${fields["password"]!!}")
                 auth.createUserWithEmailAndPassword(fields["email"]!!, fields["password"]!!)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -96,6 +96,7 @@ class SignupViewModel @Inject constructor(
                 when (key) {
                     "email" -> !"^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])\$".toRegex()
                         .matches(f)
+
                     "password" -> f.isEmpty() || f.length < 6
                     "confirmPassword" -> f.isEmpty() || f != fields["password"]
                     else -> f.isEmpty()
@@ -104,7 +105,7 @@ class SignupViewModel @Inject constructor(
         }
 
         for (value in fieldsErrors.values) {
-            if (value){
+            if (value) {
                 return false
             }
         }

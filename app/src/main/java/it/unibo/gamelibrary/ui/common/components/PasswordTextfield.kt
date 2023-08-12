@@ -27,7 +27,7 @@ fun PasswordTextfield(
     leadingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null
-){
+) {
     val focusManager = LocalFocusManager.current
     TextField(
         value = value,
@@ -40,11 +40,12 @@ fun PasswordTextfield(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         ),
-        leadingIcon = { if (leadingIcon == null)
-            Icon(
-                Icons.Outlined.Lock,
-                contentDescription = "password"
-            ) else leadingIcon.invoke()
+        leadingIcon = {
+            if (leadingIcon == null)
+                Icon(
+                    Icons.Outlined.Lock,
+                    contentDescription = "password"
+                ) else leadingIcon.invoke()
         },
         trailingIcon = {
             IconButton(onClick = {

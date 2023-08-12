@@ -9,7 +9,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,12 +27,13 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material.icons.outlined.PersonRemoveAlt1
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,19 +63,23 @@ fun Profile(
     navigator: DestinationsNavigator,
     userID: String?,
 ) {
-    var uid = userID?: Firebase.auth.currentUser!!.uid
+    var uid = userID ?: Firebase.auth.currentUser!!.uid
     viewModel.getUser(uid)
     viewModel.getLibrary(uid)
     viewModel.getFollowers(uid)
     viewModel.getFollowed(uid)
 
-    TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
-    TopAppBarState.customTitle ={
+    TopAppBarState.actions = {
+        if (Firebase.auth.currentUser?.uid == uid) {
+            EditButton(viewModel)
+        }
+    }
+    TopAppBarState.customTitle = {
         Row(
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
 
-            if(viewModel.user?.image != null) {
+            if (viewModel.user?.image != null) {
                 GlideImage(
                     {
                         Uri.parse(viewModel.user?.image)
@@ -76,8 +88,7 @@ fun Profile(
                         .size(48.dp)
                         .clip(RoundedCornerShape(24.dp))
                 )
-            }
-            else {
+            } else {
                 Image(
                     Icons.Outlined.AccountCircle,
                     "profile image is not set",
@@ -91,15 +102,15 @@ fun Profile(
         }
     }
 
-    LazyColumn() {
+    LazyColumn {
         item {//bio, follow
             Row {
-                    Text(viewModel.user?.bio.toString(), modifier = Modifier.padding(24.dp))
+                Text(viewModel.user?.bio.toString(), modifier = Modifier.padding(24.dp))
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
-            ){
+            ) {
                 Text(text = viewModel.followers.count().toString() + " followers")
                 Text(text = viewModel.followed.count().toString() + " following")
 
@@ -108,8 +119,8 @@ fun Profile(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
-            ){
-                if(Firebase.auth.currentUser?.uid != uid){
+            ) {
+                if (Firebase.auth.currentUser?.uid != uid) {
                     FollowButton(viewModel, Firebase.auth.currentUser!!.uid, uid)
                 }
             }
@@ -128,23 +139,21 @@ fun Profile(
 private fun FollowButton(
     viewModel: ProfileViewModel,
     me: String,
-    other: String)
-{
+    other: String
+) {
     TextButton(
         onClick = {
-            if(viewModel.amIFollowing()){//seguo già, se clicco = unfollow
+            if (viewModel.amIFollowing()) {//seguo già, se clicco = unfollow
                 viewModel.toggleFollow(me, other)//unfollow
-            }
-            else{
+            } else {
                 viewModel.toggleFollow(me, other)//follow
             }
         }
-    ){
-        if(viewModel.amIFollowing()){
+    ) {
+        if (viewModel.amIFollowing()) {
             Text(text = "Unfollow ")
             Icon(Icons.Outlined.PersonRemoveAlt1, null)
-        }
-        else{
+        } else {
             Text(text = "Follow ")
             Icon(Icons.Outlined.PersonAddAlt1, null)
         }
@@ -154,10 +163,11 @@ private fun FollowButton(
 @Composable
 private fun EditButton(
     viewModel: ProfileViewModel
-){
-    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
-        viewModel.imagePickerCallback(uri)
-    }
+) {
+    val pickMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
+            viewModel.imagePickerCallback(uri)
+        }
 
     //image from camera
     val context = LocalContext.current
@@ -184,8 +194,8 @@ private fun EditButton(
     }
 
     IconButton(onClick = {
-        viewModel.showProfileEditDialog = true;
-    }){
+        viewModel.showProfileEditDialog = true
+    }) {
         Image(
             imageVector = Icons.Filled.Edit,
             contentDescription = "Edit Profile"
@@ -195,7 +205,7 @@ private fun EditButton(
     if (viewModel.showProfileEditDialog) {
         CustomDialog(
             onDismissRequest = { viewModel.showProfileEditDialog = false },
-            title = {Text("Edit Profile")},
+            title = { Text("Edit Profile") },
             buttons = {
                 TextButton(
                     onClick = {
@@ -216,15 +226,14 @@ private fun EditButton(
             }
         ) {
             Column {
-                if(viewModel.newImage.value != "") {
+                if (viewModel.newImage.value != "") {
                     GlideImage(
                         {
                             Uri.parse(viewModel.newImage.value)
                         },
                         modifier = Modifier.size(256.dp)
                     )
-                }
-                else {
+                } else {
                     Image(
                         Icons.Outlined.AccountCircle,
                         "profile image is not set",
@@ -299,6 +308,7 @@ private fun EditButton(
         }
     }
 }
+
 fun Context.createImageFile(): File {
     // Create an image file name
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())

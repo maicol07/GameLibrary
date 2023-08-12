@@ -2,7 +2,12 @@ package it.unibo.gamelibrary.ui.views.Signup
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -11,7 +16,16 @@ import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Send
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -40,9 +54,10 @@ fun SignupPage(
     val loginViewModel: LoginViewModel = hiltViewModel()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        loginViewModel.signInWithGoogle(result, context, navController)
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            loginViewModel.signInWithGoogle(result, context, navController)
+        }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -126,7 +141,9 @@ fun SignupPage(
                     onChange = { viewModel.fields["password"] = it },
                     label = "Password",
                     isHidden = viewModel.isPasswordHidden,
-                    onPasswordVisible = { viewModel.isPasswordHidden = !viewModel.isPasswordHidden },
+                    onPasswordVisible = {
+                        viewModel.isPasswordHidden = !viewModel.isPasswordHidden
+                    },
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Lock,
@@ -166,7 +183,9 @@ fun SignupPage(
                     onChange = { viewModel.fields["confirmPassword"] = it },
                     label = "Confirm password",
                     isHidden = viewModel.isPasswordConfirmHidden,
-                    onPasswordVisible = { viewModel.isPasswordConfirmHidden = !viewModel.isPasswordConfirmHidden },
+                    onPasswordVisible = {
+                        viewModel.isPasswordConfirmHidden = !viewModel.isPasswordConfirmHidden
+                    },
                     leadingIcon = {
                         Icon(
                             painterResource(id = R.drawable.lock_check_outline),

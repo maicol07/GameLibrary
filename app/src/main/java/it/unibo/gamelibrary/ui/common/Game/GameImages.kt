@@ -5,13 +5,14 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.api.igdb.utils.ImageSize
 import com.api.igdb.utils.imageBuilder
 import com.skydoves.landscapist.ImageOptions
@@ -60,7 +61,10 @@ fun GameCoverImage(
                 ImageSize.COVER_BIG
             ) else R.drawable.no_image
         },
-        imageOptions = ImageOptions(contentScale = ContentScale.Crop, contentDescription = contentDescription),
+        imageOptions = ImageOptions(
+            contentScale = ContentScale.Crop,
+            contentDescription = contentDescription
+        ),
         previewPlaceholder = R.drawable.ffviirebirth,
         component = rememberImageComponent {
             CrossfadePlugin()
@@ -85,14 +89,14 @@ fun GameArtwork(
     val fullscreenState = remember { mutableStateOf(false) }
 
     Fullscreen(fullscreenState) {
-            GameArtwork(
-                game,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .then(fullscreenModifier),
-                contentDescription = "${game.name} cover"
-            )
-        }
+        GameArtwork(
+            game,
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(fullscreenModifier),
+            contentDescription = "${game.name} cover"
+        )
+    }
     val clickableModifier = if (fullscreenable) {
         modifier
             .combinedClickable(
@@ -138,7 +142,10 @@ fun GameScreenshot(game: Game, contentDescription: String, modifier: Modifier = 
                 R.drawable.no_image
             }
         },
-        imageOptions = ImageOptions(contentScale = ContentScale.FillBounds, contentDescription = contentDescription),
+        imageOptions = ImageOptions(
+            contentScale = ContentScale.FillBounds,
+            contentDescription = contentDescription
+        ),
         previewPlaceholder = R.drawable.ffviirebirth,
         modifier = modifier
             .fillMaxWidth()

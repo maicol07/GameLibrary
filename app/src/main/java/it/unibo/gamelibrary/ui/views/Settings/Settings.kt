@@ -57,7 +57,7 @@ fun SettingsPage(
     navController: NavController
 ) {
     val darkState = rememberPreferenceDataStoreIntSettingState(key = "dark theme", defaultValue = 0)
-    val context = LocalContext.current;
+    val context = LocalContext.current
     viewModel.getAddress()
 
     TopAppBarState.title = "Settings"
@@ -71,7 +71,12 @@ fun SettingsPage(
                 state = darkState,
                 title = { Text(text = "UI theme") },
                 items = listOf("System", "Dark", "Light"),
-                icon = { Icon(imageVector = Icons.Default.Brightness4, contentDescription = "Dark theme") },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Brightness4,
+                        contentDescription = "Dark theme"
+                    )
+                },
                 subtitle = { Text(text = "Choose your app theme") },
                 onItemSelected = { index, value -> darkState.value = index },
                 modifier = Modifier.height(72.dp)
@@ -80,7 +85,7 @@ fun SettingsPage(
 
         items(viewModel.settingsList) {
             if (it.type === SettingsTypeEnum.Switch) {
-                val state = it.switchState!!();
+                val state = it.switchState!!()
                 SettingsSwitch(
                     icon = it.icon,
                     title = { Text(text = it.title) },
@@ -124,9 +129,10 @@ private fun ChangeEmailDialog(viewModel: SettingsViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        viewModel.changeEmail(result, context)
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            viewModel.changeEmail(result, context)
+        }
     CustomDialog(
         onDismissRequest = { viewModel.openEmailDialog = false },
         modifier = Modifier.padding(16.dp),
@@ -196,9 +202,10 @@ private fun ChangeEmailDialog(viewModel: SettingsViewModel = hiltViewModel()) {
 private fun ChangePasswordDialog(viewModel: SettingsViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        viewModel.changePassword(result, context)
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            viewModel.changePassword(result, context)
+        }
     CustomDialog(
         onDismissRequest = { viewModel.openPasswordDialog = false },
         modifier = Modifier.padding(16.dp),
@@ -289,7 +296,8 @@ private fun CheckPermission(viewModel: SettingsViewModel = hiltViewModel()) {
             // First time the user sees this feature or the user doesn't want to be asked again
             "This feature requires location permission"
         }
-        val buttonText = if (!allPermissionsRevoked) "Allow precise location" else "Request permissions"
+        val buttonText =
+            if (!allPermissionsRevoked) "Allow precise location" else "Request permissions"
         AlertDialog(
             onDismissRequest = {
                 // Dismiss the dialog when the user clicks outside the dialog or on the back

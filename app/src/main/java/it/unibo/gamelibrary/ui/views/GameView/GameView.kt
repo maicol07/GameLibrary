@@ -40,9 +40,6 @@ import androidx.compose.material.icons.filled.SportsMotorsports
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material.icons.filled.ViewInAr
-import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.OutlinedFlag
-import androidx.compose.material.icons.outlined.VideogameAsset
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -119,7 +116,7 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
             .shimmer()
     }
     GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
-    if(viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+    if (viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         NotificationPermissionDialog()
     }
 }
@@ -140,7 +137,7 @@ fun GameView(
         GameHeader(game)
         GameDetails(game)
     }
-   if (viewModel.isGameLibraryEditOpen) {
+    if (viewModel.isGameLibraryEditOpen) {
         GameViewGameLibraryEditDialog(game)
     }
 }
@@ -171,7 +168,9 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier) {
             Text(
                 text = game.name,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.offset(8.dp, 100.dp).padding(end = 8.dp),
+                modifier = Modifier
+                    .offset(8.dp, 100.dp)
+                    .padding(end = 8.dp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -199,7 +198,15 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
                     else -> Icons.Default.Business
                 }
                 AssistChip(
-                    label = { Text(text = "${it.company.name} (${roles.filter { it.value }.keys.joinToString(", ")})") },
+                    label = {
+                        Text(
+                            text = "${it.company.name} (${
+                                roles.filter { it.value }.keys.joinToString(
+                                    ", "
+                                )
+                            })"
+                        )
+                    },
                     modifier = Modifier.padding(end = 8.dp),
                     leadingIcon = {
                         if (icon is ImageVector) {
@@ -311,7 +318,10 @@ fun GameViewBottomBar(viewModel: GameViewViewModel) {
             IconButton(onClick = {
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "https://game-library.app/game/${viewModel.game?.id}")
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        "https://game-library.app/game/${viewModel.game?.id}"
+                    )
                     type = "text/plain"
                 }
 
@@ -367,7 +377,7 @@ fun GameViewBottomBar(viewModel: GameViewViewModel) {
 fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hiltViewModel()) {
     CustomDialog(
         onDismissRequest = { viewModel.isGameLibraryEditOpen = false },
-        title = {Text(text = if (viewModel.libraryEntry.entry !== null) "Edit ${game.name} library entry" else "Add ${game.name} to library")},
+        title = { Text(text = if (viewModel.libraryEntry.entry !== null) "Edit ${game.name} library entry" else "Add ${game.name} to library") },
         buttons = {
             TextButton(onClick = { viewModel.isGameLibraryEditOpen = false }) {
                 Text(text = "Cancel")
@@ -442,7 +452,11 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
                 10 -> "10/10 - Masterpiece"
                 else -> ""
             }
-            Text(text = text, style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(bottom = 8.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
             TextField(
                 value = viewModel.libraryEntry.notes,
@@ -458,11 +472,11 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel()){
+fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel()) {
     val notificationPermissionsState = rememberPermissionState(
         Manifest.permission.POST_NOTIFICATIONS
     )
-    if (notificationPermissionsState.status.isGranted){
+    if (notificationPermissionsState.status.isGranted) {
         viewModel.openNotificationDialog = false
     } else {
         val textToShow = if (notificationPermissionsState.status.shouldShowRationale) {
@@ -507,7 +521,7 @@ fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel())
                         viewModel.openNotificationDialog = false
                     }
                 ) {
-                    Text( if(notificationPermissionsState.status.shouldShowRationale) "Dismiss" else "Ok")
+                    Text(if (notificationPermissionsState.status.shouldShowRationale) "Dismiss" else "Ok")
                 }
             }
         )

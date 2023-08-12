@@ -81,7 +81,12 @@ fun CrashScreen() {
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.padding(16.dp)
     ) {
-        Icon(Icons.Default.BugReport, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.error)
+        Icon(
+            Icons.Default.BugReport,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.error
+        )
         Text("An unexpected error occurred. Please restart the app.")
         val restart =
             remember {

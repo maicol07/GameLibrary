@@ -14,7 +14,7 @@ import androidx.work.WorkerParameters
 import it.unibo.gamelibrary.utils.notificationId
 
 
-class NotificationWorker(private val context: Context, workerParams: WorkerParameters):
+class NotificationWorker(private val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
     override fun doWork(): Result {
 

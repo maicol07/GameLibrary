@@ -20,11 +20,13 @@ class RepositoryModule {
     fun bindUserRepository(@ApplicationContext context: Context) = UserRepository(
         (context.applicationContext as GameLibraryApplication).database.userDao()
     )
+
     @Singleton
     @Provides
     fun bindLibraryRepository(@ApplicationContext context: Context) = LibraryRepository(
         (context.applicationContext as GameLibraryApplication).database.libraryDao()
     )
+
     @Singleton
     @Provides
     fun bindFollowRepository(@ApplicationContext context: Context) = FollowRepository(

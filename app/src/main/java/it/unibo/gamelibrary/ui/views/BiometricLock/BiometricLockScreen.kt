@@ -29,7 +29,10 @@ import it.unibo.gamelibrary.utils.TopAppBarState
 
 @Destination
 @Composable
-fun BiometricLockScreen(viewModel: BiometricLockScreenViewModel = hiltViewModel(), navController: NavController) {
+fun BiometricLockScreen(
+    viewModel: BiometricLockScreenViewModel = hiltViewModel(),
+    navController: NavController
+) {
     TopAppBarState.hide = true
     val context = LocalContext.current
     if (viewModel.isBiometricAvailable(context) == BiometricManager.BIOMETRIC_SUCCESS) {
@@ -42,13 +45,27 @@ fun BiometricLockScreen(viewModel: BiometricLockScreenViewModel = hiltViewModel(
             }
         }
     }
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-        .padding(16.dp)
-        .fillMaxSize(), verticalArrangement = Arrangement.Center) {
-        FilledTonalIconButton(onClick = { viewModel.authenticate(context, navController) }, modifier = Modifier.size(128.dp).padding(16.dp)) {
-            Icon(imageVector = Icons.Default.Fingerprint, contentDescription = null, modifier = Modifier.size(64.dp))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize(), verticalArrangement = Arrangement.Center
+    ) {
+        FilledTonalIconButton(
+            onClick = { viewModel.authenticate(context, navController) },
+            modifier = Modifier
+                .size(128.dp)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Fingerprint,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp)
+            )
         }
         Spacer(modifier = Modifier.size(16.dp))
-        Text(text = "The app is locked with biometric protection. Please authenticate to unlock it.", textAlign = TextAlign.Justify)
+        Text(
+            text = "The app is locked with biometric protection. Please authenticate to unlock it.",
+            textAlign = TextAlign.Justify
+        )
     }
 }

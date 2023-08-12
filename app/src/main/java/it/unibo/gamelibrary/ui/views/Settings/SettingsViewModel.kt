@@ -8,7 +8,6 @@ import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Build
-import android.os.CancellationSignal
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -60,12 +59,14 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel(), HasBiometrics {
     val auth: FirebaseAuth = Firebase.auth
     val settingsList = SettingsEnum.values()
+
     //Change email
     var openEmailDialog by mutableStateOf(false)
     var emailValue by mutableStateOf("")
     var isSignInWithGoogle by mutableStateOf(false)
     var passwordValue by mutableStateOf("")
     var isHidden by mutableStateOf(true)
+
     //Change password
     var openPasswordDialog by mutableStateOf(false)
     val passwordFields = mutableStateMapOf(
@@ -78,15 +79,19 @@ class SettingsViewModel @Inject constructor(
         Pair("new", true),
         Pair("confirm", true),
     )
+
     //Change location
     lateinit var fusedLocationClient: FusedLocationProviderClient
     var openLocationDialog by mutableStateOf(false)
     var addressUser by mutableStateOf<String?>(null)
+
     //Logout
     var openLogoutDialog by mutableStateOf(false)
 
-    fun changeEmail(result: ActivityResult, context: Context){
-        if ("^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])\$".toRegex().matches(emailValue)) {
+    fun changeEmail(result: ActivityResult, context: Context) {
+        if ("^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])\$".toRegex()
+                .matches(emailValue)
+        ) {
             if (result.resultCode == RESULT_OK) {
                 if (isSignInWithGoogle) {
                     val oneTapClient = Identity.getSignInClient(context)
@@ -111,7 +116,8 @@ class SettingsViewModel @Inject constructor(
                         }
                     }
                 } else {
-                    val credentials = EmailAuthProvider.getCredential(auth.currentUser?.email!!, passwordValue)
+                    val credentials =
+                        EmailAuthProvider.getCredential(auth.currentUser?.email!!, passwordValue)
                     reauthenticateAndChange(
                         credentials,
                         emailValue,
@@ -134,7 +140,7 @@ class SettingsViewModel @Inject constructor(
         passwordValue = ""
     }
 
-    fun changePassword(result: ActivityResult, context: Context){
+    fun changePassword(result: ActivityResult, context: Context) {
         if (passwordFields["new"] == passwordFields["confirm"]) {
             if (result.resultCode == RESULT_OK) {
                 if (isSignInWithGoogle) {
@@ -158,7 +164,10 @@ class SettingsViewModel @Inject constructor(
                     }
                 } else {
                     val credentials =
-                        EmailAuthProvider.getCredential(auth.currentUser?.email!!, passwordFields["old"]!!)
+                        EmailAuthProvider.getCredential(
+                            auth.currentUser?.email!!,
+                            passwordFields["old"]!!
+                        )
                     reauthenticateAndChange(
                         credentials,
                         passwordFields["new"]!!,
@@ -173,7 +182,7 @@ class SettingsViewModel @Inject constructor(
                 snackbarHostState.showSnackbar("Impossible to change the password. New password and Confirm password are different")
             }
         }
-        for (key in passwordFields.keys){
+        for (key in passwordFields.keys) {
             passwordFields[key] = ""
         }
         openPasswordDialog = false
@@ -235,7 +244,10 @@ class SettingsViewModel @Inject constructor(
                 Toast.makeText(activity, "Cannot get location.", Toast.LENGTH_SHORT).show()
             } else {
                 viewModelScope.launch {
-                    repository.setLocation(auth.currentUser?.uid!!, "${location.latitude} ${location.longitude}")
+                    repository.setLocation(
+                        auth.currentUser?.uid!!,
+                        "${location.latitude} ${location.longitude}"
+                    )
                     showAddress(context, location.latitude, location.longitude)
                     getAddress()
                 }
@@ -244,18 +256,18 @@ class SettingsViewModel @Inject constructor(
         openLocationDialog = false
     }
 
-    fun logout(navController: NavController){
+    fun logout(navController: NavController) {
         auth.signOut()
         navController.navigate(LoginPageDestination())
     }
 
-    fun openMap(latitude: Double, longitude: Double, context: Context){
+    fun openMap(latitude: Double, longitude: Double, context: Context) {
         val uri = "geo:$latitude,$longitude?q=$latitude,$longitude"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
         context.startActivity(intent)
     }
 
-    fun getAddress(){
+    fun getAddress() {
         viewModelScope.launch {
             addressUser = repository.getUserByUid(auth.currentUser?.uid!!)?.address
         }
@@ -275,10 +287,16 @@ class SettingsViewModel @Inject constructor(
                 longitude,
                 1
             ) { addresses ->
-                if(addresses[0] != null){
+                if (addresses[0] != null) {
                     Log.d("ADDRESS", addresses[0].toString())
                     viewModelScope.launch {
-                        snackbarHostState.showSnackbar("Address changed. Your new address is ${addresses[0].getAddressLine(0)}")
+                        snackbarHostState.showSnackbar(
+                            "Address changed. Your new address is ${
+                                addresses[0].getAddressLine(
+                                    0
+                                )
+                            }"
+                        )
                     }
                 } else {
                     viewModelScope.launch {
@@ -298,7 +316,13 @@ class SettingsViewModel @Inject constructor(
             )?.get(0)
             if (address != null) {
                 viewModelScope.launch {
-                    snackbarHostState.showSnackbar("Address changed. Your new address is ${address.getAddressLine(0)}")
+                    snackbarHostState.showSnackbar(
+                        "Address changed. Your new address is ${
+                            address.getAddressLine(
+                                0
+                            )
+                        }"
+                    )
                 }
             } else {
                 viewModelScope.launch {
@@ -308,7 +332,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun reauthenticateAndChange(credentials: AuthCredential, field: String, error: String, change: (field: String) -> Unit){
+    private fun reauthenticateAndChange(
+        credentials: AuthCredential,
+        field: String,
+        error: String,
+        change: (field: String) -> Unit
+    ) {
         auth.currentUser?.reauthenticate(credentials)
             ?.addOnCompleteListener { task ->
                 Log.i("Authenticate", task.isSuccessful.toString())
@@ -332,9 +361,9 @@ class SettingsViewModel @Inject constructor(
             onError = { errorCode, errorMessage ->
                 state.value = !state.value
                 Toast.makeText(
-                        context,
-                        "Authentication Error ($errorCode): $errorMessage",
-                        Toast.LENGTH_SHORT
+                    context,
+                    "Authentication Error ($errorCode): $errorMessage",
+                    Toast.LENGTH_SHORT
                 ).show()
             },
             onCancel = {
@@ -343,8 +372,8 @@ class SettingsViewModel @Inject constructor(
             }
         )
     }
-            
-    fun goToNotificationSettings(){
+
+    fun goToNotificationSettings() {
         val intent = Intent()
         intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
         intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)

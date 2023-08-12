@@ -39,7 +39,11 @@ interface HasBiometrics {
             }
         }
 
-        val biometricPrompt = BiometricPrompt(context.findActivity(), ContextCompat.getMainExecutor(context), authCallback)
+        val biometricPrompt = BiometricPrompt(
+            context.findActivity(),
+            ContextCompat.getMainExecutor(context),
+            authCallback
+        )
 
         val cancellationSignal = CancellationSignal()
         cancellationSignal.setOnCancelListener(onCancel)

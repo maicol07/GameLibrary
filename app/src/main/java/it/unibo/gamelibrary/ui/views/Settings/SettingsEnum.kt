@@ -77,21 +77,28 @@ enum class SettingsEnum(
             }
         }
     }),
-    BiometricLogin(SettingsTypeEnum.Switch, {
-        Icon(
-            Icons.Default.Fingerprint,
-            contentDescription = null
-        )
-    }, "Biometric Login protection", "Protect the app with biometrics when opening it", onCheckedChange = { viewModel, context, state ->
-        viewModel.toggleBiometrics(context, state)
-    }, enabled = { viewModel, context ->
-        viewModel.isBiometricAvailable(context) == BiometricManager.BIOMETRIC_SUCCESS
-    }, switchState = {
-        rememberPreferenceDataStoreBooleanSettingState(
-            key = "biometric",
-            defaultValue = false
-        )
-    }),
+    BiometricLogin(
+        SettingsTypeEnum.Switch,
+        {
+            Icon(
+                Icons.Default.Fingerprint,
+                contentDescription = null
+            )
+        },
+        "Biometric Login protection",
+        "Protect the app with biometrics when opening it",
+        onCheckedChange = { viewModel, context, state ->
+            viewModel.toggleBiometrics(context, state)
+        },
+        enabled = { viewModel, context ->
+            viewModel.isBiometricAvailable(context) == BiometricManager.BIOMETRIC_SUCCESS
+        },
+        switchState = {
+            rememberPreferenceDataStoreBooleanSettingState(
+                key = "biometric",
+                defaultValue = false
+            )
+        }),
     Notification(SettingsTypeEnum.MenuLink, {
         Icon(
             Icons.Default.Notifications,

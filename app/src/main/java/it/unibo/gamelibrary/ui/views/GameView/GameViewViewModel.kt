@@ -84,14 +84,14 @@ class GameViewViewModel @Inject constructor(
     }
 
     fun getUserLibraryEntry(gameId: Int, userId: String) = viewModelScope.launch {
-        libraryEntry.entry = libraryRepository.getLibraryEntryByUserAndGame(userId, gameId.toString())
+        libraryEntry.entry =
+            libraryRepository.getLibraryEntryByUserAndGame(userId, gameId.toString())
         libraryEntry.status = libraryEntry.entry?.status
         libraryEntry.rating.intValue = libraryEntry.entry?.rating ?: 0
         libraryEntry.notes = libraryEntry.entry?.notes ?: ""
     }
 
     fun saveGameToLibrary() = viewModelScope.launch {
-//        Log.d("GameViewViewModel", libraryEntry.entry.toString())
         if (libraryEntry.entry?.id != null && libraryEntry.entry?.id != 0) {
             libraryEntry.entry!!.status = libraryEntry.status
             libraryEntry.entry!!.rating = libraryEntry.rating.intValue
@@ -126,16 +126,17 @@ class GameViewViewModel @Inject constructor(
 
     private fun enableNotification() {
         val releaseDate = game!!.firstReleaseDate
-        val secondDate = Instant.ofEpochSecond(releaseDate.seconds).minusSeconds(Instant.now().epochSecond)
+        val secondDate =
+            Instant.ofEpochSecond(releaseDate.seconds).minusSeconds(Instant.now().epochSecond)
         Log.i("GameId", libraryEntry.entry?.gameId!!.toString())
-        if (secondDate.epochSecond >= 0){
+        if (secondDate.epochSecond >= 0) {
             val notificationWorker = OneTimeWorkRequestBuilder<NotificationWorker>()
                 .setInitialDelay(Duration.ofSeconds(releaseDate.seconds))
                 .setInputData(
                     Data.Builder()
-                    .putInt("gameId", libraryEntry.entry?.gameId!!)
-                    .putString("gameName", game?.name)
-                    .build()
+                        .putInt("gameId", libraryEntry.entry?.gameId!!)
+                        .putString("gameName", game?.name)
+                        .build()
                 )
                 .build()
             WorkManager
