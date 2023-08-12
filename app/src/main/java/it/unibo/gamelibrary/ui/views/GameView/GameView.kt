@@ -47,6 +47,7 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -327,8 +328,12 @@ fun GameViewBottomBar(viewModel: GameViewViewModel) {
                 IconToggleButton(
                     checked = viewModel.libraryEntry.status === status,
                     onCheckedChange = {
-                        viewModel.libraryEntry.status = status
-                        viewModel.saveGameToLibrary()
+                        if (it) {
+                            viewModel.libraryEntry.status = status
+                            viewModel.saveGameToLibrary()
+                        } else {
+                            viewModel.removeGameFromLibrary()
+                        }
                     }) {
                     Icon(
                         if (viewModel.libraryEntry.status === status) status.selectedIcon else status.unselectedIcon,
@@ -366,6 +371,17 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
         buttons = {
             TextButton(onClick = { viewModel.isGameLibraryEditOpen = false }) {
                 Text(text = "Cancel")
+            }
+            if (viewModel.libraryEntry.entry !== null) {
+                TextButton(
+                    onClick = {
+                        viewModel.removeGameFromLibrary()
+                        viewModel.isGameLibraryEditOpen = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text(text = "Remove")
+                }
             }
             TextButton(onClick = {
                 viewModel.saveGameToLibrary()

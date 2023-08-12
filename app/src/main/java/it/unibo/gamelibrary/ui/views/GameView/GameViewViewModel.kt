@@ -113,7 +113,15 @@ class GameViewViewModel @Inject constructor(
 
         enableNotification()
         isGameLibraryEditOpen = false
-//        Log.d("GameViewViewModel AFTER", libraryEntry.entry.toString())
+    }
+
+    fun removeGameFromLibrary() = viewModelScope.launch {
+        libraryRepository.deleteEntry(libraryEntry.entry!!)
+        libraryEntry.entry = null
+        libraryEntry.status = null
+        libraryEntry.rating.intValue = 0
+        libraryEntry.notes = ""
+        viewModelScope.launch { snackbarHostState.showSnackbar("Game removed from library!") }
     }
 
     private fun enableNotification() {

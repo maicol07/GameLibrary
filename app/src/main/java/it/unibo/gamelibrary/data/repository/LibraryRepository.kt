@@ -36,7 +36,7 @@ class LibraryRepository(private val libraryDao: LibraryDao) {
     }
 
     @WorkerThread
-    suspend fun deleteUser(libraryEntry: LibraryEntry){
+    suspend fun deleteEntry(libraryEntry: LibraryEntry){
         libraryDao.delete(libraryEntry)
     }
 
