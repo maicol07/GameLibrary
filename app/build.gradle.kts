@@ -104,6 +104,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.security.crypto)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.fuel)
 
 
     // Test
