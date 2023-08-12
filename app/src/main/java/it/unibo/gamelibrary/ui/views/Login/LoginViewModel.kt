@@ -3,6 +3,10 @@ package it.unibo.gamelibrary.ui.views.Login
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -11,25 +15,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import it.unibo.gamelibrary.Secrets
+import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.auth.GoogleAuthProvider
-import it.unibo.gamelibrary.Secrets
-import it.unibo.gamelibrary.data.model.User
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -59,6 +60,10 @@ class LoginViewModel @Inject constructor(
                 auth.signInWithEmailAndPassword(usernameOrEmail, fields["password"]!!)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            val displayName = auth.currentUser?.displayName?.split(" ")
+                            val name = displayName?.get(0) ?: ""
+                            val surname = displayName?.get(1) ?: ""
+                            insertUserIfNotExist(name, surname, "${name}_${surname}", usernameOrEmail)
                             navController.navigate(HomeDestination())
                         } else {
                             errorValidation()
@@ -86,7 +91,6 @@ class LoginViewModel @Inject constructor(
             // Got an ID token from Google. Use it to authenticate
             // with your backend.
             Log.i("email", credential.id)
-            Log.i("DisplayName", credential.displayName!!)
             val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
             auth.signInWithCredential(firebaseCredential)
                 .addOnCompleteListener { task ->
@@ -94,19 +98,10 @@ class LoginViewModel @Inject constructor(
                         val name = credential.displayName!!.split(" ")[0]
                         val surname = credential.displayName!!.split(" ")[1]
                         val username = "${name.lowercase()}_${surname.lowercase()}"
-                        viewModelScope.launch {
-                            if(repository.getUserByUid( auth.currentUser?.uid!!) == null) {
-                                repository.insertUser(
-                                    User(
-                                        auth.currentUser?.uid!!,
-                                        name,
-                                        surname,
-                                        username,
-                                        credential.id
-                                    )
-                                )
-                            }
-                        }
+                        auth.currentUser?.updateProfile(userProfileChangeRequest {
+                            displayName = "$name $surname"
+                        })
+                        insertUserIfNotExist(name, surname, username, credential.id)
                         navController.navigate(HomeDestination())
                     } else {
                         errorValidation()
@@ -168,6 +163,22 @@ class LoginViewModel @Inject constructor(
         isError = true
         viewModelScope.launch {
             snackbarHostState.showSnackbar("${if (isEmail) "Email" else "Username"} or password is incorrect")
+        }
+    }
+
+    private fun insertUserIfNotExist(name: String, surname: String, username: String, email: String){
+        viewModelScope.launch {
+            if(repository.getUserByUid(auth.currentUser?.uid!!) == null) {
+                repository.insertUser(
+                    User(
+                        auth.currentUser?.uid!!,
+                        name,
+                        surname,
+                        username,
+                        email
+                    )
+                )
+            }
         }
     }
 }

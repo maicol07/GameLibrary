@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,6 +69,9 @@ class SignupViewModel @Inject constructor(
                                 fields["email"]!!
                             )
                             insertUser(user)
+                            auth.currentUser?.updateProfile(userProfileChangeRequest {
+                                displayName = "${user.name} ${user.surname}"
+                            })
                             navController.navigate(HomeDestination())
                         } else {
                             // If sign in fails, display a message to the user.
