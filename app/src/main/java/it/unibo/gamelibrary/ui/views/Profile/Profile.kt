@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material.icons.outlined.PersonRemoveAlt1
@@ -62,7 +63,7 @@ fun Profile(
     viewModel.getFollowed(uid)
 
     TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
-    TopAppBarState.customTitle ={
+    TopAppBarState.customTitle = {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ){
@@ -78,7 +79,7 @@ fun Profile(
                 )
             }
             else {
-                Image(
+                Icon(
                     Icons.Outlined.AccountCircle,
                     "profile image is not set",
                     modifier = Modifier
@@ -100,7 +101,7 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ){
-                Text(text = viewModel.followers.count().toString() + " followers")
+                Text(text = viewModel.followers.count().toString() + " followers")//TODO clickable
                 Text(text = viewModel.followed.count().toString() + " following")
 
             }
@@ -186,8 +187,8 @@ private fun EditButton(
     IconButton(onClick = {
         viewModel.showProfileEditDialog = true;
     }){
-        Image(
-            imageVector = Icons.Filled.Edit,
+        Icon(
+            imageVector = Icons.Outlined.Edit,
             contentDescription = "Edit Profile"
         )
     }
@@ -245,6 +246,9 @@ private fun EditButton(
                 ) {
                     Text(text = "Select New Profile Image")
                 }
+
+                Spacer(modifier = Modifier.size(16.dp))
+
                 Button(
                     onClick = {
                         val permissionCheckResult =
