@@ -12,7 +12,8 @@ fun Fullscreen(
     fullscreenState: MutableState<Boolean> = remember { mutableStateOf(false) },
     onDismissRequest: () -> Unit = { fullscreenState.value = false },
     dialogProperties: DialogProperties = DialogProperties(),
-    content: @Composable () -> Unit) {
+    content: @Composable () -> Unit
+) {
     if (fullscreenState.value) {
         Dialog(onDismissRequest = onDismissRequest, properties = dialogProperties) {
             content()

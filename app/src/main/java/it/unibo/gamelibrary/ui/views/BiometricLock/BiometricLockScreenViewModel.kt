@@ -10,8 +10,7 @@ import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import javax.inject.Inject
 
 @HiltViewModel
-class BiometricLockScreenViewModel @Inject constructor(): ViewModel(), HasBiometrics
-{
+class BiometricLockScreenViewModel @Inject constructor() : ViewModel(), HasBiometrics {
     fun authenticate(context: Context, navController: NavController) {
         showBiometricPrompt(context, "Unlock GameLibrary", onSuccess = {
             navController.navigate(HomeDestination) {

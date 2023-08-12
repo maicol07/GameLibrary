@@ -4,10 +4,15 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
@@ -28,9 +33,7 @@ import com.mahmoudalim.compose_rating_bar.RatingBarView
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.data.model.LibraryEntry
-import it.unibo.gamelibrary.ui.common.Game.GameArtwork
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
-import it.unibo.gamelibrary.ui.views.GameView.GameView
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
 
@@ -41,7 +44,7 @@ fun UserReview(
     navigator: DestinationsNavigator,
     showUser: Boolean = true,
     viewModel: UserReviewViewModel = hiltViewModel(),
-){
+) {
     Card(
         onClick = {},
         modifier = Modifier
@@ -53,8 +56,10 @@ fun UserReview(
         viewModel.getGame(review.gameId)
         viewModel.getUser(review.uid)
 
-        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-            if(showUser) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
+            if (showUser) {
                 Row( //user image and username
                     modifier = Modifier
                         .padding(8.dp)
@@ -96,7 +101,7 @@ fun UserReview(
             )
 
             //game image
-            if(viewModel.game[review.gameId] != null){
+            if (viewModel.game[review.gameId] != null) {
                 GameCoverImage(
                     viewModel.game[review.gameId]!!,
                     Modifier
@@ -119,10 +124,10 @@ fun UserReview(
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                 starSize = 26.dp
             )
-            Row (
+            Row(
                 modifier = Modifier.padding(8.dp)
-            ){
-                Text(text = review.notes ?: "" )
+            ) {
+                Text(text = review.notes ?: "")
             }
         }
     }

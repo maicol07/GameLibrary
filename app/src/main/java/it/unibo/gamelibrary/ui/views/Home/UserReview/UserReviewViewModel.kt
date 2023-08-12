@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserReviewViewModel @Inject constructor(
     private val userRepository: UserRepository
-): ViewModel() {
+) : ViewModel() {
     var game = mutableStateMapOf<Int, Game?>()
     var user = mutableStateMapOf<String, User?>()
 

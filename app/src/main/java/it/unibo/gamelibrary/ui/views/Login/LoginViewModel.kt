@@ -3,6 +3,10 @@ package it.unibo.gamelibrary.ui.views.Login
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -11,25 +15,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import it.unibo.gamelibrary.Secrets
+import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.auth.GoogleAuthProvider
-import it.unibo.gamelibrary.Secrets
-import it.unibo.gamelibrary.data.model.User
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -46,7 +46,7 @@ class LoginViewModel @Inject constructor(
     var isError by mutableStateOf(false)
     val isPasswordHidden = mutableStateOf(true)
 
-    fun login(navController: NavController){
+    fun login(navController: NavController) {
         viewModelScope.launch {
             var usernameOrEmail = fields["usernameOrEmail"]!!
             if (!isEmail) {
@@ -70,11 +70,12 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController){
+    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController) {
         if (result.resultCode != Activity.RESULT_OK) {
             // The user cancelled the login, was it due to an Exception?
             if (result.data?.action == ActivityResultContracts.StartIntentSenderForResult.ACTION_INTENT_SENDER_REQUEST) {
-                val exception = result.data?.getSerializableExtra(ActivityResultContracts.StartIntentSenderForResult.EXTRA_SEND_INTENT_EXCEPTION)
+                val exception =
+                    result.data?.getSerializableExtra(ActivityResultContracts.StartIntentSenderForResult.EXTRA_SEND_INTENT_EXCEPTION)
                 Log.e("LOG", "Couldn't start One Tap UI: ${exception?.toString()}")
             }
             return
@@ -95,7 +96,7 @@ class LoginViewModel @Inject constructor(
                         val surname = credential.displayName!!.split(" ")[1]
                         val username = "${name.lowercase()}_${surname.lowercase()}"
                         viewModelScope.launch {
-                            if(repository.getUserByUid( auth.currentUser?.uid!!) == null) {
+                            if (repository.getUserByUid(auth.currentUser?.uid!!) == null) {
                                 repository.insertUser(
                                     User(
                                         auth.currentUser?.uid!!,
@@ -151,12 +152,13 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun isEmail(field: String){
-        isEmail = "^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])\$".toRegex().matches(field)
+    fun isEmail(field: String) {
+        isEmail =
+            "^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])\$".toRegex().matches(field)
     }
 
-    fun sendEmailResetPassword(){
-        if(emailResetPassword.isNotEmpty()) {
+    fun sendEmailResetPassword() {
+        if (emailResetPassword.isNotEmpty()) {
             auth.sendPasswordResetEmail(emailResetPassword)
         }
         viewModelScope.launch {
@@ -164,7 +166,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun errorValidation(){
+    private fun errorValidation() {
         isError = true
         viewModelScope.launch {
             snackbarHostState.showSnackbar("${if (isEmail) "Email" else "Username"} or password is incorrect")

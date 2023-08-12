@@ -4,7 +4,8 @@ import androidx.security.crypto.MasterKey
 
 class SecurePreferences(context: Context) {
 
-    private val masterKeyAlias = (MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build())
+    private val masterKeyAlias =
+        (MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build())
     private val sharedPreferences = EncryptedSharedPreferences.create(
         context,
         "gamelibrary_secure_preferences",

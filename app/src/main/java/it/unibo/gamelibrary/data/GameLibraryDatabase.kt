@@ -16,17 +16,17 @@ import it.unibo.gamelibrary.data.model.User
         User::class,
         LibraryEntry::class,
         Follow::class
-   ],
+    ],
     version = 5
 )
-abstract class GameLibraryDatabase: RoomDatabase() {
+abstract class GameLibraryDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun libraryDao(): LibraryDao
     abstract fun followDao(): FollowDao
 
-    companion object{
+    companion object {
         @Volatile
-        private var INSTANCE : GameLibraryDatabase ?= null
+        private var INSTANCE: GameLibraryDatabase? = null
 
         fun getDatabase(context: Context): GameLibraryDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -34,7 +34,7 @@ abstract class GameLibraryDatabase: RoomDatabase() {
                     context.applicationContext,
                     GameLibraryDatabase::class.java,
                     "game_library"
-                    )
+                )
                     .fallbackToDestructiveMigration() // TODO: remove this on final release
                     .build()
                 INSTANCE = instance

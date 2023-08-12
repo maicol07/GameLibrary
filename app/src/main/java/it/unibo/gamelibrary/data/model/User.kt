@@ -14,7 +14,7 @@ data class UserWithLibraryEntries(
 )
 
 @Entity(primaryKeys = ["uid"], tableName = "users")
-data class User (
+data class User(
     @ColumnInfo var uid: String,
     @ColumnInfo var name: String,
     @ColumnInfo var surname: String,

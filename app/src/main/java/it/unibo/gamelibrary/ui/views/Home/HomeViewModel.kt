@@ -23,7 +23,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
     private val userRepository: UserRepository,
-): ViewModel() {
+) : ViewModel() {
 
     var newGames = mutableStateListOf<Game>()
     var popularGames = mutableStateListOf<Game>()
@@ -44,7 +44,10 @@ class HomeViewModel @Inject constructor(
             APICalypse()
                 .fields("*,cover.image_id, version_parent")
                 .sort("rating", Sort.DESCENDING)
-                .where("parent_game = null & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000)
+                .where(
+                    "parent_game = null & first_release_date < " + java.time.Instant.now()
+                        .toEpochMilli() / 1000
+                )
                 .limit(25),
             popularGames
         )
@@ -55,7 +58,10 @@ class HomeViewModel @Inject constructor(
             APICalypse()
                 .fields("*,cover.image_id")
                 .sort("first_release_date", Sort.DESCENDING)
-                .where("parent_game = null & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000)
+                .where(
+                    "parent_game = null & first_release_date < " + java.time.Instant.now()
+                        .toEpochMilli() / 1000
+                )
                 .limit(25),
             newGames
         )
@@ -73,13 +79,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPosts(){
+    private fun fetchPosts() {
         viewModelScope.launch {
             posts.addAll(libraryRepository.getAll())
         }
     }
 
-    private fun fetchUsers(){
+    private fun fetchUsers() {
         viewModelScope.launch {
             users.addAll(userRepository.getAll())
         }

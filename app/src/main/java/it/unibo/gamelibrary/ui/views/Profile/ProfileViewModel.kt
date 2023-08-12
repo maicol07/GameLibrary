@@ -1,18 +1,16 @@
 package it.unibo.gamelibrary.ui.views.Profile
+
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import it.unibo.gamelibrary.data.dao.FollowDao
-import it.unibo.gamelibrary.data.model.Follow
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.FollowRepository
@@ -28,13 +26,14 @@ class ProfileViewModel @Inject constructor(
     private val followRepository: FollowRepository,
     private val libraryRepository: LibraryRepository
 
-): ViewModel() {
+) : ViewModel() {
     var user by mutableStateOf<User?>(null)
     var userLibrary = mutableStateListOf<LibraryEntry>()
     var newImage = mutableStateOf("")
     var newBio = mutableStateOf("")
     var newUsername = mutableStateOf("")
-    var followed = mutableStateListOf<String>()//seguaci e seguiti dell'utente di cui si viualizza il profilo
+    var followed =
+        mutableStateListOf<String>()//seguaci e seguiti dell'utente di cui si viualizza il profilo
     var followers = mutableStateListOf<String>()
 
     var showProfileEditDialog by mutableStateOf(false)
@@ -55,7 +54,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun imagePickerCallback(uri: Uri?){
+    fun imagePickerCallback(uri: Uri?) {
         if (uri != null) {
             newImage.value = uri.toString()
         } else {
@@ -63,19 +62,19 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun applyChanges(){
+    fun applyChanges() {
         viewModelScope.launch {
 
-            if(newImage.value != user?.image){
+            if (newImage.value != user?.image) {
                 repository.setImage(user!!.uid, newImage.value)
             }
-            if(newBio.value != ( user?.bio ?: "" )) {
+            if (newBio.value != (user?.bio ?: "")) {
                 repository.setBio(user!!.uid, newBio.value)
             }
-            if(newUsername.value != (user?.username ?: "" )){
+            if (newUsername.value != (user?.username ?: "")) {
                 repository.setUsername(user!!.uid, newUsername.value)
             }
-           getUser(uid = user!!.uid)
+            getUser(uid = user!!.uid)
         }
     }
 
@@ -85,6 +84,7 @@ class ProfileViewModel @Inject constructor(
             followed.addAll(followRepository.getFollowed(uid).map { it.followed })
         }
     }
+
     fun getFollowers(uid: String): Job {
         return viewModelScope.launch {
             followers.clear()
@@ -92,19 +92,18 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun toggleFollow(uid1: String, uid2: String){
+    fun toggleFollow(uid1: String, uid2: String) {
         viewModelScope.launch {
-            if(amIFollowing()) {
+            if (amIFollowing()) {
                 followRepository.unfollow(uid1, uid2)
-            }
-            else{
+            } else {
                 followRepository.follow(uid1, uid2)
             }
             getFollowers(uid2)
         }
     }
 
-    fun amIFollowing(): Boolean{
+    fun amIFollowing(): Boolean {
         return followers.contains(Firebase.auth.currentUser?.uid)
     }
 

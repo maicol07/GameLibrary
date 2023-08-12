@@ -79,7 +79,7 @@ class MainActivity : FragmentActivity() {
     val auth: FirebaseAuth = Firebase.auth
 
     private val secrets = Secrets()
-    private var biometricStarted = false;
+    private var biometricStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,7 +89,9 @@ class MainActivity : FragmentActivity() {
             val prefs = SecurePreferences(this@MainActivity)
             var token = prefs.getString("twitch_token", "")
             val tokenExpiration = prefs.getString("twitch_token_expiration", "")
-            if (token == "" || tokenExpiration == "" || Instant.parse(tokenExpiration).isBefore(Instant.now())) {
+            if (token == "" || tokenExpiration == "" || Instant.parse(tokenExpiration)
+                    .isBefore(Instant.now())
+            ) {
                 Log.i("TwitchAuthenticator", "Local Token is null")
                 //in a real application it is better to use twitchAuthenticator only once, serverside.
                 val twitchToken = TwitchAuthenticator.requestTwitchToken(
@@ -100,7 +102,10 @@ class MainActivity : FragmentActivity() {
                 // The instance stores the token in the object until a new one is requested
                 if (twitchToken != null) {
                     prefs.putString("twitch_token", twitchToken.access_token)
-                    prefs.putString("twitch_token_expiration", Instant.now().plusSeconds(twitchToken.expires_in).toString())
+                    prefs.putString(
+                        "twitch_token_expiration",
+                        Instant.now().plusSeconds(twitchToken.expires_in).toString()
+                    )
                     token = twitchToken.access_token
                     Log.i("TwitchAuthenticator", "Got new token")
                 } else {
@@ -109,10 +114,11 @@ class MainActivity : FragmentActivity() {
             }
             IGDBWrapper.setCredentials(secrets.getIGDBClientId(packageName), token)
         }
-            createNotificationChannel()
+        createNotificationChannel()
 
         setContent {
-            val theme = rememberPreferenceDataStoreIntSettingState(key = "dark theme", defaultValue = 0)
+            val theme =
+                rememberPreferenceDataStoreIntSettingState(key = "dark theme", defaultValue = 0)
             val darkTheme = when (theme.value) {
                 0 -> isSystemInDarkTheme()
                 1 -> true
@@ -121,15 +127,19 @@ class MainActivity : FragmentActivity() {
             GameLibraryTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
                 navController.addOnDestinationChangedListener { controller, destination, arguments ->
-                    TopAppBarState.title = "";
+                    TopAppBarState.title = ""
                     TopAppBarState.customTitle = null
                     TopAppBarState.actions = {}
                     TopAppBarState.hide = false
                 }
 
-                var startRoute = if (auth.currentUser === null) LoginPageDestination else HomeDestination
+                var startRoute =
+                    if (auth.currentUser === null) LoginPageDestination else HomeDestination
 
-                val biometricLockEnabled by rememberPreferenceDataStoreBooleanSettingState(key = "biometric", defaultValue = false)
+                val biometricLockEnabled by rememberPreferenceDataStoreBooleanSettingState(
+                    key = "biometric",
+                    defaultValue = false
+                )
                 if (biometricLockEnabled && !biometricStarted) {
                     startRoute = BiometricLockScreenDestination
                     biometricStarted = true
@@ -138,15 +148,17 @@ class MainActivity : FragmentActivity() {
                 val lifecycleOwner = LocalLifecycleOwner.current
 
                 DisposableEffect(lifecycleOwner) {
-                    var locked = false;
+                    var locked = false
                     val lifecycleEventObserver = LifecycleEventObserver { _, event ->
                         when (event) {
                             Lifecycle.Event.ON_STOP -> {
                                 locked = true
                             }
+
                             Lifecycle.Event.ON_CREATE -> {
                                 locked = true
                             }
+
                             Lifecycle.Event.ON_RESUME -> {
                                 if (biometricLockEnabled && locked && biometricStarted) {
                                     try {
@@ -164,6 +176,7 @@ class MainActivity : FragmentActivity() {
                                     }
                                 }
                             }
+
                             else -> {}
                         }
                     }
@@ -186,7 +199,9 @@ class MainActivity : FragmentActivity() {
                             SnackbarHost(snackbarHostState)
                         },
                         bottomBar = {
-                            if (currentDestination in NavBarDestinations.values().map { it.direction }) {
+                            if (currentDestination in NavBarDestinations.values()
+                                    .map { it.direction }
+                            ) {
                                 NavBar(navController = navController)
                                 BottomBar = {}
                             } else {
@@ -197,15 +212,18 @@ class MainActivity : FragmentActivity() {
                             if (TopAppBarState.hide || (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
                                 TopBar(
                                     currentScreen = "Game Library",
-                                    canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values().map {it.direction}.contains(currentDestination),
+                                    canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values()
+                                        .map { it.direction }.contains(currentDestination),
                                     navigateUp = { navController.navigateUp() }
                                 )
                             }
                         })
                     {
-                        Column(modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it)) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(it)
+                        ) {
                             DestinationsNavHost(
                                 navController = navController,
                                 navGraph = NavGraphs.root,
@@ -227,7 +245,13 @@ class MainActivity : FragmentActivity() {
         modifier: Modifier = Modifier
     ) {
         TopAppBar(
-            title = TopAppBarState.customTitle ?: { Text(text = TopAppBarState.title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+            title = TopAppBarState.customTitle ?: {
+                Text(
+                    text = TopAppBarState.title,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
             modifier = modifier,
             navigationIcon = {
                 //se si può navigare indietro (non home screen) allora appare la freccetta
@@ -251,7 +275,11 @@ class MainActivity : FragmentActivity() {
     ) {
         Home(HomeDestination, Icons.Default.Home, R.string.bottom_bar_home_label),
         Profile(ProfileDestination, Icons.Default.AccountCircle, R.string.bottom_bar_profile_label),
-        Settings(SettingsPageDestination, Icons.Default.Settings, R.string.bottom_bar_settings_label),
+        Settings(
+            SettingsPageDestination,
+            Icons.Default.Settings,
+            R.string.bottom_bar_settings_label
+        ),
     }
 
     @Composable

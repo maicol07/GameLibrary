@@ -16,7 +16,7 @@ class LibraryRepository(private val libraryDao: LibraryDao) {
     }
 
     @WorkerThread
-    suspend fun getUserLibraryEntries(uid : String): List<LibraryEntry> {
+    suspend fun getUserLibraryEntries(uid: String): List<LibraryEntry> {
         return libraryDao.getUserLibrary(uid)
     }
 
@@ -26,17 +26,17 @@ class LibraryRepository(private val libraryDao: LibraryDao) {
     }
 
     @WorkerThread
-    suspend fun insertEntry(libraryEntry: LibraryEntry){
+    suspend fun insertEntry(libraryEntry: LibraryEntry) {
         libraryDao.add(libraryEntry)
     }
 
     @WorkerThread
-    suspend fun updateEntry(libraryEntry: LibraryEntry){
+    suspend fun updateEntry(libraryEntry: LibraryEntry) {
         libraryDao.update(libraryEntry)
     }
 
     @WorkerThread
-    suspend fun deleteEntry(libraryEntry: LibraryEntry){
+    suspend fun deleteEntry(libraryEntry: LibraryEntry) {
         libraryDao.delete(libraryEntry)
     }
 

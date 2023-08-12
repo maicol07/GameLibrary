@@ -5,6 +5,6 @@ import dagger.hilt.android.HiltAndroidApp
 import it.unibo.gamelibrary.data.GameLibraryDatabase
 
 @HiltAndroidApp
-class GameLibraryApplication: Application() {
+class GameLibraryApplication : Application() {
     val database by lazy { GameLibraryDatabase.getDatabase(this) }
 }
