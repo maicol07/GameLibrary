@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -50,16 +53,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import dagger.hilt.android.AndroidEntryPoint
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
+import it.unibo.gamelibrary.ui.views.BiometricLock.BiometricLockScreen
 import it.unibo.gamelibrary.ui.views.NavGraphs
 import it.unibo.gamelibrary.ui.views.appCurrentDestinationAsState
-import it.unibo.gamelibrary.ui.views.destinations.BiometricLockScreenDestination
 import it.unibo.gamelibrary.ui.views.destinations.Destination
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
@@ -135,50 +137,20 @@ class MainActivity : FragmentActivity() {
                     TopAppBarState.hide = false
                 }
 
-                var startRoute =
-                    if (auth.currentUser === null) LoginPageDestination else HomeDestination
-
                 val biometricLockEnabled by rememberPreferenceDataStoreBooleanSettingState(
                     key = "biometric",
                     defaultValue = false
                 )
-                if (biometricLockEnabled && !biometricStarted) {
-                    startRoute = BiometricLockScreenDestination
-                    biometricStarted = true
-                }
+                val locked = rememberSaveable { mutableStateOf(biometricLockEnabled) }
 
                 val lifecycleOwner = LocalLifecycleOwner.current
 
                 DisposableEffect(lifecycleOwner) {
-                    var locked = false
                     val lifecycleEventObserver = LifecycleEventObserver { _, event ->
                         when (event) {
-                            Lifecycle.Event.ON_STOP -> {
-                                locked = true
+                            Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_CREATE -> {
+                                locked.value = true
                             }
-
-                            Lifecycle.Event.ON_CREATE -> {
-                                locked = true
-                            }
-
-                            Lifecycle.Event.ON_RESUME -> {
-                                if (biometricLockEnabled && locked && biometricStarted) {
-                                    try {
-                                        navController.navigate(BiometricLockScreenDestination) {
-                                            if (navController.currentDestination?.route != null) {
-                                                popUpTo(navController.currentDestination!!.route!!) {
-                                                    inclusive = true
-                                                }
-                                            }
-                                            locked = false
-                                            biometricStarted = false
-                                        }
-                                    } catch (exception: IllegalArgumentException) {
-                                        // Do nothing (navigation graph not initialized)
-                                    }
-                                }
-                            }
-
                             else -> {}
                         }
                     }
@@ -196,41 +168,48 @@ class MainActivity : FragmentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Scaffold(
-                        snackbarHost = {
-                            SnackbarHost(snackbarHostState)
-                        },
-                        bottomBar = {
-                            if (currentDestination in NavBarDestinations.values()
-                                    .map { it.direction }
+
+                    if (biometricLockEnabled && locked.value) {
+                        BiometricLockScreen(locked = locked)
+                    }
+
+                    AnimatedVisibility(visible = !locked.value) {
+                        Scaffold(
+                            snackbarHost = {
+                                SnackbarHost(snackbarHostState)
+                            },
+                            bottomBar = {
+                                if (currentDestination in NavBarDestinations.values()
+                                        .map { it.direction }
+                                ) {
+                                    NavBar(navController = navController)
+                                    BottomBar = {}
+                                } else {
+                                    BottomBar()
+                                }
+                            },
+                            topBar = {
+                                if (TopAppBarState.hide || (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
+                                    TopBar(
+                                        currentScreen = "Game Library",
+                                        canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values()
+                                            .map { it.direction }.contains(currentDestination),
+                                        navigateUp = { navController.navigateUp() }
+                                    )
+                                }
+                            })
+                        {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(it)
                             ) {
-                                NavBar(navController = navController)
-                                BottomBar = {}
-                            } else {
-                                BottomBar()
-                            }
-                        },
-                        topBar = {
-                            if (TopAppBarState.hide || (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
-                                TopBar(
-                                    currentScreen = "Game Library",
-                                    canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values()
-                                        .map { it.direction }.contains(currentDestination),
-                                    navigateUp = { navController.navigateUp() }
+                                DestinationsNavHost(
+                                    navController = navController,
+                                    navGraph = NavGraphs.root,
+                                    startRoute = if (auth.currentUser === null) LoginPageDestination else HomeDestination
                                 )
                             }
-                        })
-                    {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(it)
-                        ) {
-                            DestinationsNavHost(
-                                navController = navController,
-                                navGraph = NavGraphs.root,
-                                startRoute = startRoute
-                            )
                         }
                     }
                 }
