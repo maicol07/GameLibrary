@@ -29,7 +29,7 @@ fun BiometricLockScreen(
     viewModel: BiometricLockScreenViewModel = hiltViewModel(),
     locked: MutableState<Boolean>
 ) {
-    TopAppBarState.hide = true
+    TopAppBarState.show = false
     val context = LocalContext.current
     if (viewModel.isBiometricAvailable(context) == BiometricManager.BIOMETRIC_SUCCESS) {
         viewModel.authenticate(context, locked)

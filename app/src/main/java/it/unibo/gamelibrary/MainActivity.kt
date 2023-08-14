@@ -131,10 +131,7 @@ class MainActivity : FragmentActivity() {
             GameLibraryTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
                 navController.addOnDestinationChangedListener { controller, destination, arguments ->
-                    TopAppBarState.title = ""
-                    TopAppBarState.customTitle = null
-                    TopAppBarState.actions = {}
-                    TopAppBarState.hide = false
+                    TopAppBarState.restoreDefaults()
                 }
 
                 val biometricLockEnabled by rememberPreferenceDataStoreBooleanSettingState(
@@ -189,7 +186,7 @@ class MainActivity : FragmentActivity() {
                                 }
                             },
                             topBar = {
-                                if (TopAppBarState.hide || (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
+                                if (TopAppBarState.show || (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
                                     TopBar(
                                         currentScreen = "Game Library",
                                         canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values()
