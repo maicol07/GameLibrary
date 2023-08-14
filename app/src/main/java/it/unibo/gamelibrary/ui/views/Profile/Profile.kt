@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material.icons.outlined.PersonRemoveAlt1
@@ -49,6 +50,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.BuildConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
+import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
 import java.io.File
@@ -63,42 +65,20 @@ fun Profile(
     navigator: DestinationsNavigator,
     userID: String?,
 ) {
-    var uid = userID ?: Firebase.auth.currentUser!!.uid
+    val uid = userID ?: Firebase.auth.currentUser!!.uid
     viewModel.getUser(uid)
     viewModel.getLibrary(uid)
     viewModel.getFollowers(uid)
     viewModel.getFollowed(uid)
 
-    TopAppBarState.actions = {
-        if (Firebase.auth.currentUser?.uid == uid) {
-            EditButton(viewModel)
-        }
-    }
+    TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
     TopAppBarState.customTitle = {
         Row(
             verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            if (viewModel.user?.image != null) {
-                GlideImage(
-                    {
-                        Uri.parse(viewModel.user?.image)
-                    },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                )
-            } else {
-                Image(
-                    Icons.Outlined.AccountCircle,
-                    "profile image is not set",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                )
+        ){
+            if(viewModel.user != null){
+                UserBar(user = viewModel.user!!, link = false, navigator = null)
             }
-            Spacer(Modifier.size(16.dp))
-            Text(text = viewModel.user?.username ?: "??")
         }
     }
 
@@ -111,9 +91,8 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(text = viewModel.followers.count().toString() + " followers")
-                Text(text = viewModel.followed.count().toString() + " following")
-
+                FollowList(viewModel = viewModel, followers = true, navigator)
+                FollowList(viewModel = viewModel, followers = false, navigator)
             }
 
             Row(
@@ -161,6 +140,59 @@ private fun FollowButton(
 }
 
 @Composable
+fun FollowList(
+    viewModel: ProfileViewModel,
+    followers: Boolean,
+    navigator: DestinationsNavigator
+){
+    Button(onClick = {
+        if(followers){
+            viewModel.getUsers(viewModel.followers)
+        }
+        else{
+            viewModel.getUsers(viewModel.followed)
+        }
+        viewModel.showFollowDialog = true;
+    }){
+        Text(text =
+            if(followers){ viewModel.followers.count().toString() + " followers"}
+            else{viewModel.followed.count().toString() + " following"}
+        )
+    }
+
+    if (viewModel.showFollowDialog) {
+        CustomDialog(
+            onDismissRequest = { viewModel.showFollowDialog = false },
+            title = {
+                Text(
+                    if (followers) {
+                        "followers"
+                    } else {
+                        " following"
+                    }
+                )
+            },
+            buttons = {
+                TextButton(
+                    onClick = {
+                        viewModel.showFollowDialog = false
+                    },
+                    shape = RoundedCornerShape(50.dp),
+                ) {
+                    Text(text = "Close")
+                }
+            }
+        ) {
+            LazyColumn {
+                items(viewModel.users){ user ->
+                    UserBar(user = user, true, navigator = navigator)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun EditButton(
     viewModel: ProfileViewModel
 ) {
@@ -169,40 +201,41 @@ private fun EditButton(
             viewModel.imagePickerCallback(uri)
         }
 
-    //image from camera
-    val context = LocalContext.current
-    val file = context.createImageFile()
-    val uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        BuildConfig.APPLICATION_ID + ".provider", file
-    )
-
-    val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            viewModel.newImage.value = uri.toString()
-        }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {
-        if (it) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(uri)
-        } else {
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     IconButton(onClick = {
-        viewModel.showProfileEditDialog = true
-    }) {
-        Image(
-            imageVector = Icons.Filled.Edit,
+        viewModel.showProfileEditDialog = true;
+    }){
+        Icon(
+            imageVector = Icons.Outlined.Edit,
             contentDescription = "Edit Profile"
         )
     }
 
     if (viewModel.showProfileEditDialog) {
+
+        //image from camera
+        val context = LocalContext.current
+        val file = context.createImageFile()
+        val uri = FileProvider.getUriForFile(
+            Objects.requireNonNull(context),
+            BuildConfig.APPLICATION_ID + ".provider", file
+        )
+
+        val cameraLauncher =
+            rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+                viewModel.newImage.value = uri.toString()
+            }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) {
+            if (it) {
+                Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+                cameraLauncher.launch(uri)
+            } else {
+                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         CustomDialog(
             onDismissRequest = { viewModel.showProfileEditDialog = false },
             title = { Text("Edit Profile") },
@@ -254,8 +287,12 @@ private fun EditButton(
                 ) {
                     Text(text = "Select New Profile Image")
                 }
+
+                Spacer(modifier = Modifier.size(16.dp))
+
                 Button(
                     onClick = {
+
                         val permissionCheckResult =
                             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                         if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
@@ -299,7 +336,7 @@ private fun EditButton(
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Book,
-                            contentDescription = "biografia"
+                            contentDescription = "bio"
                         )
                     },
                     modifier = Modifier.fillMaxWidth()
