@@ -42,6 +42,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.BuildConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
+import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
 import java.io.File
@@ -67,16 +68,8 @@ fun Profile(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ){
-
-            if(viewModel.user?.image != null) {
-                GlideImage(
-                    {
-                        Uri.parse(viewModel.user?.image)
-                    },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                )
+            if(viewModel.user != null){
+                UserBar(user = viewModel.user!!, link = false, navigator = null)
             }
             else {
                 Icon(
