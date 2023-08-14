@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
@@ -27,7 +28,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,13 +56,13 @@ fun SignupPage(
     viewModel: SignupViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    viewModel.getListCompanies()
     val loginViewModel: LoginViewModel = hiltViewModel()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            loginViewModel.signInWithGoogle(result, context, navController)
-        }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        loginViewModel.signInWithGoogle(result, context, navController, viewModel.isPublisher)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,6 +70,16 @@ fun SignupPage(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.size(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+            Switch(
+                checked = viewModel.isPublisher,
+                onCheckedChange = { viewModel.isPublisher = !viewModel.isPublisher}
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            Text("Are you a publisher?")
+        }
+        Spacer(modifier = Modifier.size(8.dp))
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -72,37 +87,41 @@ fun SignupPage(
             ) {
                 Text(text = "Signup", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.size(16.dp))
-                TextField(
-                    value = viewModel.fields["name"]!!,
-                    onValueChange = { viewModel.fields["name"] = it },
-                    label = { Text("Name") },
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Person,
-                            contentDescription = "name"
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                    isError = viewModel.fieldsErrors["name"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["name"]!!) Text(text = "Name field is required") }
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                TextField(
-                    value = viewModel.fields["surname"]!!,
-                    onValueChange = { viewModel.fields["surname"] = it },
-                    label = { Text("Surname") },
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Person,
-                            contentDescription = "surname"
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                    isError = viewModel.fieldsErrors["surname"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["surname"]!!) Text(text = "Surname field is required") }
-                )
+                if(!viewModel.isPublisher) {
+                    TextField(
+                        value = viewModel.fields["name"]!!,
+                        onValueChange = { viewModel.fields["name"] = it },
+                        label = { Text("Name") },
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Person,
+                                contentDescription = "name"
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                        isError = viewModel.fieldsErrors["name"]!!,
+                        supportingText = { if (viewModel.fieldsErrors["name"]!!) Text(text = "Name field is required") }
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+                    TextField(
+                        value = viewModel.fields["surname"]!!,
+                        onValueChange = { viewModel.fields["surname"] = it },
+                        label = { Text("Surname") },
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Person,
+                                contentDescription = "surname"
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                        isError = viewModel.fieldsErrors["surname"]!!,
+                        supportingText = { if (viewModel.fieldsErrors["surname"]!!) Text(text = "Surname field is required") }
+                    )
+                } else {
+                    PublisherExposedDropdownMenu()
+                }
                 Spacer(modifier = Modifier.size(16.dp))
                 TextField(
                     value = viewModel.fields["username"]!!,
@@ -153,30 +172,6 @@ fun SignupPage(
                     isError = viewModel.fieldsErrors["password"]!!,
                     supportingText = { if (viewModel.fieldsErrors["password"]!!) Text(text = "Password field has less than 6 characters") }
                 )
-                /*TextField(
-                    value = viewModel.fields["password"]!!,
-                    onValueChange = { viewModel.fields["password"] = it },
-                    label = { Text("Password") },
-                    singleLine = true,
-                    visualTransformation = if (viewModel.isPasswordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Lock,
-                            contentDescription = "password"
-                        )
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { viewModel.isPasswordHidden = !viewModel.isPasswordHidden }) {
-                            Icon(
-                                imageVector = if (viewModel.isPasswordHidden) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
-                                contentDescription = if (viewModel.isPasswordHidden) "hide password" else "show password"
-                            )
-                        }
-                    },
-                    isError = viewModel.fieldsErrors["password"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["password"]!!) Text(text = "Password field has less than 6 characters") else Unit }
-                )*/
                 Spacer(modifier = Modifier.size(16.dp))
                 PasswordTextfield(
                     value = viewModel.fields["confirmPassword"]!!,
@@ -195,32 +190,6 @@ fun SignupPage(
                     isError = viewModel.fieldsErrors["confirmPassword"]!!,
                     supportingText = { if (viewModel.fieldsErrors["confirmPassword"]!!) Text(text = "Passwords are different") }
                 )
-                /*TextField(
-                    value = viewModel.fields["confirmPassword"]!!,
-                    onValueChange = { viewModel.fields["confirmPassword"] = it },
-                    label = { Text("Confirm Password") },
-                    singleLine = true,
-                    visualTransformation = if (viewModel.isPasswordConfirmHidden) PasswordVisualTransformation() else VisualTransformation.None,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    leadingIcon = {
-                        Icon(
-                            painterResource(id = R.drawable.lock_check_outline),
-                            contentDescription = "confirm password"
-                        )
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            viewModel.isPasswordConfirmHidden = !viewModel.isPasswordConfirmHidden
-                        }) {
-                            Icon(
-                                imageVector = if (viewModel.isPasswordConfirmHidden) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
-                                contentDescription = if (viewModel.isPasswordConfirmHidden) "hide password" else "show password"
-                            )
-                        }
-                    },
-                    isError = viewModel.fieldsErrors["confirmPassword"]!!,
-                    supportingText = { if (viewModel.fieldsErrors["confirmPassword"]!!) Text(text = "Passwords are different") else Unit }
-                )*/
                 Spacer(modifier = Modifier.size(16.dp))
                 Button(onClick = {
                     viewModel.signUp(navController)
@@ -229,31 +198,77 @@ fun SignupPage(
                     Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                     Text(text = "Signup")
                 }
-                Spacer(modifier = Modifier.size(16.dp))
-                Text("Or signup with:")
-                Spacer(modifier = Modifier.size(16.dp))
-                OutlinedButton(
-                    onClick = {
-                        scope.launch {
-                            loginViewModel.launchSignInWithGoogle(
-                                context = context,
-                                launcher = launcher
-                            )
+                if(!viewModel.isPublisher) {
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Text("Or signup with:")
+                    Spacer(modifier = Modifier.size(16.dp))
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                loginViewModel.launchSignInWithGoogle(
+                                    context = context,
+                                    launcher = launcher
+                                )
+                            }
                         }
+                    ) {
+                        Icon(
+                            painterResource(id = R.drawable.google),
+                            contentDescription = "sign in"
+                        )
+                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(text = "Google")
                     }
-                ) {
-                    Icon(
-                        painterResource(id = R.drawable.google),
-                        contentDescription = "sign in"
-                    )
-                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                    Text(text = "Google")
                 }
                 TextButton(
                     onClick = { navController.navigate(LoginPageDestination()) }
                 ) {
                     Text("Do you already have an account? Sign in")
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PublisherExposedDropdownMenu(viewModel: SignupViewModel = hiltViewModel()) {
+    var expanded by remember { mutableStateOf(false) }
+    //TODO: change text when menu is open
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = !expanded
+       },
+    ) {
+        TextField(
+            // The `menuAnchor` modifier must be passed to the text field for correctness.
+            modifier = Modifier.menuAnchor(),
+            value = viewModel.publisherField,
+            onValueChange = {
+                viewModel.publisherField = it
+                viewModel.getListCompanies(it)
+            },
+            label = { Text("Publisher") },
+            leadingIcon = { Icon(Icons.Outlined.Business, "business")},
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            isError = viewModel.publisherError,
+            supportingText = {if (viewModel.publisherError) Text("The publisher name doesn't exist")}
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            viewModel.publisherOptions.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption.name) },
+                    onClick = {
+                        viewModel.publisherField = selectionOption.name
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
             }
         }
     }
