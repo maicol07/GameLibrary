@@ -186,7 +186,7 @@ class MainActivity : FragmentActivity() {
                                 }
                             },
                             topBar = {
-                                if (TopAppBarState.show || (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
+                                if (TopAppBarState.show && (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
                                     TopBar(
                                         currentScreen = "Game Library",
                                         canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values()
