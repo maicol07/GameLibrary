@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -55,7 +56,7 @@ class SignupViewModel @Inject constructor(
     private var publisherSlug by mutableStateOf<String?>(null)
     var publisherOptions by mutableStateOf<List<Company>>(emptyList())
     var isPublisher by mutableStateOf(false)
-    var publisherField by mutableStateOf("")
+    var publisherField by mutableStateOf(TextFieldValue(""))
     var publisherError by mutableStateOf(false)
 
     private var isSignupButtonPressed by mutableStateOf(false)
@@ -74,7 +75,7 @@ class SignupViewModel @Inject constructor(
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("AuthEmail", "createUserWithEmail:success")
-                            getSlugByCompany(publisherField)?.invokeOnCompletion {
+                            getSlugByCompany(publisherField.text)?.invokeOnCompletion {
                                 val user = if (!isPublisher) User(
                                     auth.currentUser?.uid!!,
                                     fields["name"]!!,
@@ -93,7 +94,7 @@ class SignupViewModel @Inject constructor(
                                     repository.insertUser(user)
                                 }
                                 auth.currentUser?.updateProfile(userProfileChangeRequest {
-                                    displayName = if (isPublisher) publisherField else "${user.name} ${user.surname}"
+                                    displayName = if (isPublisher) publisherField.text else "${user.name} ${user.surname}"
                                 })
                                 navController.navigate(HomeDestination())
                             }
@@ -171,7 +172,7 @@ class SignupViewModel @Inject constructor(
             }
         }
         if(isPublisher) {
-            publisherError = publisherField.isEmpty() || !publisherOptions.map { it.name }.contains(publisherField)
+            publisherError = publisherField.text.isEmpty() || !publisherOptions.map { it.name }.contains(publisherField.text)
         }
         for (value in fieldsErrors.values) {
             if (value) {

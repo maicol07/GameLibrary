@@ -43,8 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -240,12 +242,11 @@ fun SignupPage(
 @Composable
 fun PublisherExposedDropdownMenu(viewModel: SignupViewModel = hiltViewModel()) {
     var expanded by remember { mutableStateOf(false) }
-    //TODO: change text when menu is open
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
             expanded = !expanded
-       },
+       }
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
@@ -253,24 +254,27 @@ fun PublisherExposedDropdownMenu(viewModel: SignupViewModel = hiltViewModel()) {
             value = viewModel.publisherField,
             onValueChange = {
                 viewModel.publisherField = it
-                viewModel.getListCompanies(it)
+                viewModel.getListCompanies(it.text)
             },
             label = { Text("Publisher") },
             leadingIcon = { Icon(Icons.Outlined.Business, "business")},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             isError = viewModel.publisherError,
-            supportingText = {if (viewModel.publisherError) Text("The publisher name doesn't exist")}
+            supportingText = {if (viewModel.publisherError) Text("The publisher name doesn't exist")},
         )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-        ) {
+        ){
             viewModel.publisherOptions.forEach { selectionOption ->
                 DropdownMenuItem(
                     text = { Text(selectionOption.name) },
                     onClick = {
-                        viewModel.publisherField = selectionOption.name
+                        viewModel.publisherField = TextFieldValue(
+                            text = selectionOption.name,
+                            selection = TextRange(selectionOption.name.length)
+                        )
                         expanded = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
