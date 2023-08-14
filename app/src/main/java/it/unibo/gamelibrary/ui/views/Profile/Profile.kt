@@ -71,17 +71,6 @@ fun Profile(
             if(viewModel.user != null){
                 UserBar(user = viewModel.user!!, link = false, navigator = null)
             }
-            else {
-                Icon(
-                    Icons.Outlined.AccountCircle,
-                    "profile image is not set",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                )
-            }
-            Spacer(Modifier.size(16.dp))
-            Text(text = viewModel.user?.username ?: "??")
         }
     }
 
@@ -94,9 +83,8 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ){
-                Text(text = viewModel.followers.count().toString() + " followers")//TODO clickable
-                Text(text = viewModel.followed.count().toString() + " following")
-
+                followList(viewModel = viewModel, followers = true, navigator)
+                followList(viewModel = viewModel, followers = false, navigator)
             }
 
             Row(
@@ -141,6 +129,59 @@ private fun FollowButton(
         else{
             Text(text = "Follow ")
             Icon(Icons.Outlined.PersonAddAlt1, null)
+        }
+    }
+}
+
+@Composable
+fun followList(
+    viewModel: ProfileViewModel,
+    followers: Boolean,
+    navigator: DestinationsNavigator
+){
+    Button(onClick = {
+        if(followers){
+            viewModel.getUsers(viewModel.followers)
+        }
+        else{
+            viewModel.getUsers(viewModel.followed)
+        }
+        viewModel.showFollowDialog = true;
+    }){
+        Text(text = 
+            if(followers){ viewModel.followers.count().toString() + " followers"} 
+            else{viewModel.followed.count().toString() + " following"}
+        )
+    }
+
+    if (viewModel.showFollowDialog) {
+        CustomDialog(
+            onDismissRequest = { viewModel.showFollowDialog = false },
+            title = {
+                Text(
+                    if (followers) {
+                        "followers"
+                    } else {
+                        " following"
+                    }
+                )
+            },
+            buttons = {
+                TextButton(
+                    onClick = {
+                        viewModel.showFollowDialog = false
+                    },
+                    shape = RoundedCornerShape(50.dp),
+                ) {
+                    Text(text = "Close")
+                }
+            }
+        ) {
+            LazyColumn {
+                items(viewModel.users){ user ->
+                    UserBar(user = user, true, navigator = navigator)
+                }
+            }
         }
     }
 }

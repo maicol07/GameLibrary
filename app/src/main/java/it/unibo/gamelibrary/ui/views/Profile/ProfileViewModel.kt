@@ -36,8 +36,10 @@ class ProfileViewModel @Inject constructor(
     var newUsername = mutableStateOf("")
     var followed = mutableStateListOf<String>()//seguaci e seguiti dell'utente di cui si viualizza il profilo
     var followers = mutableStateListOf<String>()
+    var users = mutableStateListOf<User>()
 
     var showProfileEditDialog by mutableStateOf(false)
+    var showFollowDialog by mutableStateOf(false)
 
     fun getUser(uid: String) {
         viewModelScope.launch {
@@ -65,7 +67,6 @@ class ProfileViewModel @Inject constructor(
 
     fun applyChanges(){
         viewModelScope.launch {
-
             if(newImage.value != user?.image){
                 repository.setImage(user!!.uid, newImage.value)
             }
@@ -106,6 +107,16 @@ class ProfileViewModel @Inject constructor(
 
     fun amIFollowing(): Boolean{
         return followers.contains(Firebase.auth.currentUser?.uid)
+    }
+
+    fun getUsers(uids: List<String>){
+        users.clear()
+        viewModelScope.launch {
+            uids.forEach{
+                users.add(repository.getUserByUid(it)!!)
+            }
+
+        }
     }
 
 }
