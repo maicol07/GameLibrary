@@ -35,6 +35,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -85,7 +89,13 @@ fun Profile(
     LazyColumn {
         item {//bio, follow
             Row {
-                Text(viewModel.user?.bio.toString(), modifier = Modifier.padding(24.dp))
+                Text(
+                    if(viewModel.user?.bio != null){
+                        viewModel.user?.bio.toString()
+                    } else {
+                        "..."
+                    }, modifier = Modifier.padding(24.dp))
+
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -106,6 +116,7 @@ fun Profile(
 
             Spacer(Modifier.size(16.dp))
         }
+
         //reviews di questo user
         items(viewModel.userLibrary)
         {
@@ -145,14 +156,16 @@ fun FollowList(
     followers: Boolean,
     navigator: DestinationsNavigator
 ){
-    Button(onClick = {
+    var showDialog by remember{ mutableStateOf(false) }
+
+    TextButton(onClick = {
         if(followers){
             viewModel.getUsers(viewModel.followers)
         }
         else{
             viewModel.getUsers(viewModel.followed)
         }
-        viewModel.showFollowDialog = true;
+        showDialog = true;
     }){
         Text(text =
             if(followers){ viewModel.followers.count().toString() + " followers"}
@@ -160,22 +173,22 @@ fun FollowList(
         )
     }
 
-    if (viewModel.showFollowDialog) {
+    if (showDialog) {
         CustomDialog(
-            onDismissRequest = { viewModel.showFollowDialog = false },
+            onDismissRequest = { showDialog = false },
             title = {
-                Text(
-                    if (followers) {
-                        "followers"
+                Text(text =
+                    if(followers) {
+                        "Followers"
                     } else {
-                        " following"
+                        "Following"
                     }
                 )
             },
             buttons = {
                 TextButton(
                     onClick = {
-                        viewModel.showFollowDialog = false
+                        showDialog = false
                     },
                     shape = RoundedCornerShape(50.dp),
                 ) {
