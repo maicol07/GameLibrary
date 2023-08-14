@@ -57,7 +57,7 @@ fun Profile(
     navigator: DestinationsNavigator,
     userID: String?,
 ) {
-    var uid = userID?: Firebase.auth.currentUser!!.uid
+    val uid = userID?: Firebase.auth.currentUser!!.uid
     viewModel.getUser(uid)
     viewModel.getLibrary(uid)
     viewModel.getFollowers(uid)
@@ -83,8 +83,8 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ){
-                followList(viewModel = viewModel, followers = true, navigator)
-                followList(viewModel = viewModel, followers = false, navigator)
+                FollowList(viewModel = viewModel, followers = true, navigator)
+                FollowList(viewModel = viewModel, followers = false, navigator)
             }
 
             Row(
@@ -134,7 +134,7 @@ private fun FollowButton(
 }
 
 @Composable
-fun followList(
+fun FollowList(
     viewModel: ProfileViewModel,
     followers: Boolean,
     navigator: DestinationsNavigator
@@ -194,30 +194,6 @@ private fun EditButton(
         viewModel.imagePickerCallback(uri)
     }
 
-    //image from camera
-    val context = LocalContext.current
-    val file = context.createImageFile()
-    val uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        BuildConfig.APPLICATION_ID + ".provider", file
-    )
-
-    val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            viewModel.newImage.value = uri.toString()
-        }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {
-        if (it) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(uri)
-        } else {
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     IconButton(onClick = {
         viewModel.showProfileEditDialog = true;
     }){
@@ -228,6 +204,31 @@ private fun EditButton(
     }
 
     if (viewModel.showProfileEditDialog) {
+
+        //image from camera
+        val context = LocalContext.current
+        val file = context.createImageFile()
+        val uri = FileProvider.getUriForFile(
+            Objects.requireNonNull(context),
+            BuildConfig.APPLICATION_ID + ".provider", file
+        )
+
+        val cameraLauncher =
+            rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+                viewModel.newImage.value = uri.toString()
+            }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) {
+            if (it) {
+                Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+                cameraLauncher.launch(uri)
+            } else {
+                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         CustomDialog(
             onDismissRequest = { viewModel.showProfileEditDialog = false },
             title = {Text("Edit Profile")},
@@ -285,6 +286,7 @@ private fun EditButton(
 
                 Button(
                     onClick = {
+
                         val permissionCheckResult =
                             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                         if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
@@ -328,7 +330,7 @@ private fun EditButton(
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Book,
-                            contentDescription = "biografia"
+                            contentDescription = "bio"
                         )
                     },
                     modifier = Modifier.fillMaxWidth()
