@@ -28,6 +28,7 @@ class HomeViewModel @Inject constructor(
     var newGames = mutableStateListOf<Game>()
     var mostLovedGames = mutableStateListOf<Game>()
     var popularGames = mutableStateListOf<Game>()
+    var upcomingGames = mutableStateListOf<Game>()
     var posts = mutableStateListOf<LibraryEntry>()
 
     //"users" used in testing.
@@ -38,6 +39,7 @@ class HomeViewModel @Inject constructor(
         fetchMostLoved()
         fetchPopularGames()
         fetchPosts()
+        fetchUpcoming()
         fetchUsers()
     }
 
@@ -47,8 +49,22 @@ class HomeViewModel @Inject constructor(
                 .fields("*,cover.image_id")
                 .sort("rating", Sort.DESCENDING)
                 .where("parent_game = null & follows > 200")
-                .limit(25),
+                .limit(50),
             mostLovedGames
+        )
+    }
+
+    fun fetchUpcoming() {
+        fetchList(
+            APICalypse()
+                .fields("*,cover.image_id")
+                .sort("first_release_date", Sort.ASCENDING)
+                .where(
+                    "parent_game = null & first_release_date > " + java.time.Instant.now()
+                        .toEpochMilli() / 1000
+                )
+                .limit(50),
+            upcomingGames
         )
     }
 
@@ -60,13 +76,13 @@ class HomeViewModel @Inject constructor(
                 .sort("rating", Sort.DESCENDING)
                 .where("parent_game = null & follows > 5 & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000
                         + "& first_release_date > " + (java.time.Instant.now().toEpochMilli() / 1000).minus(yearSec))
-                .limit(25),
+                .limit(50),
             popularGames
         )
     }
 
     fun fetchNewGames() {
-        fetchList( //fields *; where game.platforms = 48 & date < 1538129354; sort date desc;
+        fetchList(
             APICalypse()
                 .fields("*,cover.image_id")
                 .sort("first_release_date", Sort.DESCENDING)
@@ -74,7 +90,7 @@ class HomeViewModel @Inject constructor(
                     "parent_game = null & first_release_date < " + java.time.Instant.now()
                         .toEpochMilli() / 1000
                 )
-                .limit(25),
+                .limit(50),
             newGames
         )
     }
