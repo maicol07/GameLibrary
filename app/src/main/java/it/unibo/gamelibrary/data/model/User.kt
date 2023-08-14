@@ -16,11 +16,13 @@ data class UserWithLibraryEntries(
 @Entity(primaryKeys = ["uid"], tableName = "users")
 data class User (
     @ColumnInfo var uid: String,
-    @ColumnInfo var name: String,
-    @ColumnInfo var surname: String,
+    @ColumnInfo var name: String? = null,
+    @ColumnInfo var surname: String? = null,
     @ColumnInfo var username: String,
     @ColumnInfo var email: String,
     @ColumnInfo var address: String? = null,
     @ColumnInfo var image: String? = null,
     @ColumnInfo var bio: String? = null,
+    @ColumnInfo var isPublisher: Boolean = false,
+    @ColumnInfo var publisherName: String? = null
 )

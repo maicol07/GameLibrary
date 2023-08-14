@@ -17,7 +17,7 @@ import it.unibo.gamelibrary.data.model.User
         LibraryEntry::class,
         Follow::class
    ],
-    version = 5
+    version = 7
 )
 abstract class GameLibraryDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
