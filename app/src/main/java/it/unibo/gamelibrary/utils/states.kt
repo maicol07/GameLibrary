@@ -10,7 +10,14 @@ object TopAppBarState {
     var title by mutableStateOf("Game Library")
     var customTitle by mutableStateOf<(@Composable () -> Unit)?>(null)
     var actions by mutableStateOf<@Composable RowScope.() -> Unit>({})
-    var hide by mutableStateOf(false)
+    var show by mutableStateOf(true)
+
+    fun restoreDefaults() {
+        title = "Game Library"
+        customTitle = null
+        actions = {}
+        show = true
+    }
 }
 
 var BottomBar by mutableStateOf<@Composable () -> Unit>({})
