@@ -67,6 +67,12 @@ fun Home(
                 viewModel.newGames,
                 navigator
             )
+            Spacer(Modifier.size(8.dp))
+            HomeSection(
+                title = "Upcoming Games",
+                viewModel.upcomingGames,
+                navigator
+            )
         }
 
         items(
@@ -77,7 +83,6 @@ fun Home(
         }
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -131,6 +136,3 @@ fun HomeSection(
         }
     }
 }
-
-
-
