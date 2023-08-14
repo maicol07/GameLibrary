@@ -169,7 +169,7 @@ class MainActivity : FragmentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    if (biometricLockEnabled && locked.value) {
+                    if (auth.currentUser !== null && biometricLockEnabled && locked.value) {
                         BiometricLockScreen(locked = locked)
                     }
 
