@@ -165,12 +165,12 @@ class MainActivity : FragmentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-                    if (auth.currentUser !== null && biometricLockEnabled && locked.value) {
+                    val isLocked = auth.currentUser !== null && biometricLockEnabled && locked.value
+                    if (isLocked) {
                         BiometricLockScreen(locked = locked)
                     }
 
-                    AnimatedVisibility(visible = !locked.value) {
+                    AnimatedVisibility(visible = !isLocked) {
                         Scaffold(
                             snackbarHost = {
                                 SnackbarHost(snackbarHostState)
