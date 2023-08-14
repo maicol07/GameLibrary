@@ -3,6 +3,8 @@ package it.unibo.gamelibrary.ui.views.Home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,6 +50,18 @@ fun Home(
 
     LazyColumn {
         item {
+            HomeSection(
+                title = "Popular Games",
+                viewModel.popularGames,
+                navigator
+            )
+            Spacer(Modifier.size(8.dp))
+            HomeSection(
+                title = "Most Loved Games",
+                viewModel.mostLovedGames,
+                navigator
+            )
+            Spacer(Modifier.size(8.dp))
             HomeSection(
                 title = "New Games",
                 viewModel.newGames,

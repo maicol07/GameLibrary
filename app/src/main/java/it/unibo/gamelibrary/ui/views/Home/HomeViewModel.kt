@@ -26,6 +26,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     var newGames = mutableStateListOf<Game>()
+    var mostLovedGames = mutableStateListOf<Game>()
     var popularGames = mutableStateListOf<Game>()
     var posts = mutableStateListOf<LibraryEntry>()
 
@@ -34,20 +35,31 @@ class HomeViewModel @Inject constructor(
 
     init {
         fetchNewGames()
-        //fetchPopularGames()
+        fetchMostLoved()
+        fetchPopularGames()
         fetchPosts()
         fetchUsers()
     }
 
-    fun fetchPopularGames() { //TODO la query è la stessa di new, cambiala
+    fun fetchMostLoved() {
         fetchList(
             APICalypse()
-                .fields("*,cover.image_id, version_parent")
+                .fields("*,cover.image_id")
                 .sort("rating", Sort.DESCENDING)
-                .where(
-                    "parent_game = null & first_release_date < " + java.time.Instant.now()
-                        .toEpochMilli() / 1000
-                )
+                .where("parent_game = null & follows > 200")
+                .limit(25),
+            mostLovedGames
+        )
+    }
+
+    fun fetchPopularGames() {//giochi rilasciati nell'ultimo anno
+        val yearSec = 31556926
+        fetchList(
+            APICalypse()
+                .fields("*,cover.image_id")
+                .sort("rating", Sort.DESCENDING)
+                .where("parent_game = null & follows > 5 & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000
+                        + "& first_release_date > " + (java.time.Instant.now().toEpochMilli() / 1000).minus(yearSec))
                 .limit(25),
             popularGames
         )
