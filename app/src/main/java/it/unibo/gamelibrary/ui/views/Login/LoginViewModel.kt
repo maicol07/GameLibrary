@@ -53,7 +53,6 @@ class LoginViewModel @Inject constructor(
             if (!isEmail) {
                 val user = repository.getUserByUsername(usernameOrEmail)
                 usernameOrEmail = user?.email ?: ""
-                Log.i("Email From Username", usernameOrEmail)
             }
             Log.i("Email", usernameOrEmail)
             if (usernameOrEmail.isNotEmpty() && fields["password"]!!.isNotEmpty()) {
@@ -75,12 +74,10 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController){
+    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController, isPublisher: Boolean = false){
         if (result.resultCode != Activity.RESULT_OK) {
-            // The user cancelled the login, was it due to an Exception?
-            if (result.data?.action == ActivityResultContracts.StartIntentSenderForResult.ACTION_INTENT_SENDER_REQUEST) {
-                val exception = result.data?.getSerializableExtra(ActivityResultContracts.StartIntentSenderForResult.EXTRA_SEND_INTENT_EXCEPTION)
-                Log.e("LOG", "Couldn't start One Tap UI: ${exception?.toString()}")
+            viewModelScope.launch {
+                snackbarHostState.showSnackbar("Google login cancelled")
             }
             return
         }
@@ -101,7 +98,7 @@ class LoginViewModel @Inject constructor(
                         auth.currentUser?.updateProfile(userProfileChangeRequest {
                             displayName = "$name $surname"
                         })
-                        insertUserIfNotExist(name, surname, username, credential.id)
+                        insertUserIfNotExist(name, surname, username, credential.id, isPublisher)
                         navController.navigate(HomeDestination())
                     } else {
                         errorValidation()
@@ -166,16 +163,17 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun insertUserIfNotExist(name: String, surname: String, username: String, email: String){
+    private fun insertUserIfNotExist(name: String, surname: String, username: String, email: String, isPublisher: Boolean = false){
         viewModelScope.launch {
             if(repository.getUserByUid(auth.currentUser?.uid!!) == null) {
                 repository.insertUser(
                     User(
-                        auth.currentUser?.uid!!,
-                        name,
-                        surname,
-                        username,
-                        email
+                        uid = auth.currentUser?.uid!!,
+                        name = name,
+                        surname = surname,
+                        username = username,
+                        email = email,
+                        isPublisher = isPublisher
                     )
                 )
             }
