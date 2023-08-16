@@ -15,7 +15,7 @@ import it.unibo.gamelibrary.ui.views.GameView.GameHeader
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import proto.Game
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameCardView(
     game: Game,

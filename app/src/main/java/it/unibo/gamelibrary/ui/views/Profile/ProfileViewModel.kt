@@ -67,7 +67,6 @@ class ProfileViewModel @Inject constructor(
             var publisher = IGDBApiRequest {
                 IGDBWrapper.companies(
                     APICalypse()
-                        //.fields("published, slug, published.name, published.cover.image_id")
                         .fields(
                             listOf(
                                 "published, slug, published.name, published.cover.image_id",
@@ -86,13 +85,13 @@ class ProfileViewModel @Inject constructor(
                                 "published.release_dates.platform.platform_logo.url",
                             ).joinToString(",")
                         )
-                        .sort("slug", Sort.DESCENDING)
                         .where("slug = \"${user?.publisherName}\"")
                         .limit(2)
                 )
             }[0]
             publisherGames.clear()
             publisherGames.addAll(publisher!!.publishedList)
+            publisherGames.sortByDescending { it.firstReleaseDate.seconds }
         }
     }
 
