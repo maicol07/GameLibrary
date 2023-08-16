@@ -8,6 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.api.igdb.apicalypse.APICalypse
+import com.api.igdb.apicalypse.Sort
+import com.api.igdb.exceptions.RequestException
+import com.api.igdb.request.IGDBWrapper
+import com.api.igdb.request.companies
+import com.api.igdb.request.games
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +22,11 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.FollowRepository
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
+import it.unibo.gamelibrary.utils.IGDBApiRequest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import proto.Company
+import proto.Game
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,8 +46,9 @@ class ProfileViewModel @Inject constructor(
     var followers = mutableStateListOf<String>()
     var users = mutableStateListOf<User>()
 
+    var publisherGames = mutableStateListOf<Game>()
+
     var showProfileEditDialog by mutableStateOf(false)
-    var showFollowDialog by mutableStateOf(false)
 
     fun getUser(uid: String) {
         viewModelScope.launch {
@@ -46,6 +56,43 @@ class ProfileViewModel @Inject constructor(
             newBio.value = user?.bio ?: ""
             newImage.value = user?.image ?: ""
             newUsername.value = user?.username ?: ""
+            if(user?.isPublisher == true){
+                getPublisherGames()
+            }
+        }
+    }
+
+    fun getPublisherGames(){
+        viewModelScope.launch {
+            var publisher = IGDBApiRequest {
+                IGDBWrapper.companies(
+                    APICalypse()
+                        //.fields("published, slug, published.name, published.cover.image_id")
+                        .fields(
+                            listOf(
+                                "published, slug, published.name, published.cover.image_id",
+                                "published.name",
+                                "published.artworks.image_id",
+                                "published.cover.image_id",
+                                "published.first_release_date",
+                                "published.involved_companies.*",
+                                "published.involved_companies.company.name",
+                                "published.genres.name",
+                                "published.genres.slug",
+                                "published.screenshots.image_id",
+                                "published.summary",
+                                "published.release_dates.human",
+                                "published.release_dates.platform.name",
+                                "published.release_dates.platform.platform_logo.url",
+                            ).joinToString(",")
+                        )
+                        .sort("slug", Sort.DESCENDING)
+                        .where("slug = \"${user?.publisherName}\"")
+                        .limit(2)
+                )
+            }[0]
+            publisherGames.clear()
+            publisherGames.addAll(publisher!!.publishedList)
         }
     }
 

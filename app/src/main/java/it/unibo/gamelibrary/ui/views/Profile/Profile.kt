@@ -54,9 +54,11 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.BuildConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
+import it.unibo.gamelibrary.ui.common.components.GameCardView.GameCardView
 import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
+import proto.Game
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -101,8 +103,8 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                FollowList(viewModel = viewModel, followers = true, navigator)
                 FollowList(viewModel = viewModel, followers = false, navigator)
+                FollowList(viewModel = viewModel, followers = true, navigator)
             }
 
             Row(
@@ -113,14 +115,20 @@ fun Profile(
                     FollowButton(viewModel, Firebase.auth.currentUser!!.uid, uid)
                 }
             }
-
             Spacer(Modifier.size(16.dp))
         }
 
         //reviews di questo user
-        items(viewModel.userLibrary)
-        {
-            UserReview(it, navigator, showUser = false)
+        if(viewModel.user?.isPublisher == false){
+            items(viewModel.userLibrary)
+            {
+                UserReview(it, navigator, showUser = false)
+            }
+        }
+        else{
+            items(viewModel.publisherGames){game: Game ->
+                GameCardView(game = game, navigator = navigator)
+            }
         }
     }
 }

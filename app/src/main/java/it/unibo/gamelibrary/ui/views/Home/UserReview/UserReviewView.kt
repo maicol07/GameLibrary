@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,6 +35,7 @@ import com.mahmoudalim.compose_rating_bar.RatingBarView
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.data.model.LibraryEntry
+import it.unibo.gamelibrary.ui.common.Game.GameArtwork
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
@@ -52,7 +55,6 @@ fun UserReview(
             .padding(8.dp)
             .wrapContentHeight()
     ) {
-
         viewModel.getGame(review.gameId)
         viewModel.getUser(review.uid)
 
@@ -102,18 +104,20 @@ fun UserReview(
 
             //game image
             if (viewModel.game[review.gameId] != null) {
-                GameCoverImage(
+                GameArtwork(
                     viewModel.game[review.gameId]!!,
+                    "",
                     Modifier
+                        .height(200.dp)
+                        .padding(8.dp)
                         .combinedClickable(
                             onClick = { navigator.navigate(GameViewNavDestination(review.gameId)) },
                         )
-                        .padding(8.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(8.dp)),
                 )
             }
 
-            var rating = remember { mutableStateOf(review.rating ?: 0) }
+            var rating = remember { mutableIntStateOf(review.rating ?: 0) }
             RatingBarView(
                 rating = rating,
                 isRatingEditable = false,

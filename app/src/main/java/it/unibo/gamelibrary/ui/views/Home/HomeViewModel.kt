@@ -22,7 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
-    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     var newGames = mutableStateListOf<Game>()
@@ -31,16 +30,12 @@ class HomeViewModel @Inject constructor(
     var upcomingGames = mutableStateListOf<Game>()
     var posts = mutableStateListOf<LibraryEntry>()
 
-    //"users" used in testing.
-    var users = mutableStateListOf<User>()
-
     init {
         fetchNewGames()
         fetchMostLoved()
         fetchPopularGames()
         fetchPosts()
         fetchUpcoming()
-        fetchUsers()
     }
 
     fun fetchMostLoved() {
@@ -100,7 +95,6 @@ class HomeViewModel @Inject constructor(
             try {
                 list.clear()
                 list.addAll(IGDBApiRequest { IGDBWrapper.games(query) })
-                //Log.i("fetch list, list =", list[0].toString())
             } catch (e: RequestException) {
                 Log.e("ERR_FETCH_GAME_LIST_HOME", "${e.statusCode} , ${e.message}")
             }
@@ -112,11 +106,4 @@ class HomeViewModel @Inject constructor(
             posts.addAll(libraryRepository.getAll())
         }
     }
-
-    private fun fetchUsers() {
-        viewModelScope.launch {
-            users.addAll(userRepository.getAll())
-        }
-    }
-
 }
