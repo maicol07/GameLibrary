@@ -86,7 +86,7 @@ class ProfileViewModel @Inject constructor(
                             ).joinToString(",")
                         )
                         .where("slug = \"${user?.publisherName}\"")
-                        .limit(2)
+                        .limit(1)
                 )
             }[0]
             publisherGames.clear()

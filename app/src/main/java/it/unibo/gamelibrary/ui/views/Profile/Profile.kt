@@ -64,6 +64,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
 
+
+//TODO se sei sul profilo di qualcun'altro la bottom app bar seleziona sia home che profile
+//TODO
 @Destination
 @Composable()
 fun Profile(
@@ -92,10 +95,10 @@ fun Profile(
         item {//bio, follow
             Row {
                 Text(
-                    if(viewModel.user?.bio != null){
+                    if(viewModel.user?.bio != null || viewModel.user?.bio == ""){
                         viewModel.user?.bio.toString()
                     } else {
-                        "..."
+                        "nothing here yet"
                     }, modifier = Modifier.padding(24.dp))
 
             }
