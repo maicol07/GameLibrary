@@ -34,10 +34,6 @@ class HomePublisherViewModel @Inject constructor(
     private var publisher by mutableStateOf<Company?>(null)
     var posts = mutableStateListOf<LibraryEntry>()
 
-    init {
-        fetchGamesAndPosts()
-    }
-
     fun fetchGamesAndPosts(){
         viewModelScope.launch {
             try {
@@ -66,6 +62,7 @@ class HomePublisherViewModel @Inject constructor(
 
     private fun fetchPosts() {
         viewModelScope.launch {
+            posts.clear()
             for (game in games){
                 posts.addAll(libraryRepository.getCollectionsByGame(game))
             }
