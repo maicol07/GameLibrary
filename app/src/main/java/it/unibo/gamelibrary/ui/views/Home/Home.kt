@@ -18,7 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -72,7 +76,7 @@ fun Home(
                         )
                         Spacer(Modifier.size(8.dp))
                         HomeSection(
-                            title = "New Games",
+                            title = "Recently Released Games",
                             viewModel.newGames,
                             navigator
                         )
@@ -106,7 +110,7 @@ fun HomeSection(
     Column {
         Text(
             text = title,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(4.dp)
         )
