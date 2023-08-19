@@ -4,8 +4,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -187,6 +189,7 @@ private fun ChangeEmailDialog(viewModel: SettingsViewModel = hiltViewModel()) {
                 Text("Insert your password")
                 Spacer(modifier = Modifier.padding(16.dp))
                 PasswordTextfield(
+                    Modifier,
                     viewModel.passwordValue,
                     { viewModel.passwordValue = it },
                     "Password",
@@ -208,7 +211,9 @@ private fun ChangePasswordDialog(viewModel: SettingsViewModel = hiltViewModel())
         }
     CustomDialog(
         onDismissRequest = { viewModel.openPasswordDialog = false },
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+                .padding(16.dp)
+                .requiredWidth(320.dp),
         buttons = {
             TextButton(
                 onClick = { viewModel.openPasswordDialog = false }
@@ -239,6 +244,7 @@ private fun ChangePasswordDialog(viewModel: SettingsViewModel = hiltViewModel())
         Column {
             if (!viewModel.isSignInWithGoogle) {
                 PasswordTextfield(
+                    Modifier.fillMaxWidth(),
                     viewModel.passwordFields["old"]!!,
                     { viewModel.passwordFields["old"] = it },
                     "Old password",
@@ -248,6 +254,7 @@ private fun ChangePasswordDialog(viewModel: SettingsViewModel = hiltViewModel())
                 Spacer(modifier = Modifier.padding(16.dp))
             }
             PasswordTextfield(
+                Modifier.fillMaxWidth(),
                 viewModel.passwordFields["new"]!!,
                 { viewModel.passwordFields["new"] = it },
                 "New password",
@@ -256,6 +263,7 @@ private fun ChangePasswordDialog(viewModel: SettingsViewModel = hiltViewModel())
             )
             Spacer(modifier = Modifier.padding(16.dp))
             PasswordTextfield(
+                Modifier.fillMaxWidth(),
                 viewModel.passwordFields["confirm"]!!,
                 { viewModel.passwordFields["confirm"] = it },
                 "Confirm password",

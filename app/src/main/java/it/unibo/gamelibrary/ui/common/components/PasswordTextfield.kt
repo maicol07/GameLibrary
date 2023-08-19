@@ -11,14 +11,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun PasswordTextfield(
+    modifier: Modifier = Modifier,
     value: String,
     onChange: (String) -> Unit,
     label: String,
@@ -30,9 +33,16 @@ fun PasswordTextfield(
 ) {
     val focusManager = LocalFocusManager.current
     TextField(
+        modifier = modifier,
         value = value,
         onValueChange = onChange,
-        label = { Text(label) },
+        label = {
+            Text(
+                text = label,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
         singleLine = true,
         visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
