@@ -1,7 +1,10 @@
 package it.unibo.gamelibrary.ui.views.Home
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.api.igdb.apicalypse.APICalypse
@@ -9,12 +12,16 @@ import com.api.igdb.apicalypse.Sort
 import com.api.igdb.exceptions.RequestException
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.games
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBApiRequest
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import proto.Game
 import javax.inject.Inject
@@ -30,6 +37,8 @@ class HomeViewModel @Inject constructor(
     var popularGames = mutableStateListOf<Game>()
     var upcomingGames = mutableStateListOf<Game>()
     var posts = mutableStateListOf<LibraryEntry>()
+
+    var user by mutableStateOf<User?>(null)
 
     //"users" used in testing.
     var users = mutableStateListOf<User>()
@@ -93,6 +102,14 @@ class HomeViewModel @Inject constructor(
                 .limit(50),
             newGames
         )
+    }
+
+    fun getUser() {
+        viewModelScope.launch {
+            user = userRepository.getUserByUid(
+                    Firebase.auth.currentUser?.uid!!
+            )
+        }
     }
 
     private fun fetchList(query: APICalypse, list: MutableList<Game>) {
