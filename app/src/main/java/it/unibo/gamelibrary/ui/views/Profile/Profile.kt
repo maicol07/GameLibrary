@@ -64,9 +64,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
 
-
-//TODO se sei sul profilo di qualcun'altro la bottom app bar seleziona sia home che profile
-//TODO
 @Destination
 @Composable()
 fun Profile(
@@ -207,11 +204,16 @@ fun FollowList(
                 }
             }
         ) {
-            LazyColumn {
-                items(viewModel.users){ user ->
-                    UserBar(user = user, true, navigator = navigator)
+            if(viewModel.users.isNotEmpty()){
+                LazyColumn {
+                    items(viewModel.users){ user ->
+                        UserBar(user = user, true, navigator = navigator)
+                    }
                 }
+            }else{
+                Text(text = "No one here yet!")
             }
+
         }
     }
 }
@@ -300,38 +302,33 @@ private fun EditButton(
 
                 Spacer(modifier = Modifier.size(16.dp))
 
-                Button(
-                    onClick = {
-                        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                    },
-                    shape = RoundedCornerShape(50.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(text = "Select New Profile Image")
-                }
-
-                Spacer(modifier = Modifier.size(16.dp))
-
-                Button(
-                    onClick = {
-
-                        val permissionCheckResult =
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                        if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                            cameraLauncher.launch(uri)
-                        } else {
-                            // Request a permission
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
+                Row (
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    TextButton(
+                        onClick = {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         }
-                    },
-                    shape = RoundedCornerShape(50.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(text = "Take a picture")
+                    ) {
+                        Text(text = "Select Image")
+                    }
+
+                    TextButton(
+                        onClick = {
+
+                            val permissionCheckResult =
+                                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                                cameraLauncher.launch(uri)
+                            } else {
+                                // Request a permission
+                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+                    ) {
+                        Text(text = "Take a picture")
+                    }
                 }
 
                 Spacer(modifier = Modifier.size(16.dp))
@@ -356,7 +353,6 @@ private fun EditButton(
                     value = viewModel.newBio.value,
                     onValueChange = { viewModel.newBio.value = it },
                     label = { Text("Bio") },
-                    singleLine = true,
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Book,
