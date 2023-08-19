@@ -29,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     var newGames = mutableStateListOf<Game>()
