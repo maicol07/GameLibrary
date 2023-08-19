@@ -57,6 +57,7 @@ import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
+import com.ramcosta.composedestinations.utils.route
 import dagger.hilt.android.AndroidEntryPoint
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
 import it.unibo.gamelibrary.ui.views.BiometricLock.BiometricLockScreen
@@ -271,7 +272,13 @@ class MainActivity : FragmentActivity() {
             for (destination in NavBarDestinations.values()) {
                 val isCurrentDestOnBackStack = navController.isRouteOnBackStack(destination.direction)
                 NavigationBarItem(
-                    selected = isCurrentDestOnBackStack,
+                    selected =
+                        if(currentDestination.route == "profile?userID={userID}" && navController.currentBackStackEntry?.arguments?.getString("userID") != null){
+                            false
+                        }
+                        else{
+                            currentDestination == destination.direction
+                        },
                     onClick = {
                         if (isCurrentDestOnBackStack) {
                             // When we click again on a bottom bar item and it was already selected
