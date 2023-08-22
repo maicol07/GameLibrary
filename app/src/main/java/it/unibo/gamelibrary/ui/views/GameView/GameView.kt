@@ -506,6 +506,7 @@ private fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltView
                 // Dismiss the dialog when the user clicks outside the dialog or on the back
                 // button. If you want to disable that functionality, simply use an empty
                 // onDismissRequest.
+                notShowAgain.value = viewModel.notShowAgainNotification
                 viewModel.openNotificationDialog = false
             },
             title = {
