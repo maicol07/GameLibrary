@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.api.igdb.utils.ImageSize
 import com.api.igdb.utils.imageBuilder
@@ -31,7 +32,8 @@ fun GameCoverImage(
     contentDescription: String? = null,
     fullscreenable: Boolean = false,
     fullscreenModifier: Modifier = Modifier,
-    shape: RoundedCornerShape = RoundedCornerShape(16.dp)
+    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
+    shadowElevation: Dp = 16.dp,
 ) {
     val fullscreenState = remember { mutableStateOf(false) }
 
@@ -71,7 +73,7 @@ fun GameCoverImage(
         },
         modifier = Modifier
             .clip(shape)
-            .shadow(16.dp, shape)
+            .shadow(shadowElevation, shape)
             .then(clickableModifier)
     )
 }
