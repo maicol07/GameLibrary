@@ -1,6 +1,5 @@
 package it.unibo.gamelibrary.ui.views.Home.Search
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.api.igdb.apicalypse.APICalypse
 import com.api.igdb.apicalypse.Sort
-import com.api.igdb.exceptions.RequestException
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.games
 import com.api.igdb.request.genres
@@ -33,9 +31,10 @@ enum class SearchType(val text: String) {
 
 data class FilterState<out T>(
     var values: SnapshotStateList<@UnsafeVariance T>,
-    var selected: SnapshotStateList<@UnsafeVariance T> = mutableStateListOf())
+    var selected: SnapshotStateList<@UnsafeVariance T> = mutableStateListOf()
+)
 
-data class SearchTypeObject<R, F> (
+data class SearchTypeObject<R, F>(
     private val defaultQuery: String = "",
     private val defaultInProgress: Boolean = false,
     var results: SnapshotStateList<R> = mutableStateListOf(),
@@ -78,11 +77,16 @@ class SearchViewModel @Inject constructor(
 
         for ((filter, state) in gamesSearch.filters) {
             if (state.selected.isNotEmpty()) {
-                where.add("${filter.apiField} = (${state.selected.joinToString(",") { when (it) {
-                    is Platform -> it.id.toString()
-                    is Genre -> it.id.toString()
-                    else -> ""
-                }} })")
+                where.add(
+                    "${filter.apiField} = (${
+                        state.selected.joinToString(",") {
+                            when (it) {
+                                is Platform -> it.id.toString()
+                                is Genre -> it.id.toString()
+                                else -> ""
+                            }
+                        }
+                    })")
             }
         }
 
@@ -101,52 +105,41 @@ class SearchViewModel @Inject constructor(
     private fun fetchSearchedGames(query: APICalypse) {
         gamesSearch.inProgress = true
         viewModelScope.launch {
-            try {
-                gamesSearch.results.clear()
-                gamesSearch.results.addAll(IGDBApiRequest { IGDBWrapper.games(query) })
-                gamesSearch.inProgress = false
-            } catch (e: RequestException) {
-                Log.e("ERR_FETCH_GAME_LIST_HOME", "${e.statusCode} , ${e.message}")
-            }
+            gamesSearch.results.clear()
+            IGDBApiRequest { IGDBWrapper.games(query) }?.let { gamesSearch.results.addAll(it) }
+            gamesSearch.inProgress = false
         }
     }
 
     private fun fetchSearchedUsers(query: String) {
         usersSearch.inProgress = true
         viewModelScope.launch {
-            try {
-                usersSearch.results.clear()
-                usersSearch.results.addAll(userRepository.searchUser(query))
-                usersSearch.inProgress = false
-            } catch (e: RequestException) {
-                Log.e("ERR_FETCH_GAME_LIST_HOME", "${e.statusCode} , ${e.message}")
-            }
+            usersSearch.results.clear()
+            usersSearch.results.addAll(userRepository.searchUser(query))
+            usersSearch.inProgress = false
         }
     }
 
     private fun fetchPlaforms() {
         viewModelScope.launch {
-            try {
-                platforms.clear()
-                platforms.addAll(IGDBApiRequest { IGDBWrapper.platforms(APICalypse()
-                    .fields("slug,name,platform_logo.url")
-                    .sort("generation", Sort.DESCENDING)
-                    .where("generation != null")
-                    .limit(30)
-                ) })
-            } catch (e: RequestException) {
-                Log.e("ERR_FETCH_GAME_LIST_HOME", "${e.statusCode} , ${e.message}")
-            }
+            platforms.clear()
+            IGDBApiRequest {
+                IGDBWrapper.platforms(
+                    APICalypse()
+                        .fields("slug,name,platform_logo.url")
+                        .sort("generation", Sort.DESCENDING)
+                        .where("generation != null")
+                        .limit(30)
+                )
+            }?.let { platforms.addAll(it) }
         }
     }
 
     private fun fetchGenres() {
         viewModelScope.launch {
-            try {
-                genres.clear()
-                genres.addAll(IGDBApiRequest { IGDBWrapper.genres(APICalypse().fields("slug,name").limit(25)) })
-            } catch (e: RequestException) {
-                Log.e("ERR_FETCH_GAME_LIST_HOME", "${e.statusCode} , ${e.message}")
+            genres.clear()
+            IGDBApiRequest { IGDBWrapper.genres(APICalypse().fields("slug,name").limit(25)) }?.let {
+                genres.addAll(it)
             }
         }
     }

@@ -9,11 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.api.igdb.apicalypse.APICalypse
-import com.api.igdb.apicalypse.Sort
-import com.api.igdb.exceptions.RequestException
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.companies
-import com.api.igdb.request.games
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +22,6 @@ import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBApiRequest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import proto.Company
 import proto.Game
 import javax.inject.Inject
 
@@ -88,7 +84,7 @@ class ProfileViewModel @Inject constructor(
                         .where("slug = \"${user?.publisherName}\"")
                         .limit(1)
                 )
-            }[0]
+            }?.get(0)
             publisherGames.clear()
             publisherGames.addAll(publisher!!.publishedList)
             publisherGames.sortByDescending { it.firstReleaseDate.seconds }

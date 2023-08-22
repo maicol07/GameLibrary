@@ -129,7 +129,7 @@ class SignupViewModel @Inject constructor(
                                 "name ~ *\"${name}\"*"
                             )
                     )
-                }
+                } ?: emptyList()
         }
     }
 
@@ -147,7 +147,7 @@ class SignupViewModel @Inject constructor(
                                 "name = \"$name\""
                             )
                     )
-                }[0].slug
+                }?.get(0)?.slug
             Log.i("Slug", publisherSlug ?: "slug")
         }
         return jobSlug

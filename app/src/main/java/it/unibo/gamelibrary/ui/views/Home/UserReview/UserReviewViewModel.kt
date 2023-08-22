@@ -50,6 +50,6 @@ class UserReviewViewModel @Inject constructor(
                     .where("id = $gameId")
             )
         }
-        game[gameId] = games[0]
+        game[gameId] = games?.get(0)
     }
 }

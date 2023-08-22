@@ -80,7 +80,7 @@ class GameViewViewModel @Inject constructor(
                     .where("id = $gameId")
             )
         }
-        game = games[0]
+        game = games?.get(0)
         getUserLibraryEntry(gameId, Firebase.auth.currentUser!!.uid)
     }
 

@@ -21,14 +21,13 @@ val snackbarHostState = SnackbarHostState()
 var notificationId by mutableIntStateOf(0)
 var channel_id by mutableStateOf("")
 
-@Throws(RequestException::class)
-suspend fun <T> IGDBApiRequest(apiRequest: () -> T): T = withContext(Dispatchers.IO) {
+suspend fun <T> IGDBApiRequest(apiRequest: () -> T): T? = withContext(Dispatchers.IO) {
     try {
         apiRequest()
     } catch (e: RequestException) {
         val response = e.request.response().second;
         Log.e("IGDBApiRequest", response.toString())
-        throw e
+        null
     }
 }
 

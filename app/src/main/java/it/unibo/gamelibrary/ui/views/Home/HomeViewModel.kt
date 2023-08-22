@@ -1,6 +1,5 @@
 package it.unibo.gamelibrary.ui.views.Home
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -9,10 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.api.igdb.apicalypse.APICalypse
 import com.api.igdb.apicalypse.Sort
-import com.api.igdb.exceptions.RequestException
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.games
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +18,6 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBApiRequest
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import proto.Game
 import javax.inject.Inject
@@ -31,7 +27,6 @@ class HomeViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-
     var newGames = mutableStateListOf<Game>()
     var mostLovedGames = mutableStateListOf<Game>()
     var popularGames = mutableStateListOf<Game>()
@@ -82,8 +77,12 @@ class HomeViewModel @Inject constructor(
             APICalypse()
                 .fields("*,cover.image_id")
                 .sort("rating", Sort.DESCENDING)
-                .where("parent_game = null & follows > 5 & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000
-                        + "& first_release_date > " + (java.time.Instant.now().toEpochMilli() / 1000).minus(yearSec))
+                .where(
+                    "parent_game = null & follows > 5 & first_release_date < " + java.time.Instant.now()
+                        .toEpochMilli() / 1000
+                            + "& first_release_date > " + (java.time.Instant.now()
+                        .toEpochMilli() / 1000).minus(yearSec)
+                )
                 .limit(50),
             popularGames
         )
@@ -106,19 +105,15 @@ class HomeViewModel @Inject constructor(
     fun getUser() {
         viewModelScope.launch {
             user = userRepository.getUserByUid(
-                    Firebase.auth.currentUser?.uid!!
+                Firebase.auth.currentUser?.uid!!
             )
         }
     }
 
     private fun fetchList(query: APICalypse, list: MutableList<Game>) {
         viewModelScope.launch {
-            try {
-                list.clear()
-                list.addAll(IGDBApiRequest { IGDBWrapper.games(query) })
-            } catch (e: RequestException) {
-                Log.e("ERR_FETCH_GAME_LIST_HOME", "${e.statusCode} , ${e.message}")
-            }
+            list.clear()
+            IGDBApiRequest { IGDBWrapper.games(query) }?.let { list.addAll(it) }
         }
     }
 
