@@ -41,4 +41,8 @@ interface UserDao {
 
     @Query("UPDATE users SET bio = :bio WHERE uid = :uid")
     suspend fun setBio(uid: String, bio: String)
+
+    // Search user by name, surname or username
+    @Query("SELECT * FROM users WHERE username LIKE '%' || :query || '%' OR name LIKE '%' || :query || '%' OR surname LIKE '%' || :query || '%'")
+    suspend fun searchUser(query: String): List<User>
 }

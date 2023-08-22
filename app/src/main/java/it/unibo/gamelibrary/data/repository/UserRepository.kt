@@ -60,4 +60,9 @@ class UserRepository(private val userDao: UserDao) {
     suspend fun updateUser(user: User) {
         userDao.update(user)
     }
+
+    @WorkerThread
+    suspend fun searchUser(query: String): List<User> {
+        return userDao.searchUser(query)
+    }
 }

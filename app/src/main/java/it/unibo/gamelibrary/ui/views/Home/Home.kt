@@ -39,6 +39,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.ui.views.Home.Search.SearchBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.ui.views.HomePublisher.HomePublisher
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
@@ -52,47 +53,56 @@ fun Home(
     navigator: DestinationsNavigator,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    if (Firebase.auth.currentUser != null) {
-        if (viewModel.user == null) {
-            viewModel.getUser()
-        } else {
-            if (viewModel.user?.isPublisher == true) {
-                HomePublisher(navigator = navigator)
+    TopAppBarState.show = false
+    Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            SearchBar(navigator)
+        }
+        Spacer(modifier = Modifier.size(8.dp))
+        if (Firebase.auth.currentUser != null) {
+            if (viewModel.user == null) {
+                viewModel.getUser()
             } else {
-                TopAppBarState.actions = {}
-                TopAppBarState.title = "Home"
-                LazyColumn {
-                    item {
-                        HomeSection(
-                            title = "Popular Games",
-                            viewModel.popularGames,
-                            navigator
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        HomeSection(
-                            title = "Most Loved Games",
-                            viewModel.mostLovedGames,
-                            navigator
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        HomeSection(
-                            title = "Recently Released Games",
-                            viewModel.newGames,
-                            navigator
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        HomeSection(
-                            title = "Upcoming Games",
-                            viewModel.upcomingGames,
-                            navigator
-                        )
-                    }
+                if (viewModel.user?.isPublisher == true) {
+                    HomePublisher(navigator = navigator)
+                } else {
+                    LazyColumn {
+                        item {
+                            HomeSection(
+                                title = "Popular Games",
+                                viewModel.popularGames,
+                                navigator
+                            )
+                            Spacer(Modifier.size(8.dp))
+                            HomeSection(
+                                title = "Most Loved Games",
+                                viewModel.mostLovedGames,
+                                navigator
+                            )
+                            Spacer(Modifier.size(8.dp))
+                            HomeSection(
+                                title = "Recently Released Games",
+                                viewModel.newGames,
+                                navigator
+                            )
+                            Spacer(Modifier.size(8.dp))
+                            HomeSection(
+                                title = "Upcoming Games",
+                                viewModel.upcomingGames,
+                                navigator
+                            )
+                        }
 
-                    items(
-                        viewModel.posts,
-                        key = { it.id })
-                    {
-                        UserReview(it, navigator, showUser = true)
+                        items(
+                            viewModel.posts,
+                            key = { it.id })
+                        {
+                            UserReview(it, navigator, showUser = true)
+                        }
                     }
                 }
             }
