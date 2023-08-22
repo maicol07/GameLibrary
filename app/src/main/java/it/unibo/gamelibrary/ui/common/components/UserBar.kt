@@ -16,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.data.model.User
@@ -60,7 +62,7 @@ fun UserBar(user: User, link: Boolean, navigator: DestinationsNavigator?){
             )
         }
         Spacer(Modifier.size(16.dp))
-        Text(text = user.username)
+        Text(text = user.username, fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 
 }
