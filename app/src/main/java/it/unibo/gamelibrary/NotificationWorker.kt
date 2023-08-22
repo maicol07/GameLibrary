@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import it.unibo.gamelibrary.utils.channel_id
 import it.unibo.gamelibrary.utils.notificationId
 
 
@@ -29,7 +30,7 @@ class NotificationWorker(private val context: Context, workerParams: WorkerParam
             val pendingIntent: PendingIntent =
                 PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-            val builder = NotificationCompat.Builder(context, "channel_id")
+            val builder = NotificationCompat.Builder(context, channel_id)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle("$gameName is out today")
                 .setContentText("Click here to see it!")

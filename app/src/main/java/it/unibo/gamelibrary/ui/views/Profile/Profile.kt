@@ -54,9 +54,11 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.BuildConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
+import it.unibo.gamelibrary.ui.common.components.GameCardView.GameCardView
 import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
+import proto.Game
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -90,10 +92,10 @@ fun Profile(
         item {//bio, follow
             Row {
                 Text(
-                    if(viewModel.user?.bio != null){
+                    if(viewModel.user?.bio != null || viewModel.user?.bio == ""){
                         viewModel.user?.bio.toString()
                     } else {
-                        "..."
+                        "nothing here yet"
                     }, modifier = Modifier.padding(24.dp))
 
             }
@@ -101,8 +103,8 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                FollowList(viewModel = viewModel, followers = true, navigator)
                 FollowList(viewModel = viewModel, followers = false, navigator)
+                FollowList(viewModel = viewModel, followers = true, navigator)
             }
 
             Row(
@@ -113,14 +115,20 @@ fun Profile(
                     FollowButton(viewModel, Firebase.auth.currentUser!!.uid, uid)
                 }
             }
-
             Spacer(Modifier.size(16.dp))
         }
 
         //reviews di questo user
-        items(viewModel.userLibrary)
-        {
-            UserReview(it, navigator, showUser = false)
+        if(viewModel.user?.isPublisher == false){
+            items(viewModel.userLibrary)
+            {
+                UserReview(it, navigator, showUser = false)
+            }
+        }
+        else{
+            items(viewModel.publisherGames){game: Game ->
+                GameCardView(game = game, navigator = navigator)
+            }
         }
     }
 }
@@ -196,11 +204,16 @@ fun FollowList(
                 }
             }
         ) {
-            LazyColumn {
-                items(viewModel.users){ user ->
-                    UserBar(user = user, true, navigator = navigator)
+            if(viewModel.users.isNotEmpty()){
+                LazyColumn {
+                    items(viewModel.users){ user ->
+                        UserBar(user = user, true, navigator = navigator)
+                    }
                 }
+            }else{
+                Text(text = "No one here yet!")
             }
+
         }
     }
 }
@@ -289,38 +302,33 @@ private fun EditButton(
 
                 Spacer(modifier = Modifier.size(16.dp))
 
-                Button(
-                    onClick = {
-                        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                    },
-                    shape = RoundedCornerShape(50.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(text = "Select New Profile Image")
-                }
-
-                Spacer(modifier = Modifier.size(16.dp))
-
-                Button(
-                    onClick = {
-
-                        val permissionCheckResult =
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                        if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                            cameraLauncher.launch(uri)
-                        } else {
-                            // Request a permission
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
+                Row (
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    TextButton(
+                        onClick = {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         }
-                    },
-                    shape = RoundedCornerShape(50.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(text = "Take a picture")
+                    ) {
+                        Text(text = "Select Image")
+                    }
+
+                    TextButton(
+                        onClick = {
+
+                            val permissionCheckResult =
+                                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                                cameraLauncher.launch(uri)
+                            } else {
+                                // Request a permission
+                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+                    ) {
+                        Text(text = "Take a picture")
+                    }
                 }
 
                 Spacer(modifier = Modifier.size(16.dp))
@@ -345,7 +353,6 @@ private fun EditButton(
                     value = viewModel.newBio.value,
                     onValueChange = { viewModel.newBio.value = it },
                     label = { Text("Bio") },
-                    singleLine = true,
                     leadingIcon = {
                         Icon(
                             Icons.Outlined.Book,

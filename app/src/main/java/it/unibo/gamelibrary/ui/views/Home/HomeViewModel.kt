@@ -1,7 +1,10 @@
 package it.unibo.gamelibrary.ui.views.Home
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.api.igdb.apicalypse.APICalypse
@@ -9,12 +12,16 @@ import com.api.igdb.apicalypse.Sort
 import com.api.igdb.exceptions.RequestException
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.games
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBApiRequest
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import proto.Game
 import javax.inject.Inject
@@ -22,13 +29,16 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     var newGames = mutableStateListOf<Game>()
     var mostLovedGames = mutableStateListOf<Game>()
     var popularGames = mutableStateListOf<Game>()
+    var upcomingGames = mutableStateListOf<Game>()
     var posts = mutableStateListOf<LibraryEntry>()
+
+    var user by mutableStateOf<User?>(null)
 
     //"users" used in testing.
     var users = mutableStateListOf<User>()
@@ -38,7 +48,7 @@ class HomeViewModel @Inject constructor(
         fetchMostLoved()
         fetchPopularGames()
         fetchPosts()
-        fetchUsers()
+        fetchUpcoming()
     }
 
     fun fetchMostLoved() {
@@ -47,8 +57,22 @@ class HomeViewModel @Inject constructor(
                 .fields("*,cover.image_id")
                 .sort("rating", Sort.DESCENDING)
                 .where("parent_game = null & follows > 200")
-                .limit(25),
+                .limit(50),
             mostLovedGames
+        )
+    }
+
+    fun fetchUpcoming() {
+        fetchList(
+            APICalypse()
+                .fields("*,cover.image_id")
+                .sort("first_release_date", Sort.ASCENDING)
+                .where(
+                    "parent_game = null & first_release_date > " + java.time.Instant.now()
+                        .toEpochMilli() / 1000
+                )
+                .limit(50),
+            upcomingGames
         )
     }
 
@@ -60,13 +84,13 @@ class HomeViewModel @Inject constructor(
                 .sort("rating", Sort.DESCENDING)
                 .where("parent_game = null & follows > 5 & first_release_date < " + java.time.Instant.now().toEpochMilli() / 1000
                         + "& first_release_date > " + (java.time.Instant.now().toEpochMilli() / 1000).minus(yearSec))
-                .limit(25),
+                .limit(50),
             popularGames
         )
     }
 
     fun fetchNewGames() {
-        fetchList( //fields *; where game.platforms = 48 & date < 1538129354; sort date desc;
+        fetchList(
             APICalypse()
                 .fields("*,cover.image_id")
                 .sort("first_release_date", Sort.DESCENDING)
@@ -74,9 +98,17 @@ class HomeViewModel @Inject constructor(
                     "parent_game = null & first_release_date < " + java.time.Instant.now()
                         .toEpochMilli() / 1000
                 )
-                .limit(25),
+                .limit(50),
             newGames
         )
+    }
+
+    fun getUser() {
+        viewModelScope.launch {
+            user = userRepository.getUserByUid(
+                    Firebase.auth.currentUser?.uid!!
+            )
+        }
     }
 
     private fun fetchList(query: APICalypse, list: MutableList<Game>) {
@@ -84,7 +116,6 @@ class HomeViewModel @Inject constructor(
             try {
                 list.clear()
                 list.addAll(IGDBApiRequest { IGDBWrapper.games(query) })
-                //Log.i("fetch list, list =", list[0].toString())
             } catch (e: RequestException) {
                 Log.e("ERR_FETCH_GAME_LIST_HOME", "${e.statusCode} , ${e.message}")
             }
@@ -96,11 +127,4 @@ class HomeViewModel @Inject constructor(
             posts.addAll(libraryRepository.getAll())
         }
     }
-
-    private fun fetchUsers() {
-        viewModelScope.launch {
-            users.addAll(userRepository.getAll())
-        }
-    }
-
 }

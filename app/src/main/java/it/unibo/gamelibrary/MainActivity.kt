@@ -57,6 +57,7 @@ import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
+import com.ramcosta.composedestinations.utils.route
 import dagger.hilt.android.AndroidEntryPoint
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
 import it.unibo.gamelibrary.ui.views.BiometricLock.BiometricLockScreen
@@ -71,11 +72,13 @@ import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
 import it.unibo.gamelibrary.ui.views.startAppDestination
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.TopAppBarState
+import it.unibo.gamelibrary.utils.channel_id
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.util.UUID
 
 
 @AndroidEntryPoint
@@ -271,7 +274,13 @@ class MainActivity : FragmentActivity() {
             for (destination in NavBarDestinations.values()) {
                 val isCurrentDestOnBackStack = navController.isRouteOnBackStack(destination.direction)
                 NavigationBarItem(
-                    selected = isCurrentDestOnBackStack,
+                    selected =
+                        if(currentDestination.route == "profile?userID={userID}" && navController.currentBackStackEntry?.arguments?.getString("userID") != null){
+                            false
+                        }
+                        else{
+                            currentDestination == destination.direction
+                        },
                     onClick = {
                         if (isCurrentDestOnBackStack) {
                             // When we click again on a bottom bar item and it was already selected
@@ -310,18 +319,17 @@ class MainActivity : FragmentActivity() {
     private fun createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Prova"
-            val descriptionText = "Questa è una prova"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel("channel_id", name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        channel_id = UUID.randomUUID().toString()
+        val name = "Game notification"
+        val descriptionText = "Get notification when your game is published"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(channel_id, name, importance).apply {
+            description = descriptionText
         }
+        // Register the channel with the system
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
 }

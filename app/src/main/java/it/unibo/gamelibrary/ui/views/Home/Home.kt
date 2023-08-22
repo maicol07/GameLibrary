@@ -18,7 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,6 +31,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.api.igdb.utils.ImageSize
 import com.api.igdb.utils.ImageType
 import com.api.igdb.utils.imageBuilder
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -34,6 +40,7 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
+import it.unibo.gamelibrary.ui.views.HomePublisher.HomePublisher
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
 import proto.Game
@@ -45,39 +52,53 @@ fun Home(
     navigator: DestinationsNavigator,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    TopAppBarState.actions = {}
-    TopAppBarState.title = "Home"
+    if (Firebase.auth.currentUser != null) {
+        if (viewModel.user == null) {
+            viewModel.getUser()
+        } else {
+            if (viewModel.user?.isPublisher == true) {
+                HomePublisher(navigator = navigator)
+            } else {
+                TopAppBarState.actions = {}
+                TopAppBarState.title = "Home"
+                LazyColumn {
+                    item {
+                        HomeSection(
+                            title = "Popular Games",
+                            viewModel.popularGames,
+                            navigator
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        HomeSection(
+                            title = "Most Loved Games",
+                            viewModel.mostLovedGames,
+                            navigator
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        HomeSection(
+                            title = "Recently Released Games",
+                            viewModel.newGames,
+                            navigator
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        HomeSection(
+                            title = "Upcoming Games",
+                            viewModel.upcomingGames,
+                            navigator
+                        )
+                    }
 
-    LazyColumn {
-        item {
-            HomeSection(
-                title = "Popular Games",
-                viewModel.popularGames,
-                navigator
-            )
-            Spacer(Modifier.size(8.dp))
-            HomeSection(
-                title = "Most Loved Games",
-                viewModel.mostLovedGames,
-                navigator
-            )
-            Spacer(Modifier.size(8.dp))
-            HomeSection(
-                title = "New Games",
-                viewModel.newGames,
-                navigator
-            )
-        }
-
-        items(
-            viewModel.posts,
-            key = { it.id })
-        {
-            UserReview(it, navigator, showUser = true)
+                    items(
+                        viewModel.posts,
+                        key = { it.id })
+                    {
+                        UserReview(it, navigator, showUser = true)
+                    }
+                }
+            }
         }
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -89,7 +110,7 @@ fun HomeSection(
     Column {
         Text(
             text = title,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(4.dp)
         )
@@ -131,6 +152,3 @@ fun HomeSection(
         }
     }
 }
-
-
-

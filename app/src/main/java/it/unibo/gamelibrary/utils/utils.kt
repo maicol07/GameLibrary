@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentActivity
 import com.api.igdb.exceptions.RequestException
@@ -18,6 +19,7 @@ fun Timestamp.toInstant() = java.time.Instant.ofEpochSecond(seconds, nanos.toLon
 val snackbarHostState = SnackbarHostState()
 
 var notificationId by mutableIntStateOf(0)
+var channel_id by mutableStateOf("")
 
 @Throws(RequestException::class)
 suspend fun <T> IGDBApiRequest(apiRequest: () -> T): T = withContext(Dispatchers.IO) {

@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -59,11 +58,32 @@ class LoginViewModel @Inject constructor(
                 auth.signInWithEmailAndPassword(usernameOrEmail, fields["password"]!!)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            val displayName = auth.currentUser?.displayName?.split(" ")
-                            val name = displayName?.get(0) ?: ""
-                            val surname = displayName?.get(1) ?: ""
-                            insertUserIfNotExist(name, surname, "${name}_${surname}", usernameOrEmail)
-                            navController.navigate(HomeDestination())
+                            var isPublisher = false
+                            viewModelScope.launch {
+                                isPublisher =
+                                    repository.getUserByUid(auth.currentUser?.uid!!)?.isPublisher!!
+                            }.invokeOnCompletion {
+                                if (isPublisher){
+                                    insertUserIfNotExist(
+                                        username = auth.currentUser?.displayName!!,
+                                        email = usernameOrEmail,
+                                        isPublisher = true,
+                                        publisherName = auth.currentUser!!.displayName
+                                    )
+                                } else {
+                                    val displayName = auth.currentUser?.displayName?.split(" ")
+                                    val name = displayName?.get(0) ?: ""
+                                    val surname =
+                                        if (displayName?.get(1) == null) "" else displayName[1]
+                                    insertUserIfNotExist(
+                                        name,
+                                        surname,
+                                        "${name}_${surname}",
+                                        usernameOrEmail
+                                    )
+                                }
+                                navController.navigate(HomeDestination())
+                            }
                         } else {
                             errorValidation()
                         }
@@ -92,14 +112,30 @@ class LoginViewModel @Inject constructor(
             auth.signInWithCredential(firebaseCredential)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val name = credential.displayName!!.split(" ")[0]
-                        val surname = credential.displayName!!.split(" ")[1]
-                        val username = "${name.lowercase()}_${surname.lowercase()}"
-                        auth.currentUser?.updateProfile(userProfileChangeRequest {
-                            displayName = "$name $surname"
-                        })
-                        insertUserIfNotExist(name, surname, username, credential.id, isPublisher)
-                        navController.navigate(HomeDestination())
+                        var isUserPublisher = false
+                        viewModelScope.launch {
+                            isUserPublisher =
+                                repository.getUserByUid(auth.currentUser?.uid!!)?.isPublisher!!
+                        }.invokeOnCompletion {
+                            if (isUserPublisher){
+                                insertUserIfNotExist(
+                                    username = credential.displayName!!,
+                                    email = credential.id,
+                                    isPublisher = true,
+                                    publisherName = credential.displayName!!
+                                )
+                            } else {
+                                val name = credential.displayName!!.split(" ")[0]
+                                val surname = credential.displayName!!.split(" ")[1]
+                                insertUserIfNotExist(
+                                    name,
+                                    surname,
+                                    "${name.lowercase()}_${surname.lowercase()}",
+                                    credential.id
+                                )
+                            }
+                            navController.navigate(HomeDestination())
+                        }
                     } else {
                         errorValidation()
                     }
@@ -164,18 +200,32 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun insertUserIfNotExist(name: String, surname: String, username: String, email: String, isPublisher: Boolean = false){
+    private fun insertUserIfNotExist(name: String? = null,
+                                     surname: String? = null,
+                                     username: String,
+                                     email: String,
+                                     isPublisher: Boolean = false,
+                                     publisherName: String? = null){
         viewModelScope.launch {
             if(repository.getUserByUid(auth.currentUser?.uid!!) == null) {
                 repository.insertUser(
-                    User(
-                        uid = auth.currentUser?.uid!!,
-                        name = name,
-                        surname = surname,
-                        username = username,
-                        email = email,
-                        isPublisher = isPublisher
-                    )
+                    if (isPublisher)
+                        User(
+                            uid = auth.currentUser?.uid!!,
+                            username = username,
+                            email = email,
+                            isPublisher = isPublisher,
+                            publisherName = publisherName
+                        )
+                    else
+                        User(
+                            uid = auth.currentUser?.uid!!,
+                            name = name,
+                            surname = surname,
+                            username = username,
+                            email = email,
+                            isPublisher = isPublisher
+                        )
                 )
             }
         }

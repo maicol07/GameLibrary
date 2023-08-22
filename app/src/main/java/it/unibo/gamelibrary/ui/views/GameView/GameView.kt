@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -29,6 +30,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -56,6 +58,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.alorma.compose.settings.storage.base.getValue
+import com.alorma.compose.settings.storage.base.setValue
+import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -101,7 +106,8 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
             .shimmer()
     }
     GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
-    if (viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    val notShowAgain by rememberPreferenceDataStoreBooleanSettingState(key = "notShowAgain", defaultValue = false)
+    if (!notShowAgain && viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         NotificationPermissionDialog()
     }
 }
@@ -435,7 +441,8 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel()) {
+private fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel()) {
+    var notShowAgain by rememberPreferenceDataStoreBooleanSettingState(key = "notShowAgain", defaultValue = false)
     val notificationPermissionsState = rememberPermissionState(
         Manifest.permission.POST_NOTIFICATIONS
     )
@@ -464,13 +471,24 @@ fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel())
                 Text(text = "Permissions required")
             },
             text = {
-                Text(text = textToShow)
+                Column {
+                    Text(text = textToShow)
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically){
+                        Checkbox(
+                            checked = viewModel.notShowAgainNotification,
+                            onCheckedChange = { viewModel.notShowAgainNotification = !viewModel.notShowAgainNotification }
+                        )
+                        Text(text = "Don't show again")
+                    }
+                }
             },
             confirmButton = {
                 if (notificationPermissionsState.status.shouldShowRationale) {
                     TextButton(
                         onClick = {
                             notificationPermissionsState.launchPermissionRequest()
+                            notShowAgain = true
                             viewModel.openNotificationDialog = false
                         }
                     ) {

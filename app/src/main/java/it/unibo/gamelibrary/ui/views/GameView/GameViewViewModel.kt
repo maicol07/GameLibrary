@@ -54,6 +54,7 @@ class GameViewViewModel @Inject constructor(
     }
 
     var openNotificationDialog by mutableStateOf(true)
+    var notShowAgainNotification by mutableStateOf(false)
 
     fun getGame(gameId: Int) = viewModelScope.launch {
         val games = IGDBApiRequest {
@@ -137,7 +138,7 @@ class GameViewViewModel @Inject constructor(
         Log.i("GameId", libraryEntry.entry?.gameId!!.toString())
         if (secondDate.epochSecond >= 0) {
             val notificationWorker = OneTimeWorkRequestBuilder<NotificationWorker>()
-                .setInitialDelay(Duration.ofSeconds(releaseDate.seconds))
+                .setInitialDelay(Duration.ofSeconds(secondDate.epochSecond))
                 .setInputData(
                     Data.Builder()
                         .putInt("gameId", libraryEntry.entry?.gameId!!)
