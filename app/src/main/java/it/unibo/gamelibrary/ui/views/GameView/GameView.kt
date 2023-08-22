@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,6 +77,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alorma.compose.settings.storage.base.getValue
 import com.alorma.compose.settings.storage.base.setValue
+import com.alorma.compose.settings.storage.datastore.GenericPreferenceDataStoreSettingValueState
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -97,8 +99,10 @@ import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.TopAppBarState
 import me.vponomarenko.compose.shimmer.shimmer
 import proto.Game
+import kotlin.properties.Delegates
 
 private val dateFormatter = SimpleDateFormat.getDateInstance()
+private lateinit var notShowAgain: GenericPreferenceDataStoreSettingValueState<Boolean>
 
 @Destination(
     deepLinks = [
@@ -121,8 +125,9 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
             .shimmer()
     }
     GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
-    val notShowAgain by rememberPreferenceDataStoreBooleanSettingState(key = "notShowAgain", defaultValue = false)
-    if (!notShowAgain && viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    notShowAgain = rememberPreferenceDataStoreBooleanSettingState(key = "notShowAgain", defaultValue = false)
+    Log.i("NotShowAgain", notShowAgain.value.toString())
+    if (!notShowAgain.value && viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         NotificationPermissionDialog()
     }
 }
@@ -479,7 +484,6 @@ fun GameViewGameLibraryEditDialog(game: Game, viewModel: GameViewViewModel = hil
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltViewModel()) {
-    var notShowAgain by rememberPreferenceDataStoreBooleanSettingState(key = "notShowAgain", defaultValue = false)
     val notificationPermissionsState = rememberPermissionState(
         Manifest.permission.POST_NOTIFICATIONS
     )
@@ -514,7 +518,9 @@ private fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltView
                     Row(verticalAlignment = Alignment.CenterVertically){
                         Checkbox(
                             checked = viewModel.notShowAgainNotification,
-                            onCheckedChange = { viewModel.notShowAgainNotification = !viewModel.notShowAgainNotification }
+                            onCheckedChange = {
+                                viewModel.notShowAgainNotification = !viewModel.notShowAgainNotification
+                            }
                         )
                         Text(text = "Don't show again")
                     }
@@ -525,7 +531,7 @@ private fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltView
                     TextButton(
                         onClick = {
                             notificationPermissionsState.launchPermissionRequest()
-                            notShowAgain = true
+                            notShowAgain.value = viewModel.notShowAgainNotification
                             viewModel.openNotificationDialog = false
                         }
                     ) {
@@ -536,6 +542,7 @@ private fun NotificationPermissionDialog(viewModel: GameViewViewModel = hiltView
             dismissButton = {
                 TextButton(
                     onClick = {
+                        notShowAgain.value = viewModel.notShowAgainNotification
                         viewModel.openNotificationDialog = false
                     }
                 ) {
