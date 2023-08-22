@@ -20,26 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Diamond
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Mouse
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.SportsBaseball
-import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.filled.SportsMma
-import androidx.compose.material.icons.filled.SportsMotorsports
-import androidx.compose.material.icons.filled.SportsTennis
-import androidx.compose.material.icons.filled.VideogameAsset
-import androidx.compose.material.icons.filled.ViewInAr
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -86,6 +70,7 @@ import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.Game.GameArtwork
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.Game.GameScreenshot
+import it.unibo.gamelibrary.ui.common.Game.icon
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
 import it.unibo.gamelibrary.utils.BottomBar
@@ -256,29 +241,7 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
         }
         LazyRow {
             items(game.genresList) {
-                val icon: Any? = when (it.slug) {
-                    "fighting" -> Icons.Default.SportsMma
-                    "shooter" -> R.drawable.pistol
-                    "music" -> Icons.Default.MusicNote
-                    "platform" -> Icons.Default.ViewInAr // TODO: Change with
-                    "puzzle" -> Icons.Default.Extension
-                    "racing" -> Icons.Default.SportsMotorsports
-                    "real-time-strategy-rts", "strategy", "turn-based-strategy-tbs", "tactical" -> R.drawable.strategy
-                    "role-playing-rpg" -> R.drawable.wizard_hat
-                    "adventure" -> Icons.Default.Explore
-                    "simulator" -> Icons.Default.Diamond
-                    "sport" -> Icons.Default.SportsTennis
-                    "quiz-trivia" -> Icons.Default.QuestionAnswer
-                    "hack-and-slash-beat-em-up" -> R.drawable.fencing
-                    "pinball" -> Icons.Default.SportsBaseball
-                    "arcade" -> Icons.Default.VideogameAsset
-                    "visual-novel" -> Icons.Default.Book
-                    "indie" -> Icons.Default.Build
-                    "card-board-game" -> Icons.Default.Casino
-                    "moba" -> Icons.Default.SportsEsports
-                    "point-and-click" -> Icons.Default.Mouse
-                    else -> null
-                }
+                val icon: Any? = it.icon
                 AssistChip(
                     label = { Text(text = it.name) },
                     modifier = Modifier.padding(end = 8.dp),
