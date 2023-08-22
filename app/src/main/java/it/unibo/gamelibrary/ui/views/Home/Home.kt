@@ -33,6 +33,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.ui.views.Home.Search.SearchBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
@@ -45,35 +46,43 @@ fun Home(
     navigator: DestinationsNavigator,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    TopAppBarState.actions = {}
-    TopAppBarState.title = "Home"
-
-    LazyColumn {
-        item {
-            HomeSection(
-                title = "Popular Games",
-                viewModel.popularGames,
-                navigator
-            )
-            Spacer(Modifier.size(8.dp))
-            HomeSection(
-                title = "Most Loved Games",
-                viewModel.mostLovedGames,
-                navigator
-            )
-            Spacer(Modifier.size(8.dp))
-            HomeSection(
-                title = "New Games",
-                viewModel.newGames,
-                navigator
-            )
+    TopAppBarState.show = false
+    Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            SearchBar(navigator)
         }
+        Spacer(modifier = Modifier.size(8.dp))
+        LazyColumn {
+            item {
+                HomeSection(
+                    title = "Popular Games",
+                    viewModel.popularGames,
+                    navigator
+                )
+                Spacer(Modifier.size(8.dp))
+                HomeSection(
+                    title = "Most Loved Games",
+                    viewModel.mostLovedGames,
+                    navigator
+                )
+                Spacer(Modifier.size(8.dp))
+                HomeSection(
+                    title = "New Games",
+                    viewModel.newGames,
+                    navigator
+                )
+            }
 
-        items(
-            viewModel.posts,
-            key = { it.id })
-        {
-            UserReview(it, navigator, showUser = true)
+            items(
+                viewModel.posts,
+                key = { it.id })
+            {
+                UserReview(it, navigator, showUser = true)
+            }
         }
     }
 }
