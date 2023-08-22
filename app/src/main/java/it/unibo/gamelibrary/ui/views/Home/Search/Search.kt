@@ -58,9 +58,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.api.igdb.utils.ImageSize
-import com.api.igdb.utils.ImageType
-import com.api.igdb.utils.imageBuilder
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -218,13 +215,7 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                             .shadow(100.dp, imageShape)
                                         if (it.image != null) {
                                             GlideImage(
-                                                {
-                                                    imageBuilder(
-                                                        it.image!!,
-                                                        ImageSize.COVER_BIG,
-                                                        ImageType.PNG
-                                                    )
-                                                },
+                                                { it.image },
                                                 imageOptions = ImageOptions(
                                                     contentScale = ContentScale.FillBounds,
                                                     alignment = Alignment.Center
@@ -238,8 +229,13 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                                 modifier = imageModifier
                                             )
                                         }
+                                        val userText = if (it.name != null && it.surname != null) {
+                                            "${it.name} ${it.surname}"
+                                        } else {
+                                            it.username
+                                        }
                                         Text(
-                                            text = "${it.name} ${it.surname}",
+                                            text = userText,
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier.padding(4.dp),
