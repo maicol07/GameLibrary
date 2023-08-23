@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -141,7 +142,8 @@ fun HomeSection(
                         ),
                         previewPlaceholder = R.drawable.ffviirebirth,
                         modifier = Modifier
-                            .width(160.dp)
+                            .width(150.dp)
+                            .height(200.dp)
                             .padding(5.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .shadow(100.dp, RoundedCornerShape(16.dp))
