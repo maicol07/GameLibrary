@@ -52,8 +52,14 @@ fun UserReview(
                 .padding(top = 36.dp, start = 8.dp, end = 8.dp)
                 .wrapContentHeight()
         ) {
-            viewModel.getGame(review.gameId)
-            viewModel.getUser(review.uid)
+            if(viewModel.game[review.gameId] == null){
+                viewModel.getGame(review.gameId)
+            }
+            if(viewModel.user[review.uid] == null){
+                viewModel.getUser(review.uid)
+            }
+//            viewModel.getGame(review.gameId)
+//            viewModel.getUser(review.uid)
 
             Column(modifier = Modifier
                 .fillMaxWidth()
@@ -110,7 +116,9 @@ fun UserReview(
             }
         }
         //game image
-        Box(modifier = Modifier.offset(16.dp, (13).dp) ){
+        Box(
+            modifier = Modifier.offset(16.dp, (13).dp)
+        ){
             if (viewModel.game[review.gameId] != null) {
                 GameCoverImage(
                     viewModel.game[review.gameId]!!,

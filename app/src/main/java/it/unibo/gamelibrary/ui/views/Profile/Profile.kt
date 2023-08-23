@@ -51,7 +51,9 @@ import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.BuildConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.common.components.GameCardView.GameCardView
+import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
 import it.unibo.gamelibrary.ui.common.components.UserBar
+import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
 import proto.Game
@@ -67,6 +69,7 @@ fun Profile(
     navigator: DestinationsNavigator,
     userID: String?,
 ) {
+    val context = LocalContext.current
     val uid = userID ?: Firebase.auth.currentUser!!.uid
     viewModel.getUser(uid)
     viewModel.getLibrary(uid)
@@ -101,7 +104,6 @@ fun Profile(
                 FollowList(viewModel = viewModel, followers = false, navigator)
                 FollowList(viewModel = viewModel, followers = true, navigator)
             }
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -113,18 +115,25 @@ fun Profile(
             Spacer(Modifier.size(16.dp))
         }
 
-        //reviews di questo user
-        if(viewModel.user?.isPublisher == false){
-            items(viewModel.userLibrary)
-            {
-                UserReview(it, navigator, showUser = false)
+
+
+
+        if (checkInternetConnection(context)) {
+            //reviews di questo user
+            if (viewModel.user?.isPublisher == false) {
+                items(viewModel.userLibrary)
+                {
+                    UserReview(it, navigator, showUser = false)
+                }
+            } else {
+                items(viewModel.publisherGames) { game: Game ->
+                    GameCardView(game = game, navigator = navigator)
+                }
             }
         }
-        else{
-            items(viewModel.publisherGames){game: Game ->
-                GameCardView(game = game, navigator = navigator)
-            }
-        }
+    }
+    if (!checkInternetConnection(context)) {
+        NoInternetConnection()
     }
 }
 
