@@ -218,8 +218,13 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                             modifier = imageModifier
                                         )
                                     }
+                                    val userText = if (it.name != null && it.surname != null) {
+                                        "${it.name} ${it.surname}"
+                                    } else {
+                                        it.username
+                                    }
                                     Text(
-                                        text = "${it.name} ${it.surname}",
+                                        text = userText,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(4.dp),
