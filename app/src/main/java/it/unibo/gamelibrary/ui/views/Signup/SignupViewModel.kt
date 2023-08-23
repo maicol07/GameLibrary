@@ -52,7 +52,6 @@ class SignupViewModel @Inject constructor(
         Pair("confirmPassword", "")
     )
     private var job: Job? = null
-    private var jobSlug: Job? = null
     private var publisherSlug by mutableStateOf<String?>(null)
     var publisherOptions by mutableStateOf<List<Company>>(emptyList())
     var isPublisher by mutableStateOf(false)
@@ -75,28 +74,40 @@ class SignupViewModel @Inject constructor(
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("AuthEmail", "createUserWithEmail:success")
-                            getSlugByCompany(publisherField.text)?.invokeOnCompletion {
-                                val user = if (!isPublisher) User(
+                            var user: User?
+                            if (!isPublisher) {
+                                user = User(
                                     auth.currentUser?.uid!!,
                                     fields["name"]!!,
                                     fields["surname"]!!,
                                     fields["username"]!!,
                                     fields["email"]!!,
                                     isPublisher = isPublisher
-                                ) else User(
-                                    uid = auth.currentUser?.uid!!,
-                                    username = fields["username"]!!,
-                                    email = fields["email"]!!,
-                                    isPublisher = isPublisher,
-                                    publisherName = publisherSlug
                                 )
                                 viewModelScope.launch {
-                                    repository.insertUser(user)
+                                    repository.insertUser(user!!)
                                 }
                                 auth.currentUser?.updateProfile(userProfileChangeRequest {
-                                    displayName = if (isPublisher) publisherField.text else "${user.name} ${user.surname}"
+                                    displayName = if (isPublisher) publisherField.text else "${user?.name} ${user?.surname}"
                                 })
                                 navController.navigate(HomeDestination())
+                            } else {
+                                getSlugByCompany(publisherField.text).invokeOnCompletion {
+                                    user = User(
+                                        uid = auth.currentUser?.uid!!,
+                                        username = fields["username"]!!,
+                                        email = fields["email"]!!,
+                                        isPublisher = isPublisher,
+                                        publisherName = publisherSlug
+                                    )
+                                    viewModelScope.launch {
+                                        repository.insertUser(user!!)
+                                    }
+                                    auth.currentUser?.updateProfile(userProfileChangeRequest {
+                                        displayName = if (isPublisher) publisherField.text else "${user?.name} ${user?.surname}"
+                                    })
+                                    navController.navigate(HomeDestination())
+                                }
                             }
                         } else {
                             // If sign in fails, display a message to the user.
@@ -133,9 +144,8 @@ class SignupViewModel @Inject constructor(
         }
     }
 
-    private fun getSlugByCompany(name: String): Job? {
-        jobSlug?.cancel()
-        jobSlug = viewModelScope.launch {
+    private fun getSlugByCompany(name: String): Job {
+        return viewModelScope.launch {
             publisherSlug =
                 IGDBApiRequest {
                     IGDBWrapper.companies(
@@ -150,7 +160,6 @@ class SignupViewModel @Inject constructor(
                 }?.get(0)?.slug
             Log.i("Slug", publisherSlug ?: "slug")
         }
-        return jobSlug
     }
 
     private fun validate(field: String, validate: (field: String) -> Boolean): Boolean {
