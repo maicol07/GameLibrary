@@ -1,7 +1,9 @@
 package it.unibo.gamelibrary.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.os.Build
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
@@ -38,4 +40,8 @@ fun Context.findActivity(): FragmentActivity {
         context = context.baseContext
     }
     throw IllegalStateException("no activity")
+}
+
+fun Activity.restartActivity() {
+    recreate()
 }
