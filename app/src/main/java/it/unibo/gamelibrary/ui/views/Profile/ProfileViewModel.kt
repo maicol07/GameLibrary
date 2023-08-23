@@ -86,7 +86,7 @@ class ProfileViewModel @Inject constructor(
                 )
             }?.get(0)
             publisherGames.clear()
-            publisherGames.addAll(publisher!!.publishedList)
+            publisher?.publishedList?.let { publisherGames.addAll(it) }
             publisherGames.sortByDescending { it.firstReleaseDate.seconds }
         }
     }
