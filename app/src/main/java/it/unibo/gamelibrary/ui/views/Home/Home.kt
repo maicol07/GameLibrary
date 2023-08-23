@@ -141,8 +141,8 @@ fun HomeSection(
                         ),
                         previewPlaceholder = R.drawable.ffviirebirth,
                         modifier = Modifier
-                            .size(200.dp, 250.dp)
-                            .padding(8.dp)
+                            .width(160.dp)
+                            .padding(5.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .shadow(100.dp, RoundedCornerShape(16.dp))
                             .combinedClickable(
@@ -153,8 +153,8 @@ fun HomeSection(
                         text = game.name,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
-                            .width(200.dp)
-                            .padding(8.dp),
+                            .width(153.dp)
+                            .padding(start = 5.dp, top = 2.dp),
                         maxLines = 1
                     )
                 }
