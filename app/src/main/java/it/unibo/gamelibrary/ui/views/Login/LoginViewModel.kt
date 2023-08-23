@@ -94,7 +94,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController, isPublisher: Boolean = false){
+    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController){
         if (result.resultCode != Activity.RESULT_OK) {
             viewModelScope.launch {
                 snackbarHostState.showSnackbar("Google login cancelled")

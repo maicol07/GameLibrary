@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import com.alorma.compose.settings.storage.datastore.GenericPreferenceDataStoreSettingValueState
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 
 enum class SettingsEnum(
     var type: SettingsTypeEnum,
@@ -40,7 +41,7 @@ enum class SettingsEnum(
             profile.providerId == com.google.firebase.auth.GoogleAuthProvider.PROVIDER_ID
         } ?: false
         viewModel.openEmailDialog = true
-    }),
+    }, enabled = { viewModel, context -> checkInternetConnection(context) }),
     EditPassword(SettingsTypeEnum.MenuLink, {
         Icon(
             Icons.Default.LockReset,
@@ -51,7 +52,7 @@ enum class SettingsEnum(
             profile.providerId == com.google.firebase.auth.GoogleAuthProvider.PROVIDER_ID
         } ?: false
         viewModel.openPasswordDialog = true
-    }),
+    }, enabled = { viewModel, context -> checkInternetConnection(context) }),
     EditLocation(SettingsTypeEnum.MenuLink, {
         Icon(
             Icons.Default.EditLocation,
@@ -76,7 +77,7 @@ enum class SettingsEnum(
                 )
             }
         }
-    }),
+    }, enabled = { viewModel, context -> checkInternetConnection(context) }),
     BiometricLogin(
         SettingsTypeEnum.Switch,
         {

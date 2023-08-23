@@ -79,6 +79,8 @@ import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.Game.GameScreenshot
 import it.unibo.gamelibrary.ui.common.Game.icon
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
+import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
+import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.TopAppBarState
@@ -101,19 +103,26 @@ private lateinit var notShowAgain: GenericPreferenceDataStoreSettingValueState<B
 )
 @Composable
 fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
-    TopAppBarState.title = "Loading..."
-    var modifier: Modifier = Modifier
-    if (viewModel.game == null) {
-        viewModel.getGame(gameId)
-        modifier = modifier
-            .fillMaxWidth()
-            .shimmer()
-    }
-    GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
-    notShowAgain = rememberPreferenceDataStoreBooleanSettingState(key = "notShowAgain", defaultValue = false)
-    Log.i("NotShowAgain", notShowAgain.value.toString())
-    if (!notShowAgain.value && viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        NotificationPermissionDialog()
+    if (checkInternetConnection(LocalContext.current)) {
+        TopAppBarState.title = "Loading..."
+        var modifier: Modifier = Modifier
+        if (viewModel.game == null) {
+            viewModel.getGame(gameId)
+            modifier = modifier
+                .fillMaxWidth()
+                .shimmer()
+        }
+        GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
+        notShowAgain = rememberPreferenceDataStoreBooleanSettingState(
+            key = "notShowAgain",
+            defaultValue = false
+        )
+        Log.i("NotShowAgain", notShowAgain.value.toString())
+        if (!notShowAgain.value && viewModel.openNotificationDialog && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            NotificationPermissionDialog()
+        }
+    } else {
+        NoInternetConnection()
     }
 }
 
