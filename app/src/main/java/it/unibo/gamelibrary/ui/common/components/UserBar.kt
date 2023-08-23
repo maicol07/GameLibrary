@@ -42,7 +42,7 @@ fun UserBar(user: User, link: Boolean, navigator: DestinationsNavigator?){
              },
         ),
     ){
-        if(user.image != null) {
+        if(user.image != null && user.image != "") {
             GlideImage(
                 {
                     Uri.parse(user.image)
