@@ -69,7 +69,7 @@ fun SignupPage(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        loginViewModel.signInWithGoogle(result, context, navController, viewModel.isPublisher)
+        loginViewModel.signInWithGoogle(result, context, navController)
     }
     Column(
         modifier = Modifier
