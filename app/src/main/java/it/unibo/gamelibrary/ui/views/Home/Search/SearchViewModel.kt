@@ -65,13 +65,17 @@ class SearchViewModel @Inject constructor(
     init {
         fetchPlaforms()
         fetchGenres()
+        search()
     }
 
     fun search() {
         val query = APICalypse()
             .fields("id,name,cover.image_id")
-            .search(gamesSearch.query)
             .limit(500)
+
+        if (gamesSearch.query.isNotEmpty()) {
+            query.search(gamesSearch.query)
+        }
 
         val where = mutableListOf<String>()
 

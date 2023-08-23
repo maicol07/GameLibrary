@@ -1,7 +1,6 @@
 package it.unibo.gamelibrary.ui.views.Home.Search
 
 import android.net.Uri
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,9 +58,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.api.igdb.utils.ImageSize
-import com.api.igdb.utils.ImageType
-import com.api.igdb.utils.imageBuilder
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -76,12 +72,9 @@ import proto.Platform
 
 
 private var isFiltersBottomSheetOpen by mutableStateOf(false)
-private lateinit var currentSearch: SearchTypeObject<*, *>
+private var currentSearch by mutableStateOf<SearchTypeObject<*, *>?>(null)
 
-@OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hiltViewModel()) {
     var active by rememberSaveable { mutableStateOf(false) }
@@ -90,9 +83,9 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
         SearchType.USERS -> viewModel.usersSearch
     }
     androidx.compose.material3.SearchBar(
-        query = currentSearch.query,
+        query = currentSearch!!.query,
         onQueryChange = {
-            currentSearch.query = it
+            currentSearch!!.query = it
             viewModel.search()
         },
         onSearch = { active = false },
@@ -125,152 +118,126 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                 )
             }
         }
-        if (currentSearch.query.length < 2) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+        if (currentSearch!!.inProgress) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "Search for something",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                CircularProgressIndicator()
             }
         } else {
-            if (currentSearch.inProgress) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+            if (currentSearch!!.results.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    CircularProgressIndicator()
+                    Text(
+                        text = "No results found",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             } else {
-                if (currentSearch.results.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = "No results found",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                } else {
-                    val state = rememberLazyGridState()
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 110.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        state = state
-                    ) {
-                        items(currentSearch.results) {
-                            when (it) {
-                                is Game -> {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .clickable {
-                                                navigator.navigate(
-                                                    GameViewNavDestination(it.id.toInt())
-                                                )
-                                            }
-                                    ) {
-                                        GameCoverImage(
-                                            game = it,
-                                            modifier = Modifier.height(175.dp)
-                                        )
-                                        Text(
-                                            text = it.name,
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(4.dp),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                }
-
-                                is User -> {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .clickable {
-                                                navigator.navigate(
-                                                    ProfileDestination(
-                                                        it.uid
-                                                    )
-                                                )
-                                            }
-                                    ) {
-                                        val imageShape = RoundedCornerShape(16.dp)
-                                        val imageModifier = Modifier
-                                            .size(100.dp)
-                                            .padding(8.dp)
-                                            .clip(imageShape)
-                                            .shadow(100.dp, imageShape)
-                                        if (it.image != null) {
-                                            GlideImage(
-                                                {
-                                                    Uri.parse(it.image)
-//                                                    imageBuilder(
-//                                                        it.image!!,
-//                                                        ImageSize.COVER_BIG,
-//                                                        ImageType.PNG
-//                                                    )
-                                                },
-                                                imageOptions = ImageOptions(
-                                                    contentScale = ContentScale.FillBounds,
-                                                    alignment = Alignment.Center
-                                                ),
-                                                modifier = imageModifier
-                                            )
-                                        } else {
-                                            Icon(
-                                                Icons.Outlined.AccountCircle,
-                                                contentDescription = "User image",
-                                                modifier = imageModifier
+                val state = rememberLazyGridState()
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 110.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    state = state
+                ) {
+                    items(currentSearch!!.results, key = { when (it) {
+                        is Game -> it.id
+                        is User -> it.uid
+                        else -> 0
+                    } }) {
+                        when (it) {
+                            is Game -> {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .clickable {
+                                            navigator.navigate(
+                                                GameViewNavDestination(it.id.toInt())
                                             )
                                         }
-                                        Text(
-                                            text = "${it.name} ${it.surname}",
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(4.dp),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                ) {
+                                    GameCoverImage(
+                                        game = it,
+                                        modifier = Modifier.height(175.dp)
+                                    )
+                                    Text(
+                                        text = it.name,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(4.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+
+                            is User -> {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .clickable {
+                                            navigator.navigate(
+                                                ProfileDestination(
+                                                    it.uid
+                                                )
+                                            )
+                                        }
+                                ) {
+                                    val imageShape = RoundedCornerShape(16.dp)
+                                    val imageModifier = Modifier
+                                        .size(100.dp)
+                                        .padding(8.dp)
+                                        .clip(imageShape)
+                                        .shadow(100.dp, imageShape)
+                                    if (it.image != null) {
+                                        GlideImage(
+                                            {
+                                                Uri.parse(it.image)
+                                            },
+                                            imageOptions = ImageOptions(
+                                                contentScale = ContentScale.FillBounds,
+                                                alignment = Alignment.Center
+                                            ),
+                                            modifier = imageModifier
+                                        )
+                                    } else {
+                                        Icon(
+                                            Icons.Outlined.AccountCircle,
+                                            contentDescription = "User image",
+                                            modifier = imageModifier
                                         )
                                     }
+                                    Text(
+                                        text = "${it.name} ${it.surname}",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(4.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 }
                             }
                         }
                     }
-
-//                    val isAtBottom = !state.canScrollForward
-//
-//                    LaunchedEffect(isAtBottom) {
-//                        if (isAtBottom) {
-//                            currentSearch.offset += currentSearch.results.size
-//                            viewModel.search()
-//                            Log.d("TAG", "Bottom")
-//                        }
-//                    }
                 }
             }
         }
+    }
 
 
-        if (isFiltersBottomSheetOpen) {
-            FiltersBottomSheet()
-        }
+    if (isFiltersBottomSheetOpen) {
+        FiltersBottomSheet()
     }
 }
 
@@ -299,15 +266,15 @@ fun FiltersBottomSheet(viewModel: SearchViewModel = hiltViewModel()) {
                 Text(text = "Show DLCs", modifier = Modifier.padding(4.dp))
                 Spacer(modifier = Modifier.weight(1f))
                 Switch(
-                    checked = currentSearch.showDLCs,
+                    checked = currentSearch!!.showDLCs,
                     onCheckedChange = {
-                        currentSearch.showDLCs = it
+                        currentSearch!!.showDLCs = it
                     },
                     modifier = Modifier.padding(4.dp)
                 )
             }
             for (filterType in FilterType.entries) {
-                val filter = currentSearch.filters[filterType]!!;
+                val filter = currentSearch!!.filters[filterType]!!;
                 Text(
                     text = filterType.text,
                     style = MaterialTheme.typography.headlineSmall,
