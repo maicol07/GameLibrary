@@ -21,11 +21,17 @@ val snackbarHostState = SnackbarHostState()
 var notificationId by mutableIntStateOf(0)
 var channel_id by mutableStateOf("")
 
+val requestAttempts = mutableMapOf<Int, Int>()
+
 suspend fun <T> IGDBApiRequest(apiRequest: () -> T): T? = withContext(Dispatchers.IO) {
     try {
         apiRequest()
     } catch (e: RequestException) {
         val response = e.request.response().second;
+        if ((response.statusCode == 401) && requestAttempts.getOrDefault(apiRequest.hashCode(), 0) < 3) {
+            return@withContext IGDBApiRequest(apiRequest)
+        }
+        Log.e("IGDBApiRequest", e.request.toString())
         Log.e("IGDBApiRequest", response.toString())
         null
     }
