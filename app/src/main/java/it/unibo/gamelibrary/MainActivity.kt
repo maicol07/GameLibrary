@@ -4,7 +4,6 @@ import SecurePreferences
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -49,6 +48,7 @@ import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStore
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreIntSettingState
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.TwitchAuthenticator
+import com.github.kittinunf.fuel.httpGet
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -57,7 +57,6 @@ import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
-import com.ramcosta.composedestinations.utils.route
 import dagger.hilt.android.AndroidEntryPoint
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
 import it.unibo.gamelibrary.ui.views.BiometricLock.BiometricLockScreen
@@ -77,6 +76,7 @@ import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.time.Instant
 import java.util.UUID
 
@@ -96,6 +96,24 @@ class MainActivity : FragmentActivity() {
             val prefs = SecurePreferences(this@MainActivity)
             var token = prefs.getString("twitch_token", "")
             val tokenExpiration = prefs.getString("twitch_token_expiration", "")
+
+            // Validate token
+            val request = "https://id.twitch.tv/oauth2/validate".httpGet()
+            request.headers["Authorization"] = "OAuth $token"
+            val (_, response) = request.responseString()
+            if (response.statusCode == -1) {
+                Log.e("TwitchAuthenticator", "No internet connection")
+                return@launch
+            }
+
+            val json = JSONObject(response.data.decodeToString())
+            if (response.statusCode == 401) {
+                token = ""
+            } else {
+                Log.i("TwitchAuthenticator", "Local Token is valid. Expires in ${json["expires_in"]} seconds")
+            }
+
+
             if (token == "" || tokenExpiration == "" || Instant.parse(tokenExpiration)
                     .isBefore(Instant.now())
             ) {
