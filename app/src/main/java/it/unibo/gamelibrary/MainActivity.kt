@@ -101,6 +101,11 @@ class MainActivity : FragmentActivity() {
             val request = "https://id.twitch.tv/oauth2/validate".httpGet()
             request.headers["Authorization"] = "OAuth $token"
             val (_, response) = request.responseString()
+            if (response.statusCode == -1) {
+                Log.e("TwitchAuthenticator", "No internet connection")
+                return@launch
+            }
+
             val json = JSONObject(response.data.decodeToString())
             if (response.statusCode == 401) {
                 token = ""
