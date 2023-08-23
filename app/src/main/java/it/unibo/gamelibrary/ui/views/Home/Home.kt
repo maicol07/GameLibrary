@@ -2,8 +2,10 @@ package it.unibo.gamelibrary.ui.views.Home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,17 +14,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.WifiOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -39,11 +42,15 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
+import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.Home.Search.SearchBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.ui.views.HomePublisher.HomePublisher
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
+import it.unibo.gamelibrary.utils.findActivity
+import it.unibo.gamelibrary.utils.restartActivity
 import proto.Game
 
 @RootNavGraph(start = true)
@@ -62,50 +69,54 @@ fun Home(
         ) {
             SearchBar(navigator)
         }
-        Spacer(modifier = Modifier.size(8.dp))
-        if (Firebase.auth.currentUser != null) {
-            if (viewModel.user == null) {
-                viewModel.getUser()
-            } else {
-                if (viewModel.user?.isPublisher == true) {
-                    HomePublisher(navigator = navigator)
+        if (checkInternetConnection(LocalContext.current)) {
+            Spacer(modifier = Modifier.size(8.dp))
+            if (Firebase.auth.currentUser != null) {
+                if (viewModel.user == null) {
+                    viewModel.getUser()
                 } else {
-                    LazyColumn {
-                        item {
-                            HomeSection(
-                                title = "Popular Games",
-                                viewModel.popularGames,
-                                navigator
-                            )
-                            Spacer(Modifier.size(8.dp))
-                            HomeSection(
-                                title = "Most Loved Games",
-                                viewModel.mostLovedGames,
-                                navigator
-                            )
-                            Spacer(Modifier.size(8.dp))
-                            HomeSection(
-                                title = "Recently Released Games",
-                                viewModel.newGames,
-                                navigator
-                            )
-                            Spacer(Modifier.size(8.dp))
-                            HomeSection(
-                                title = "Upcoming Games",
-                                viewModel.upcomingGames,
-                                navigator
-                            )
-                        }
+                    if (viewModel.user?.isPublisher == true) {
+                        HomePublisher(navigator = navigator)
+                    } else {
+                        LazyColumn {
+                            item {
+                                HomeSection(
+                                    title = "Popular Games",
+                                    viewModel.popularGames,
+                                    navigator
+                                )
+                                Spacer(Modifier.size(8.dp))
+                                HomeSection(
+                                    title = "Most Loved Games",
+                                    viewModel.mostLovedGames,
+                                    navigator
+                                )
+                                Spacer(Modifier.size(8.dp))
+                                HomeSection(
+                                    title = "Recently Released Games",
+                                    viewModel.newGames,
+                                    navigator
+                                )
+                                Spacer(Modifier.size(8.dp))
+                                HomeSection(
+                                    title = "Upcoming Games",
+                                    viewModel.upcomingGames,
+                                    navigator
+                                )
+                            }
 
-                        items(
-                            viewModel.posts,
-                            key = { it.id })
-                        {
-                            UserReview(it, navigator, showUser = true)
+                            items(
+                                viewModel.posts,
+                                key = { it.id })
+                            {
+                                UserReview(it, navigator, showUser = true)
+                            }
                         }
                     }
                 }
             }
+        } else {
+            NoInternetConnection()
         }
     }
 }
