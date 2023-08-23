@@ -1,5 +1,6 @@
 package it.unibo.gamelibrary.ui.views.Home.Search
 
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -219,11 +220,12 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                         if (it.image != null) {
                                             GlideImage(
                                                 {
-                                                    imageBuilder(
-                                                        it.image!!,
-                                                        ImageSize.COVER_BIG,
-                                                        ImageType.PNG
-                                                    )
+                                                    Uri.parse(it.image)
+//                                                    imageBuilder(
+//                                                        it.image!!,
+//                                                        ImageSize.COVER_BIG,
+//                                                        ImageType.PNG
+//                                                    )
                                                 },
                                                 imageOptions = ImageOptions(
                                                     contentScale = ContentScale.FillBounds,
