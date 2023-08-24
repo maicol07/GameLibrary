@@ -1,9 +1,11 @@
 package it.unibo.gamelibrary.ui.views.Profile
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -242,30 +244,26 @@ private fun EditButton(
 
     if (viewModel.showProfileEditDialog) {
 
-        //image from camera
+        ////image from camera
         val context = LocalContext.current
-        val file = context.createImageFile()
-        val uri = FileProvider.getUriForFile(
-            Objects.requireNonNull(context),
-            BuildConfig.APPLICATION_ID + ".provider", file
-        )
-
         val cameraLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-                viewModel.newImage.value = uri.toString()
+                viewModel.uri?.let { viewModel.newImage.value = it }
+//                if (viewModel.uri != null) {
+//                    viewModel.newImage.value = viewModel.uri!!
+//                }
             }
-
         val permissionLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) {
             if (it) {
                 Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-                cameraLauncher.launch(uri)
+                cameraLauncher.launch(viewModel.uri)
             } else {
                 Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
             }
         }
-
+        ////
         CustomDialog(
             onDismissRequest = { viewModel.showProfileEditDialog = false },
             title = { Text("Edit Profile") },
@@ -278,9 +276,11 @@ private fun EditButton(
                 ) {
                     Text(text = "Done")
                 }
+
+                //apply-changes button
                 TextButton(
                     onClick = {
-                        viewModel.applyChanges()
+                        viewModel.applyChanges(context)
                     },
                     shape = RoundedCornerShape(50.dp),
                 ) {
@@ -289,10 +289,10 @@ private fun EditButton(
             }
         ) {
             Column {
-                if (viewModel.newImage.value != "") {
+                if (viewModel.newImage.value != Uri.EMPTY) {
                     GlideImage(
                         {
-                            Uri.parse(viewModel.newImage.value)
+                            viewModel.newImage.value
                         },
                         modifier = Modifier.size(256.dp)
                     )
@@ -310,6 +310,8 @@ private fun EditButton(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ){
+
+                    //select-picture-from-gallery button
                     TextButton(
                         onClick = {
                             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -318,14 +320,17 @@ private fun EditButton(
                         Text(text = "Select Image")
                     }
 
+                    //take-picture-from-camera button
                     TextButton(
                         onClick = {
+                            viewModel.uri = createImageFile(context)
 
                             val permissionCheckResult =
                                 ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                             if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                                cameraLauncher.launch(uri)
-                            } else {
+                                cameraLauncher.launch(viewModel.uri)
+                            }
+                            else {
                                 // Request a permission
                                 permissionLauncher.launch(Manifest.permission.CAMERA)
                             }
@@ -370,14 +375,13 @@ private fun EditButton(
     }
 }
 
-fun Context.createImageFile(): File {
-    // Create an image file name
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val imageFileName = "JPEG_" + timeStamp + "_"
-    val image = File.createTempFile(
-        imageFileName, /* prefix */
-        ".jpg", /* suffix */
-        externalCacheDir      /* directory */
-    )
-    return image
+fun createImageFile(context: Context): Uri? {
+    val imageFileName = "JPEG_" + System.currentTimeMillis() + ".jpg"
+    val resolver = context.contentResolver
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, imageFileName)
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+    }
+
+    return resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 }
