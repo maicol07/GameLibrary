@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,6 +65,7 @@ import it.unibo.gamelibrary.ui.views.NavGraphs
 import it.unibo.gamelibrary.ui.views.appCurrentDestinationAsState
 import it.unibo.gamelibrary.ui.views.destinations.Destination
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
+import it.unibo.gamelibrary.ui.views.destinations.LibraryDestination
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
 import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
 import it.unibo.gamelibrary.ui.views.destinations.SettingsPageDestination
@@ -274,6 +276,11 @@ class MainActivity : FragmentActivity() {
     ) {
         Home(HomeDestination, Icons.Default.Home, R.string.bottom_bar_home_label),
         Profile(ProfileDestination, Icons.Default.AccountCircle, R.string.bottom_bar_profile_label),
+        Library(
+            LibraryDestination,
+            Icons.Default.Games,
+            R.string.bottom_bar_library_label
+        ),
         Settings(
             SettingsPageDestination,
             Icons.Default.Settings,
