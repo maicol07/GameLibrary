@@ -4,7 +4,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,11 +29,12 @@ import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.components.Fullscreen
 import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
 import proto.Game
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun GameCoverImage(
@@ -38,6 +45,7 @@ fun GameCoverImage(
     fullscreenModifier: Modifier = Modifier,
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
     shadowElevation: Dp = 16.dp,
+    status: LibraryEntryStatus? = null
 ) {
     val fullscreenState = remember { mutableStateOf(false) }
 
@@ -60,26 +68,34 @@ fun GameCoverImage(
         modifier
     }
 
-    GlideImage(
-        {
-            if (game.cover.imageId != "") imageBuilder(
-                game.cover.imageId,
-                ImageSize.COVER_BIG
-            ) else R.drawable.no_image
-        },
-        imageOptions = ImageOptions(
-            contentScale = ContentScale.Crop,
-            contentDescription = contentDescription
-        ),
-        previewPlaceholder = R.drawable.ffviirebirth,
-        component = rememberImageComponent {
-            CrossfadePlugin()
-        },
-        modifier = Modifier
-            .clip(shape)
-            .shadow(shadowElevation, shape)
-            .then(clickableModifier)
-    )
+    BadgedBox(badge = {
+        if (status != null) {
+            Badge(Modifier.offset(x = (-32).dp, y = 12.dp), containerColor = MaterialTheme.colorScheme.tertiaryContainer) {
+                Icon(status.selectedIcon, contentDescription = status.text)
+            }
+        }
+    }) {
+        GlideImage(
+            {
+                if (game.cover.imageId != "") imageBuilder(
+                    game.cover.imageId,
+                    ImageSize.COVER_BIG
+                ) else R.drawable.no_image
+            },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                contentDescription = contentDescription
+            ),
+            previewPlaceholder = R.drawable.ffviirebirth,
+            component = rememberImageComponent {
+                CrossfadePlugin()
+            },
+            modifier = Modifier
+                .clip(shape)
+                .shadow(shadowElevation, shape)
+                .then(clickableModifier)
+        )
+    }
 }
 
 
