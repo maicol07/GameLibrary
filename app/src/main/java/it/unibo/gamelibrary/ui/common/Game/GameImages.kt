@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.api.igdb.utils.ImageSize
@@ -22,12 +24,14 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.ui.common.components.Fullscreen
+import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
 import proto.Game
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+@Preview
 fun GameCoverImage(
-    game: Game,
+    @PreviewParameter(provider = GameParameterProvider::class) game: Game,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
     fullscreenable: Boolean = false,
