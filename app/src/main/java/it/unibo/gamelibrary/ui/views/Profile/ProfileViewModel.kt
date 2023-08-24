@@ -1,5 +1,6 @@
 package it.unibo.gamelibrary.ui.views.Profile
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 import proto.Game
 import javax.inject.Inject
 
+
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val repository: UserRepository,
@@ -34,23 +36,22 @@ class ProfileViewModel @Inject constructor(
 ) : ViewModel() {
     var user by mutableStateOf<User?>(null)
     var userLibrary = mutableStateListOf<LibraryEntry>()
-    var newImage = mutableStateOf("")
+    var newImage = mutableStateOf<Uri>(Uri.EMPTY)
     var newBio = mutableStateOf("")
     var newUsername = mutableStateOf("")
     var followed =
         mutableStateListOf<String>()//seguaci e seguiti dell'utente di cui si viualizza il profilo
     var followers = mutableStateListOf<String>()
     var users = mutableStateListOf<User>()
-
     var publisherGames = mutableStateListOf<Game>()
-
     var showProfileEditDialog by mutableStateOf(false)
+    var uri: Uri? = null
 
     fun getUser(uid: String) {
         viewModelScope.launch {
             user = repository.getUserByUid(uid)
             newBio.value = user?.bio ?: ""
-            newImage.value = user?.image ?: ""
+            newImage.value = if(Uri.parse(user?.image)!= Uri.EMPTY){Uri.parse(user?.image) }else{Uri.EMPTY}
             newUsername.value = user?.username ?: ""
             if(user?.isPublisher == true){
                 getPublisherGames()
@@ -100,16 +101,17 @@ class ProfileViewModel @Inject constructor(
 
     fun imagePickerCallback(uri: Uri?) {
         if (uri != null) {
-            newImage.value = uri.toString()
+            newImage.value = uri
         } else {
             Log.d("PhotoPicker", "No media selected")
         }
     }
 
-    fun applyChanges() {
+    fun applyChanges(context: Context) {
         viewModelScope.launch {
-            if (newImage.value != user?.image) {
-                repository.setImage(user!!.uid, newImage.value)
+
+            if (newImage.value != Uri.parse(user?.image)) {
+                repository.setImage(user!!.uid, newImage.value.toString())
             }
             if (newBio.value != (user?.bio ?: "")) {
                 repository.setBio(user!!.uid, newBio.value)

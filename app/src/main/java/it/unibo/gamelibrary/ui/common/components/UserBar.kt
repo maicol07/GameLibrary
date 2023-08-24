@@ -16,12 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.data.model.User
+import java.io.File
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -31,18 +33,18 @@ fun UserBar(user: User, link: Boolean, navigator: DestinationsNavigator?){
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-            onClick = {
-                if(link){
-                    navigator?.navigate(
-                        it.unibo.gamelibrary.ui.views.destinations.ProfileDestination(
-                            user.uid
+                onClick = {
+                    if (link) {
+                        navigator?.navigate(
+                            it.unibo.gamelibrary.ui.views.destinations.ProfileDestination(
+                                user.uid
+                            )
                         )
-                    )
-                }
-             },
-        ),
+                    }
+                },
+            ),
     ){
-        if(user.image != null && user.image != "") {
+        if(user.hasImage()) {
             GlideImage(
                 {
                     Uri.parse(user.image)
