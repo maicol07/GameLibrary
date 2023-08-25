@@ -119,7 +119,7 @@ class MainActivity : FragmentActivity() {
             if (token == "" || tokenExpiration == "" || Instant.parse(tokenExpiration)
                     .isBefore(Instant.now())
             ) {
-                Log.i("TwitchAuthenticator", "Local Token is null")
+                Log.i("TwitchAuthenticator", "Local Token is null or invalid. Requesting new token")
                 //in a real application it is better to use twitchAuthenticator only once, serverside.
                 val twitchToken = TwitchAuthenticator.requestTwitchToken(
                     secrets.getIGDBClientId(packageName),
