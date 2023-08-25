@@ -49,6 +49,8 @@ import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStore
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreIntSettingState
 import com.api.igdb.request.IGDBWrapper
 import com.api.igdb.request.TwitchAuthenticator
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpGet
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -78,10 +80,14 @@ import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
-import java.time.Instant
+import java.io.Serializable
 import java.util.UUID
 
+private data class TwitchValidationResponse(
+    val client_id: String,
+    val scopes: String?,
+    val expires_in: Long
+): Serializable
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
@@ -97,28 +103,28 @@ class MainActivity : FragmentActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             val prefs = SecurePreferences(this@MainActivity)
             var token = prefs.getString("twitch_token", "")
-            val tokenExpiration = prefs.getString("twitch_token_expiration", "")
+
+            Log.d("TwitchAuthenticator", "Validating token")
 
             // Validate token
             val request = "https://id.twitch.tv/oauth2/validate".httpGet()
             request.headers["Authorization"] = "OAuth $token"
-            val (_, response) = request.responseString()
-            if (response.statusCode == -1) {
-                Log.e("TwitchAuthenticator", "No internet connection")
-                return@launch
-            }
+            try {
+                val (_, _, result) = request.responseObject<TwitchValidationResponse>()
 
-            val json = JSONObject(response.data.decodeToString())
-            if (response.statusCode == 401) {
+                val validationResponse = result.get()
+                if (validationResponse.expires_in > 0) {
+                    Log.i("TwitchAuthenticator", "Local Token is valid. Expires in ${validationResponse.expires_in} seconds")
+                } else {
+                    token = ""
+                }
+            } catch (e: FuelError) {
+                Log.e("TwitchAuthenticator", "Token is invalid or no internet connection is available (${e.message})")
                 token = ""
-            } else {
-                Log.i("TwitchAuthenticator", "Local Token is valid. Expires in ${json["expires_in"]} seconds")
             }
 
 
-            if (token == "" || tokenExpiration == "" || Instant.parse(tokenExpiration)
-                    .isBefore(Instant.now())
-            ) {
+            if (token == "") {
                 Log.i("TwitchAuthenticator", "Local Token is null or invalid. Requesting new token")
                 //in a real application it is better to use twitchAuthenticator only once, serverside.
                 val twitchToken = TwitchAuthenticator.requestTwitchToken(
@@ -129,10 +135,6 @@ class MainActivity : FragmentActivity() {
                 // The instance stores the token in the object until a new one is requested
                 if (twitchToken != null) {
                     prefs.putString("twitch_token", twitchToken.access_token)
-                    prefs.putString(
-                        "twitch_token_expiration",
-                        Instant.now().plusSeconds(twitchToken.expires_in).toString()
-                    )
                     token = twitchToken.access_token
                     Log.i("TwitchAuthenticator", "Got new token")
                 } else {
