@@ -114,7 +114,7 @@ class LoginViewModel @Inject constructor(
                         var isUserPublisher = false
                         viewModelScope.launch {
                             isUserPublisher =
-                                repository.getUserByUid(auth.currentUser?.uid!!)?.isPublisher!!
+                                repository.getUserByUid(auth.currentUser?.uid!!)?.isPublisher == true
                         }.invokeOnCompletion {
                             if (isUserPublisher){
                                 insertUserIfNotExist(
