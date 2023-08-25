@@ -3,7 +3,6 @@ package it.unibo.gamelibrary.utils
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.os.Build
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
@@ -25,16 +24,19 @@ var channel_id by mutableStateOf("")
 
 val requestAttempts = mutableMapOf<Int, Int>()
 
-suspend fun <T> IGDBApiRequest(apiRequest: () -> T): T? = withContext(Dispatchers.IO) {
+suspend fun <T> IGDBApiRequest(requestId: Int? = null, apiRequest: () -> T): T? = withContext(Dispatchers.IO) {
     try {
         apiRequest()
     } catch (e: RequestException) {
         val response = e.request.response().second;
-        if ((response.statusCode == 401) && requestAttempts.getOrDefault(apiRequest.hashCode(), 0) < 3) {
-            return@withContext IGDBApiRequest(apiRequest)
-        }
         Log.e("IGDBApiRequest", e.request.toString())
         Log.e("IGDBApiRequest", response.toString())
+        val key = requestId ?: apiRequest.hashCode()
+        if ((response.statusCode == 401) && requestAttempts.getOrDefault(apiRequest.hashCode(), 0) < 3) {
+            requestAttempts[key] = requestAttempts.getOrDefault(key, 0) + 1
+            Log.i("IGDBApiRequest", "Retrying request")
+            return@withContext IGDBApiRequest(key, apiRequest)
+        }
         null
     }
 }
