@@ -74,6 +74,7 @@ dependencies {
 
     // Project
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.appcompat)
     implementation(libs.biometric)
     implementation(libs.compose.destinations.core)
@@ -88,8 +89,13 @@ dependencies {
     implementation(libs.datastore)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.fuel)
+    implementation(libs.fuel.android)
+    implementation(libs.fuel.coroutines)
+    implementation(libs.fuel.gson)
     implementation(libs.gms.play.services.auth)
     implementation(libs.gms.play.services.location)
+    implementation(libs.gson)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
@@ -103,8 +109,6 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
     implementation(libs.security.crypto)
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.fuel)
 
 
     // Test
