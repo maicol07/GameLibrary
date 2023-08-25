@@ -1,4 +1,4 @@
-val versionCode by extra(4)
+val versionCode by extra(7)
 val versionName by extra("0.1")
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
