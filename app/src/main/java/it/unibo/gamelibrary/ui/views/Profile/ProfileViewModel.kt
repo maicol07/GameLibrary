@@ -51,7 +51,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             user = repository.getUserByUid(uid)
             newBio.value = user?.bio ?: ""
-            newImage.value = if(Uri.parse(user?.image)!= Uri.EMPTY){Uri.parse(user?.image) }else{Uri.EMPTY}
+            newImage.value = Uri.parse(user?.image ?: "")
             newUsername.value = user?.username ?: ""
             if(user?.isPublisher == true){
                 getPublisherGames()
