@@ -1,5 +1,6 @@
 package it.unibo.gamelibrary
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -39,7 +40,6 @@ import cat.ereza.customactivityoncrash.CustomActivityOnCrash
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
-import it.unibo.gamelibrary.utils.findActivity
 
 private lateinit var config: CaocConfig
 private lateinit var errorInformation: String
@@ -96,9 +96,9 @@ fun CrashScreen() {
         val context = LocalContext.current
         Button(onClick = {
             if (restart) {
-                CustomActivityOnCrash.restartApplication(context.findActivity(), config)
+                CustomActivityOnCrash.restartApplication(context as Activity, config)
             } else {
-                CustomActivityOnCrash.closeApplication(context.findActivity(), config)
+                CustomActivityOnCrash.closeApplication(context as Activity, config)
             }
         }) {
             Icon(Icons.Default.RestartAlt, contentDescription = null)
