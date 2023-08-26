@@ -35,6 +35,8 @@ import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
+import me.vponomarenko.compose.shimmer.shimmer
+import proto.Game
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -58,8 +60,6 @@ fun UserReview(
             if(viewModel.user[review.uid] == null){
                 viewModel.getUser(review.uid)
             }
-//            viewModel.getGame(review.gameId)
-//            viewModel.getUser(review.uid)
 
             Column(modifier = Modifier
                 .fillMaxWidth()
@@ -89,6 +89,7 @@ fun UserReview(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp)
                         }
+                        //TODO status?
                     }
 
                 }
@@ -110,7 +111,6 @@ fun UserReview(
                     ) {
                         //username and profile image
                         viewModel.user[review.uid]?.let { UserBar(user = it, link = true, navigator = navigator) }
-
                     }
                 }
             }
@@ -119,19 +119,19 @@ fun UserReview(
         Box(
             modifier = Modifier.offset(16.dp, (13).dp)
         ){
-            if (viewModel.game[review.gameId] != null) {
-                GameCoverImage(
-                    viewModel.game[review.gameId]!!,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .width(150.dp)
-                        .height(200.dp)
+            GameCoverImage(
+                viewModel.game[review.gameId] ?: Game.getDefaultInstance(),
+                contentDescription = "",
+                modifier = if(viewModel.game[review.gameId] != null) {
+                    Modifier.width(150.dp).height(200.dp)
                         .combinedClickable(
                             onClick = { navigator.navigate(GameViewNavDestination(review.gameId)) },
                         )
-                        .clip(RoundedCornerShape(8.dp)),
-                )
-            }
+                        .clip(RoundedCornerShape(8.dp))
+                    }else{
+                        Modifier.width(150.dp).height(200.dp).shimmer()
+                    }
+            )
         }
     }
 
