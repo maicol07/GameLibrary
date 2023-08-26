@@ -29,14 +29,14 @@ suspend fun <T> IGDBApiRequest(requestId: Int? = null, apiRequest: () -> T): T? 
         apiRequest()
     } catch (e: RequestException) {
         val response = e.request.response().second;
-        Log.e("IGDBApiRequest", e.request.toString())
-        Log.e("IGDBApiRequest", response.toString())
         val key = requestId ?: apiRequest.hashCode()
         if ((response.statusCode == 401) && requestAttempts.getOrDefault(apiRequest.hashCode(), 0) < 3) {
             requestAttempts[key] = requestAttempts.getOrDefault(key, 0) + 1
             Log.i("IGDBApiRequest", "Retrying request")
             return@withContext IGDBApiRequest(key, apiRequest)
         }
+        Log.e("IGDBApiRequest", e.request.toString())
+        Log.e("IGDBApiRequest", response.toString())
         null
     }
 }
