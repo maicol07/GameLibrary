@@ -43,6 +43,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.compose.rememberNavController
 import com.alorma.compose.settings.storage.base.getValue
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
@@ -95,6 +96,14 @@ class MainActivity : FragmentActivity() {
 
     private val secrets = Secrets()
     private var biometricStarted = false
+    private var currentDestination: NavDestination? = null
+
+    private val navControllerListener = NavController.OnDestinationChangedListener { controller, destination, arguments ->
+        if (controller.currentDestination?.route !== currentDestination?.route) {
+            currentDestination = destination
+            TopAppBarState.restoreDefaults()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,9 +164,9 @@ class MainActivity : FragmentActivity() {
             }
             GameLibraryTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
-                navController.addOnDestinationChangedListener { controller, destination, arguments ->
-                    TopAppBarState.restoreDefaults()
-                }
+
+                navController.removeOnDestinationChangedListener(navControllerListener)
+                navController.addOnDestinationChangedListener(navControllerListener)
 
                 val biometricLockEnabled by rememberPreferenceDataStoreBooleanSettingState(
                     key = "biometric",

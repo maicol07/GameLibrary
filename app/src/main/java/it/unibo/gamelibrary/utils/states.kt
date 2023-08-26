@@ -7,13 +7,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 object TopAppBarState {
-    var title by mutableStateOf("Game Library")
+    var title by mutableStateOf("")
     var customTitle by mutableStateOf<(@Composable () -> Unit)?>(null)
     var actions by mutableStateOf<@Composable RowScope.() -> Unit>({})
     var show by mutableStateOf(true)
 
     fun restoreDefaults() {
-        title = "Game Library"
+        title = ""
         customTitle = null
         actions = {}
         show = true
