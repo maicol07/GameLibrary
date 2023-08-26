@@ -1,8 +1,12 @@
 package it.unibo.gamelibrary.ui.views.Home
 
+import android.view.Surface
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,12 +23,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +59,7 @@ import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
 import it.unibo.gamelibrary.utils.findActivity
 import it.unibo.gamelibrary.utils.restartActivity
+import me.vponomarenko.compose.shimmer.shimmer
 import proto.Game
 
 @RootNavGraph(start = true)
@@ -137,8 +145,18 @@ fun HomeSection(
             modifier = Modifier.padding(4.dp)
         )
         LazyRow {
-            items(list) { game ->
-                Column {
+
+            var loadingList: MutableList<Game> = mutableListOf()
+            for(i in 1..5){
+                loadingList.add( Game.getDefaultInstance())
+            }
+
+
+            items(items = if(list.isEmpty()){loadingList}else{list}) { game:Game ->
+
+                Column (
+                    modifier = if(list.isEmpty()){Modifier.shimmer()}else{Modifier}
+                ){
                     GlideImage(
                         {
                             if (game.hasCover()) imageBuilder(
@@ -157,10 +175,9 @@ fun HomeSection(
                             .height(200.dp)
                             .padding(5.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .shadow(100.dp, RoundedCornerShape(16.dp))
                             .combinedClickable(
                                 onClick = { navigator.navigate(GameViewNavDestination(gameId = game.id.toInt())) },
-                            )
+                            ),
                     )
                     Text(
                         text = game.name,
