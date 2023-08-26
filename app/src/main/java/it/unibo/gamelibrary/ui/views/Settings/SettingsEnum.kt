@@ -41,7 +41,7 @@ enum class SettingsEnum(
             profile.providerId == com.google.firebase.auth.GoogleAuthProvider.PROVIDER_ID
         } ?: false
         viewModel.openEmailDialog = true
-    }, enabled = { viewModel, context -> checkInternetConnection(context) }),
+    }, enabled = { _, context -> checkInternetConnection(context) }),
     EditPassword(SettingsTypeEnum.MenuLink, {
         Icon(
             Icons.Default.LockReset,
@@ -52,7 +52,7 @@ enum class SettingsEnum(
             profile.providerId == com.google.firebase.auth.GoogleAuthProvider.PROVIDER_ID
         } ?: false
         viewModel.openPasswordDialog = true
-    }, enabled = { viewModel, context -> checkInternetConnection(context) }),
+    }, enabled = { _, context -> checkInternetConnection(context) }),
     EditLocation(SettingsTypeEnum.MenuLink, {
         Icon(
             Icons.Default.EditLocation,
@@ -77,7 +77,7 @@ enum class SettingsEnum(
                 )
             }
         }
-    }, enabled = { viewModel, context -> checkInternetConnection(context) }),
+    }, enabled = { _, context -> checkInternetConnection(context) }),
     BiometricLogin(
         SettingsTypeEnum.Switch,
         {

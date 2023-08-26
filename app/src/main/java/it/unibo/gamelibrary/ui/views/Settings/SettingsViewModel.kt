@@ -1,6 +1,7 @@
 package it.unibo.gamelibrary.ui.views.Settings
 
 import android.app.Activity.RESULT_OK
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -55,10 +56,10 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: UserRepository,
-    @ApplicationContext private val context: Context
+    private val application: Application
 ) : ViewModel(), HasBiometrics {
     val auth: FirebaseAuth = Firebase.auth
-    val settingsList = SettingsEnum.values()
+    val settingsList = SettingsEnum.entries
 
     //Change email
     var openEmailDialog by mutableStateOf(false)
@@ -248,7 +249,7 @@ class SettingsViewModel @Inject constructor(
                         auth.currentUser?.uid!!,
                         "${location.latitude} ${location.longitude}"
                     )
-                    showAddress(context, location.latitude, location.longitude)
+                    showAddress(activityContext, location.latitude, location.longitude)
                     getAddress()
                 }
             }
@@ -374,6 +375,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun goToNotificationSettings() {
+        val context = application.applicationContext
         val intent = Intent()
         intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
         intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)

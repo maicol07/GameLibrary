@@ -80,37 +80,37 @@ fun SettingsPage(
                     )
                 },
                 subtitle = { Text(text = "Choose your app theme") },
-                onItemSelected = { index, value -> darkState.value = index },
+                onItemSelected = { index, _ -> darkState.value = index },
                 modifier = Modifier.height(72.dp)
             )
         }
 
-        items(viewModel.settingsList) {
-            if (it.type === SettingsTypeEnum.Switch) {
-                val state = it.switchState!!()
+        items(viewModel.settingsList) { setting ->
+            if (setting.type === SettingsTypeEnum.Switch) {
+                val state = setting.switchState!!()
                 SettingsSwitch(
-                    icon = it.icon,
-                    title = { Text(text = it.title) },
-                    subtitle = { Text(text = it.subtitle) },
+                    icon = setting.icon,
+                    title = { Text(text = setting.title) },
+                    subtitle = { Text(text = setting.subtitle) },
                     state = state,
-                    modifier = Modifier.height(if (it.subtitle.isEmpty()) 72.dp else 88.dp),
-                    enabled = it.enabled(viewModel, context),
-                    onCheckedChange = { value -> it.onCheckedChange!!(viewModel, context, state) }
+                    modifier = Modifier.height(if (setting.subtitle.isEmpty()) 72.dp else 88.dp),
+                    enabled = setting.enabled(viewModel, context),
+                    onCheckedChange = { setting.onCheckedChange!!(viewModel, context, state) }
                 )
             } else {
                 SettingsMenuLink(
-                    icon = it.icon,
+                    icon = setting.icon,
                     title = {
                         Text(
-                            text = it.title,
-                            color = if (it.title == "Logout") MaterialTheme.colorScheme.error else Color.Unspecified
+                            text = setting.title,
+                            color = if (setting.title == "Logout") MaterialTheme.colorScheme.error else Color.Unspecified
                         )
                     },
-                    subtitle = { if (it.subtitle.isNotEmpty()) Text(text = it.subtitle) },
-                    onClick = { it.onClick?.invoke(viewModel) },
-                    modifier = Modifier.height(if (it.subtitle.isEmpty()) 72.dp else 88.dp),
-                    action = if (it.action != null) { action -> it.action?.invoke(viewModel) } else null,
-                    enabled = it.enabled(viewModel, context)
+                    subtitle = { if (setting.subtitle.isNotEmpty()) Text(text = setting.subtitle) },
+                    onClick = { setting.onClick?.invoke(viewModel) },
+                    modifier = Modifier.height(if (setting.subtitle.isEmpty()) 72.dp else 88.dp),
+                    action = if (setting.action != null) { _ -> setting.action?.invoke(viewModel) } else null,
+                    enabled = setting.enabled(viewModel, context)
                 )
             }
         }
