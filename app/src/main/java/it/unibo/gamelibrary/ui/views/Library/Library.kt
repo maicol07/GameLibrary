@@ -46,6 +46,14 @@ fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
         modifier = modifier.shimmer()
     }
 
+    if (viewModel.libraryEntries.isEmpty()) {
+        Text(
+            text = "No games in your library",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 110.dp),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
