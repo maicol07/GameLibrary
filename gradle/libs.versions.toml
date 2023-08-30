@@ -92,6 +92,7 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+security-crypto-ktx = { group = "androidx.security", name = "security-crypto-ktx", version.ref = "security-crypto" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
 
 # Dependencies - Test

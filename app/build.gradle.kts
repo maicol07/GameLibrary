@@ -107,6 +107,7 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
     implementation(libs.security.crypto)
+    implementation(libs.security.crypto.ktx)
     implementation(libs.slf4j.simple)
 
 

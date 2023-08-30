@@ -6,7 +6,7 @@ class SecurePreferences(context: Context) {
 
     private val masterKeyAlias =
         (MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build())
-    private val sharedPreferences = EncryptedSharedPreferences.create(
+    private val sharedPreferences = EncryptedSharedPreferences(
         context,
         "gamelibrary_secure_preferences",
         masterKeyAlias,
