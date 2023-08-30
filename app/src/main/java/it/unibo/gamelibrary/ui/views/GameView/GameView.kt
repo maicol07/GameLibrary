@@ -70,6 +70,9 @@ import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.placeholder
+import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.Game.GameArtwork
@@ -82,7 +85,6 @@ import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.TopAppBarState
-import me.vponomarenko.compose.shimmer.shimmer
 import ru.pixnews.igdbclient.model.Game
 
 private val dateFormatter = SimpleDateFormat.getDateInstance()
@@ -107,7 +109,6 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
             viewModel.getGame(gameId)
             modifier = modifier
                 .fillMaxWidth()
-                .shimmer()
         }
         GameView(game = (viewModel.game ?: Game()), modifier)
         notShowAgain = rememberPreferenceDataStoreBooleanSettingState(
@@ -136,8 +137,8 @@ fun GameView(
     }
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        GameHeader(game)
-        GameDetails(game)
+        GameHeader(game, isLoading = viewModel.isLoading)
+        GameDetails(game, isLoading = viewModel.isLoading)
     }
     if (viewModel.isGameLibraryEditOpen) {
         GameViewGameLibraryEditDialog(game)
@@ -145,11 +146,12 @@ fun GameView(
 }
 
 @Composable
-fun GameHeader(game: Game, modifier: Modifier = Modifier) {
+fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = false) {
     Box(modifier) {
         val backgroundModifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
+            .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer())
         if (game.artworks.isNotEmpty()) {
             GameArtwork(game, "", backgroundModifier)
         } else {
@@ -163,7 +165,8 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier) {
             GameCoverImage(
                 game,
                 modifier = Modifier
-                    .size(100.dp, 150.dp),
+                    .size(100.dp, 150.dp)
+                    .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()),
                 contentDescription = "${game.name} cover",
                 fullscreenable = true
             )
@@ -172,7 +175,8 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .offset(8.dp, 100.dp)
-                    .padding(end = 8.dp),
+                    .padding(end = 8.dp)
+                    .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -182,7 +186,7 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun GameDetails(game: Game, modifier: Modifier = Modifier) {
+fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = false) {
     Column(modifier.padding(16.dp, 65.dp, 16.dp, 0.dp)) {
         LazyRow {
             items(game.involved_companies, key = { it.id }) {
@@ -209,7 +213,8 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
                             })"
                         )
                     },
-                    modifier = Modifier.padding(end = 8.dp),
+                    modifier = Modifier.padding(end = 8.dp)
+                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()),
                     leadingIcon = {
                         if (icon is ImageVector) {
                             Icon(
@@ -228,7 +233,11 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
         }
         Text(text = "Platforms", style = MaterialTheme.typography.headlineSmall)
         if (game.release_dates.isEmpty()) {
-            Text(text = "Game hasn't been released yet", style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = "Game hasn't been released yet",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer())
+            )
             // TODO: Get future platforms
         }
         LazyRow {
@@ -254,7 +263,11 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
         }
         Text(text = "Genres", style = MaterialTheme.typography.headlineSmall)
         if (game.genres.isEmpty()) {
-            Text(text = "No genres", style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = "No genres",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer())
+            )
         }
         LazyRow {
             items(game.genres) {
@@ -286,7 +299,7 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
 //        }
 
 
-        Text(text = game.summary)
+        Text(text = game.summary, modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()))
     }
 }
 

@@ -56,6 +56,7 @@ class GameViewViewModel @Inject constructor(
 
     var openNotificationDialog by mutableStateOf(true)
     var notShowAgainNotification by mutableStateOf(false)
+    var isLoading by mutableStateOf(true)
 
     fun getGame(gameId: Int) = viewModelScope.launch {
         val result = SafeRequest {
@@ -80,6 +81,7 @@ class GameViewViewModel @Inject constructor(
         }
         game = result?.games?.firstOrNull()
         getUserLibraryEntry(gameId, Firebase.auth.currentUser!!.uid)
+        isLoading = false
     }
 
     private fun getUserLibraryEntry(gameId: Int, userId: String) = viewModelScope.launch {

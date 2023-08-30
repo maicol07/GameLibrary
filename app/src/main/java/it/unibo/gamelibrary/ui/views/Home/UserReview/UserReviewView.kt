@@ -31,11 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.placeholder
+import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
-import me.vponomarenko.compose.shimmer.shimmer
 import ru.pixnews.igdbclient.model.Game
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -129,7 +131,8 @@ fun UserReview(
                         )
                         .clip(RoundedCornerShape(8.dp))
                     }else{
-                        Modifier.width(150.dp).height(200.dp).shimmer()
+                        Modifier.width(150.dp).height(200.dp)
+                            .placeholder(visible = true, highlight = PlaceholderHighlight.shimmer())
                     }
             )
         }

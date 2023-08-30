@@ -24,10 +24,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
+import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.placeholder
+import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
-import me.vponomarenko.compose.shimmer.shimmer
 import ru.pixnews.igdbclient.model.Game
 
 @Destination
@@ -40,11 +42,6 @@ fun Library(viewModel: LibraryViewModel = hiltViewModel(), navController: NavCon
 @Composable
 fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
     val state = rememberLazyGridState()
-    var modifier: Modifier = Modifier;
-
-    if (viewModel.loading) {
-        modifier = modifier.shimmer()
-    }
 
     if (viewModel.libraryEntries.isEmpty()) {
         Text(
@@ -59,8 +56,7 @@ fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        state = state,
-        modifier = modifier
+        state = state
     ) {
         items(viewModel.libraryEntries, key = { it.id }) {
             val game = viewModel.games[it.gameId.toLong()] ?: Game()
@@ -76,14 +72,16 @@ fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
             ) {
                 GameCoverImage(
                     game = game,
-                    modifier = Modifier.height(175.dp),
+                    modifier = Modifier.height(175.dp)
+                        .placeholder(visible = viewModel.loading, highlight = PlaceholderHighlight.shimmer()),
                     status = it.status
                 )
                 Text(
                     text = game.name,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(4.dp),
+                    modifier = Modifier.padding(4.dp)
+                        .placeholder(visible = viewModel.loading, highlight = PlaceholderHighlight.shimmer()),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

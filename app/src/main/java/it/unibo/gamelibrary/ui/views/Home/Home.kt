@@ -32,6 +32,9 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.placeholder
+import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
 import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
@@ -40,7 +43,6 @@ import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.ui.views.HomePublisher.HomePublisher
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
-import me.vponomarenko.compose.shimmer.shimmer
 import ru.pixnews.igdbclient.model.IgdbImageSize
 import ru.pixnews.igdbclient.util.igdbImageUrl
 
@@ -136,9 +138,7 @@ fun HomeSection(
 
             items(items = if(list.isEmpty()){loadingList}else{list}) { game ->
 
-                Column (
-                    modifier = if(list.isEmpty()){Modifier.shimmer()}else{Modifier}
-                ){
+                Column {
                     GlideImage(
                         {
                             if (game.cover != null) igdbImageUrl(
@@ -156,6 +156,7 @@ fun HomeSection(
                             .height(200.dp)
                             .padding(5.dp)
                             .clip(RoundedCornerShape(16.dp))
+                            .placeholder(visible = list.isEmpty(), highlight = PlaceholderHighlight.shimmer())
                             .combinedClickable(
                                 onClick = { navigator.navigate(GameViewNavDestination(gameId = game.id.toInt())) },
                             ),
@@ -165,7 +166,8 @@ fun HomeSection(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .width(153.dp)
-                            .padding(start = 5.dp, top = 2.dp),
+                            .padding(start = 5.dp, top = 2.dp)
+                            .placeholder(visible = list.isEmpty(), highlight = PlaceholderHighlight.shimmer()),
                         maxLines = 1
                     )
                 }
