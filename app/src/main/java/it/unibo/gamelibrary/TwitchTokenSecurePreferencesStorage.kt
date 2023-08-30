@@ -2,7 +2,6 @@ package it.unibo.gamelibrary
 
 import SecurePreferences
 import android.content.Context
-import android.util.Log
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.HttpStatusCode
@@ -14,28 +13,26 @@ import ru.pixnews.igdbclient.auth.twitch.TwitchTokenPayload.Companion.NO_TOKEN
 import ru.pixnews.igdbclient.auth.twitch.TwitchTokenPayload.Companion.getTwitchAccessToken
 import ru.pixnews.igdbclient.auth.twitch.TwitchTokenStorage
 
-class TwitchTokenSecurePreferencesStorage(
-    context: Context
-): TwitchTokenStorage {
-    private var tokenValid = false
+class TwitchTokenSecurePreferencesStorage(context: Context): TwitchTokenStorage {
+    private var tokenValidity = mutableMapOf(
+        "" to false
+    )
     private val prefs = SecurePreferences(context)
+    private var token: TwitchTokenPayload = NO_TOKEN
 
     private val lock = Mutex()
+
     override suspend fun getToken(): TwitchTokenPayload {
         return lock.withLock {
-            val token = prefs.getString("twitch_token", "")
-            if (token == "") {
-                NO_TOKEN
+            val loadedToken = prefs.getString("twitch_token")
+            if (token == NO_TOKEN && loadedToken != null) {
+                token = TwitchTokenPayload(loadedToken)
+//                Log.d("TwitchTokenStorage", "Token loaded from prefs")
             }
 
-            if (!tokenValid) {
-                validateToken(token)
-                if (!tokenValid) {
-                    NO_TOKEN
-                }
-            }
-
-            TwitchTokenPayload(token)
+//            Log.d("TwitchTokenStorage", "Checking token validity")
+            validateToken()
+            token
         }
     }
 
@@ -44,11 +41,19 @@ class TwitchTokenSecurePreferencesStorage(
         newToken: TwitchTokenPayload
     ): Boolean {
         return lock.withLock {
-            if (oldToken.getTwitchAccessToken() == prefs.getString("twitch_token", "")) {
+            if (oldToken == token) {
+//                Log.d("TwitchTokenStorage", "Updating token")
                 val newTokenString = newToken.getTwitchAccessToken()
-                if (newTokenString != null) {
+
+                if (newTokenString == null) {
+//                    Log.d("TwitchTokenStorage", "Token removed")
+                    prefs.remove("twitch_token")
+                } else {
                     prefs.putString("twitch_token", newTokenString)
                 }
+
+                token = newToken
+//                Log.d("TwitchTokenStorage", "Token updated")
                 true
             } else {
                 false
@@ -56,11 +61,14 @@ class TwitchTokenSecurePreferencesStorage(
         }
     }
 
-    private suspend fun validateToken(token: String) {
-        Log.d("TwitchTokenStorage", "Validating token $tokenValid")
-        val result = Http.get("https://id.twitch.tv/oauth2/validate") {
-            header("Authorization", "OAuth $token")
+    private suspend fun validateToken() {
+        val tokenString = token.getTwitchAccessToken()
+        val tokenValid = tokenValidity[tokenString]
+        if (tokenString != null && tokenValid == null) {
+            val result = Http.get("https://id.twitch.tv/oauth2/validate") {
+                header("Authorization", "OAuth $tokenString")
+            }
+            tokenValidity[tokenString] = result.status == HttpStatusCode.OK
         }
-        tokenValid = result.status == HttpStatusCode.OK
     }
 }
