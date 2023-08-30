@@ -1,10 +1,12 @@
 package it.unibo.gamelibrary.data.model
 
+import android.net.Uri
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Relation
 import java.io.File
+
 
 data class UserWithLibraryEntries(
     @Embedded val user: User,
@@ -28,8 +30,10 @@ data class User(
     @ColumnInfo var publisherName: String? = null
 ){
     fun hasImage(): Boolean{
-        val file = image?.let { File(it) }
-        return image != null && image != "" && file?.exists() == true
+        if(image != null && Uri.parse(image) != Uri.EMPTY){
+            return Uri.parse(image).path?.let { File(it).exists() } == true
+        }
+        return false
     }
 }
 

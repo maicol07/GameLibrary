@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -70,6 +71,7 @@ fun Profile(
     if (viewModel.user == null) {
         viewModel.setUser(uid)
     }
+
 
     TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
     TopAppBarState.customTitle = {
@@ -109,9 +111,6 @@ fun Profile(
             }
             Spacer(Modifier.size(16.dp))
         }
-
-
-
 
         if (checkInternetConnection(context)) {
             //reviews di questo user
@@ -212,7 +211,6 @@ fun FollowList(
             }else{
                 Text(text = "No one here yet!")
             }
-
         }
     }
 }
@@ -241,22 +239,19 @@ private fun EditButton(
         val context = LocalContext.current
         val cameraLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-                viewModel.uri?.let { viewModel.newImage.value = it }
-//                if (viewModel.uri != null) {
-//                    viewModel.newImage.value = viewModel.uri!!
-//                }
+                viewModel.tempUriNewImage?.let { viewModel.newImage.value = it }
             }
+
         val permissionLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) {
             if (it) {
                 Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-                cameraLauncher.launch(viewModel.uri)
+                cameraLauncher.launch(viewModel.tempUriNewImage)
             } else {
                 Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
             }
         }
-        ////
         CustomDialog(
             onDismissRequest = { viewModel.showProfileEditDialog = false },
             title = { Text("Edit Profile") },
@@ -281,13 +276,14 @@ private fun EditButton(
                 }
             }
         ) {
+            //image preview
             Column {
                 if (viewModel.newImage.value != Uri.EMPTY) {
                     CoilImage(
                         imageModel = {
                             viewModel.newImage.value
                         },
-                        modifier = Modifier.size(256.dp)
+                        modifier = Modifier.size(256.dp).clip(RoundedCornerShape(128.dp))
                     )
                 } else {
                     Image(
@@ -316,12 +312,12 @@ private fun EditButton(
                     //take-picture-from-camera button
                     TextButton(
                         onClick = {
-                            viewModel.uri = createImageFile(context)
+                            viewModel.tempUriNewImage = createImageFile(context)
 
                             val permissionCheckResult =
                                 ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                             if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                                cameraLauncher.launch(viewModel.uri)
+                                cameraLauncher.launch(viewModel.tempUriNewImage)
                             }
                             else {
                                 // Request a permission
@@ -368,7 +364,7 @@ private fun EditButton(
     }
 }
 
-fun createImageFile(context: Context): Uri? {
+fun createImageFile(context: Context): Uri {
     val imageFileName = "JPEG_" + System.currentTimeMillis() + ".jpg"
     val resolver = context.contentResolver
     val contentValues = ContentValues().apply {
@@ -376,5 +372,5 @@ fun createImageFile(context: Context): Uri? {
         put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
     }
 
-    return resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    return resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues) ?: Uri.EMPTY
 }

@@ -1,12 +1,17 @@
 package it.unibo.gamelibrary.ui.views.Profile
 
 import android.content.Context
+import android.content.ContextWrapper
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
@@ -25,6 +30,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getCompanies
 import ru.pixnews.igdbclient.model.Game
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import javax.inject.Inject
 
 
@@ -46,7 +55,7 @@ class ProfileViewModel @Inject constructor(
     var users = mutableStateListOf<User>()
     var publisherGames = mutableStateListOf<Game>()
     var showProfileEditDialog by mutableStateOf(false)
-    var uri: Uri? = null
+    var tempUriNewImage: Uri? = null
 
     fun setUser(uid: String) {
         viewModelScope.launch {
@@ -113,10 +122,46 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun applyChanges(context: Context) {
-        viewModelScope.launch {
 
-            if (newImage.value != Uri.parse(user?.image)) {
-                repository.setImage(user!!.uid, newImage.value.toString())
+        var savedUri = Uri.EMPTY
+        if(newImage.value != Uri.EMPTY){ //save image to internal storage
+            val inputStream: InputStream? = context.contentResolver.openInputStream(newImage.value)
+            val yourDrawable = Drawable.createFromStream(inputStream, newImage.toString())
+            inputStream?.close()
+
+            val cw = ContextWrapper(context.applicationContext)
+            val directory = cw.getDir("imageDir", Context.MODE_PRIVATE)
+            val file = File(directory, System.currentTimeMillis().toString() + ".jpg")
+
+            savedUri = file.toUri()
+
+            if (!file.exists()) {
+                Log.d("path", file.toString())
+                var fos: FileOutputStream?
+                try {
+                    fos = FileOutputStream(file)
+                    //TODO controlla se sui telefoni degli altrir funziona Jpeg o se serve png
+                    yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                    fos.flush()
+                    fos.close()
+
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            if (newImage.value != Uri.EMPTY) {
+
+                if(user?.hasImage() == true){
+                    if(Uri.parse(user?.image) != newImage.value){
+                        Uri.parse(user?.image).path?.let { File(it).delete() }// delete old image from internal storage
+                        repository.setImage(user!!.uid, savedUri.toString())
+                    }
+                }else{
+                    repository.setImage(user!!.uid, savedUri.toString())
+                }
             }
             if (newBio.value != (user?.bio ?: "")) {
                 repository.setBio(user!!.uid, newBio.value)
@@ -167,7 +212,6 @@ class ProfileViewModel @Inject constructor(
             uids.forEach{
                 users.add(repository.getUserByUid(it).first()!!)
             }
-
         }
     }
 

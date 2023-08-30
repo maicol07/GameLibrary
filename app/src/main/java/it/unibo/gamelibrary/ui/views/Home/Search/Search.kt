@@ -200,7 +200,7 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                         .padding(8.dp)
                                         .clip(imageShape)
                                         .shadow(100.dp, imageShape)
-                                    if (it.image != null && it.image != "") {
+                                    if (it.hasImage()) {
                                         CoilImage(
                                             imageModel = {
                                                 Uri.parse(it.image)
