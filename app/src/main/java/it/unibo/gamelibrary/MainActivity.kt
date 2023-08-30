@@ -1,11 +1,9 @@
 package it.unibo.gamelibrary
 
-import SecurePreferences
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -48,11 +46,6 @@ import androidx.navigation.compose.rememberNavController
 import com.alorma.compose.settings.storage.base.getValue
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreIntSettingState
-import com.api.igdb.request.IGDBWrapper
-import com.api.igdb.request.TwitchAuthenticator
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.gson.responseObject
-import com.github.kittinunf.fuel.httpGet
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -75,20 +68,15 @@ import it.unibo.gamelibrary.ui.views.destinations.SettingsPageDestination
 import it.unibo.gamelibrary.ui.views.destinations.SignupPageDestination
 import it.unibo.gamelibrary.ui.views.startAppDestination
 import it.unibo.gamelibrary.utils.BottomBar
+import it.unibo.gamelibrary.utils.Http
+import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.TopAppBarState
 import it.unibo.gamelibrary.utils.channel_id
 import it.unibo.gamelibrary.utils.snackbarHostState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.Serializable
+import ru.pixnews.igdbclient.IgdbClient
+import ru.pixnews.igdbclient.ktor.IgdbKtorEngine
 import java.util.UUID
-
-private data class TwitchValidationResponse(
-    val client_id: String,
-    val scopes: String?,
-    val expires_in: Long
-): Serializable
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
@@ -108,50 +96,18 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Start coroutine to get token from Twitch
-        CoroutineScope(Dispatchers.IO).launch {
-            val prefs = SecurePreferences(this@MainActivity)
-            var token = prefs.getString("twitch_token", "")
-
-            Log.d("TwitchAuthenticator", "Validating token")
-
-            // Validate token
-            val request = "https://id.twitch.tv/oauth2/validate".httpGet()
-            request.headers["Authorization"] = "OAuth $token"
-            try {
-                val (_, _, result) = request.responseObject<TwitchValidationResponse>()
-
-                val validationResponse = result.get()
-                if (validationResponse.expires_in > 0) {
-                    Log.i("TwitchAuthenticator", "Local Token is valid. Expires in ${validationResponse.expires_in} seconds")
-                } else {
-                    token = ""
-                }
-            } catch (e: FuelError) {
-                Log.e("TwitchAuthenticator", "Token is invalid or no internet connection is available (${e.message})")
-                token = ""
+        IGDBClient = IgdbClient(IgdbKtorEngine) {
+            twitchAuth {
+                clientId = secrets.getIGDBClientId(packageName)
+                clientSecret = secrets.getIGDBClientSecret(packageName)
+                storage = TwitchTokenSecurePreferencesStorage(this@MainActivity)
             }
-
-
-            if (token == "") {
-                Log.i("TwitchAuthenticator", "Local Token is null or invalid. Requesting new token")
-                //in a real application it is better to use twitchAuthenticator only once, serverside.
-                val twitchToken = TwitchAuthenticator.requestTwitchToken(
-                    secrets.getIGDBClientId(packageName),
-                    secrets.getIGDBClientSecret(packageName)
-                )
-
-                // The instance stores the token in the object until a new one is requested
-                if (twitchToken != null) {
-                    prefs.putString("twitch_token", twitchToken.access_token)
-                    token = twitchToken.access_token
-                    Log.i("TwitchAuthenticator", "Got new token")
-                } else {
-                    Log.e("TwitchAuthenticator", "Token is null")
-                }
+            httpClient {
+                httpClient = Http
+                backgroundDispatcher = Dispatchers.IO
             }
-            IGDBWrapper.setCredentials(secrets.getIGDBClientId(packageName), token)
         }
+
         createNotificationChannel()
 
         setContent {
@@ -336,8 +292,6 @@ class MainActivity : FragmentActivity() {
                             // Avoid multiple copies of the same destination when
                             // reselecting the same item
                             launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
                         }
                     },
                     icon = {

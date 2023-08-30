@@ -59,8 +59,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.alorma.compose.settings.storage.base.getValue
-import com.alorma.compose.settings.storage.base.setValue
 import com.alorma.compose.settings.storage.datastore.GenericPreferenceDataStoreSettingValueState
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -85,8 +83,7 @@ import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.TopAppBarState
 import me.vponomarenko.compose.shimmer.shimmer
-import proto.Game
-import kotlin.properties.Delegates
+import ru.pixnews.igdbclient.model.Game
 
 private val dateFormatter = SimpleDateFormat.getDateInstance()
 private lateinit var notShowAgain: GenericPreferenceDataStoreSettingValueState<Boolean>
@@ -112,7 +109,7 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
                 .fillMaxWidth()
                 .shimmer()
         }
-        GameView(game = (viewModel.game ?: Game.getDefaultInstance()), modifier)
+        GameView(game = (viewModel.game ?: Game()), modifier)
         notShowAgain = rememberPreferenceDataStoreBooleanSettingState(
             key = "notShowAgain",
             defaultValue = false
@@ -153,7 +150,7 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier) {
         val backgroundModifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-        if (game.artworksCount > 0) {
+        if (game.artworks.isNotEmpty()) {
             GameArtwork(game, "", backgroundModifier)
         } else {
             GameScreenshot(game, "", backgroundModifier)
@@ -188,7 +185,7 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier) {
 fun GameDetails(game: Game, modifier: Modifier = Modifier) {
     Column(modifier.padding(16.dp, 65.dp, 16.dp, 0.dp)) {
         LazyRow {
-            items(game.involvedCompaniesList, key = { it.id }) {
+            items(game.involved_companies, key = { it.id }) {
                 val roles = mapOf(
                     "Developer" to it.developer,
                     "Publisher" to it.publisher,
@@ -205,7 +202,7 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
                 AssistChip(
                     label = {
                         Text(
-                            text = "${it.company.name} (${
+                            text = "${it.company?.name} (${
                                 roles.filter { it.value }.keys.joinToString(
                                     ", "
                                 )
@@ -230,20 +227,20 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
             }
         }
         Text(text = "Platforms", style = MaterialTheme.typography.headlineSmall)
-        if (game.releaseDatesCount == 0) {
+        if (game.release_dates.isEmpty()) {
             Text(text = "Game hasn't been released yet", style = MaterialTheme.typography.bodySmall)
             // TODO: Get future platforms
         }
         LazyRow {
-            items(game.releaseDatesList) {
+            items(game.release_dates) {
                 AssistChip(
-                    label = { Text(text = "${it.platform.name} (${it.human})") },
+                    label = { Text(text = "${it.platform?.name} (${it.human})") },
                     modifier = Modifier.padding(end = 8.dp),
                     onClick = { /*TODO*/ },
                     leadingIcon = {
-                        if (it.platform.hasPlatformLogo()) {
+                        if (it.platform?.platform_logo != null) {
                             GlideImage(
-                                { "https://${it.platform.platformLogo.url}" },
+                                { "https://${it.platform?.platform_logo!!.url}" },
                                 previewPlaceholder = R.drawable.square_enix_logo,
                                 imageOptions = ImageOptions(contentScale = ContentScale.FillBounds),
                                 modifier = Modifier
@@ -256,11 +253,11 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier) {
             }
         }
         Text(text = "Genres", style = MaterialTheme.typography.headlineSmall)
-        if (game.genresCount == 0) {
+        if (game.genres.isEmpty()) {
             Text(text = "No genres", style = MaterialTheme.typography.bodySmall)
         }
         LazyRow {
-            items(game.genresList) {
+            items(game.genres) {
                 val icon: Any? = it.icon
                 AssistChip(
                     label = { Text(text = it.name) },

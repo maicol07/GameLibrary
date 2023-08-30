@@ -36,7 +36,7 @@ import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import me.vponomarenko.compose.shimmer.shimmer
-import proto.Game
+import ru.pixnews.igdbclient.model.Game
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -120,7 +120,7 @@ fun UserReview(
             modifier = Modifier.offset(16.dp, (13).dp)
         ){
             GameCoverImage(
-                viewModel.game[review.gameId] ?: Game.getDefaultInstance(),
+                viewModel.game[review.gameId] ?: Game(),
                 contentDescription = "",
                 modifier = if(viewModel.game[review.gameId] != null) {
                     Modifier.width(150.dp).height(200.dp)

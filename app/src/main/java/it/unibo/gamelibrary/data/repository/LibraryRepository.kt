@@ -3,7 +3,7 @@ package it.unibo.gamelibrary.data.repository
 import androidx.annotation.WorkerThread
 import it.unibo.gamelibrary.data.dao.LibraryDao
 import it.unibo.gamelibrary.data.model.LibraryEntry
-import proto.Game
+import ru.pixnews.igdbclient.model.Game
 
 class LibraryRepository(private val libraryDao: LibraryDao) {
     //val allUser: List<User> = collectionDao.getAll()

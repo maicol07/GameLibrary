@@ -1,45 +1,38 @@
 package it.unibo.gamelibrary.ui.views.GameView.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.google.protobuf.Timestamp
-import proto.Company
-import proto.Cover
-import proto.Game
-import proto.Genre
-import proto.InvolvedCompany
-import proto.PlayerPerspective
+import ru.pixnews.igdbclient.model.Company
+import ru.pixnews.igdbclient.model.Game
+import ru.pixnews.igdbclient.model.Genre
+import ru.pixnews.igdbclient.model.InvolvedCompany
+import ru.pixnews.igdbclient.model.PlayerPerspective
+import java.time.Instant
 
 class GameParameterProvider : PreviewParameterProvider<Game> {
     override val values: Sequence<Game>
         get() = sequenceOf(
-            Game.newBuilder()
-                .setId(1025)
-                .setName("Final Fantasy VII Rebirth")
-                .setCover(
-                    Cover.newBuilder()
-                        .setUrl("https://images.igdb.com/igdb/image/upload/t_cover_big/co2t3f.jpg")
-                        .build()
-                )
-                .addInvolvedCompanies(
-                    InvolvedCompany.newBuilder()
-                        .setCompany(
-                            Company.newBuilder()
-                                .setName("Square Enix")
-                                .build()
+            Game(
+                id = 1025,
+                name = "Final Fantasy VII Rebirth",
+//                cover = "co2t3f.jpg",
+                involved_companies = listOf(
+                    InvolvedCompany(
+                        company = Company(
+                            name = "Square Enix"
                         )
-                        .build()
+                    )
+                ),
+                first_release_date = Instant.ofEpochSecond(1587552000),
+                genres = listOf(
+                    Genre(
+                        name = "RPG"
+                    )
+                ),
+                player_perspectives = listOf(
+                    PlayerPerspective(
+                        name = "Single player"
+                    )
                 )
-                .setFirstReleaseDate(Timestamp.newBuilder().setSeconds(1587552000).build())
-                .addGenres(
-                    Genre.newBuilder()
-                        .setName("RPG")
-                        .build()
-                )
-                .addPlayerPerspectives(
-                    PlayerPerspective.newBuilder()
-                        .setName("Single player")
-                        .build()
-                )
-                .build()
+            )
         )
 }

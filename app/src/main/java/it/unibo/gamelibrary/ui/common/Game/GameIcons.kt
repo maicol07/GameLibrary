@@ -18,7 +18,7 @@ import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material.icons.filled.ViewInAr
 import it.unibo.gamelibrary.R
-import proto.Genre
+import ru.pixnews.igdbclient.model.Genre
 
 val Genre.icon: Any?
     get() = when (this.slug) {

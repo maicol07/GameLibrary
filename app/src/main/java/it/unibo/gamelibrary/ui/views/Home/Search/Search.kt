@@ -66,9 +66,9 @@ import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.Game.icon
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
-import proto.Game
-import proto.Genre
-import proto.Platform
+import ru.pixnews.igdbclient.model.Game
+import ru.pixnews.igdbclient.model.Genre
+import ru.pixnews.igdbclient.model.Platform
 
 
 private var isFiltersBottomSheetOpen by mutableStateOf(false)
@@ -316,10 +316,10 @@ fun FiltersBottomSheet(viewModel: SearchViewModel = hiltViewModel()) {
                                 } else {
                                     when (value) {
                                         is Platform -> {
-                                            if (value.platformLogo.id.toInt() != 0) {
+                                            if (value.platform_logo !== null && value.platform_logo!!.id.toInt() != 0) {
                                                 GlideImage(
                                                     {
-                                                        "https:${value.platformLogo.url}"
+                                                        "https:${value.platform_logo!!.url}"
                                                     },
                                                     imageOptions = ImageOptions(
                                                         contentScale = ContentScale.FillBounds,

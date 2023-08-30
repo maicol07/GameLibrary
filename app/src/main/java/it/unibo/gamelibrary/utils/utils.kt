@@ -10,33 +10,30 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentActivity
-import com.api.igdb.exceptions.RequestException
-import com.google.protobuf.Timestamp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
-fun Timestamp.toInstant() = java.time.Instant.ofEpochSecond(seconds, nanos.toLong())
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.cache.HttpCache
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import it.unibo.gamelibrary.BuildConfig
+import ru.pixnews.igdbclient.IgdbClient
+import java.net.UnknownHostException
 
 val snackbarHostState = SnackbarHostState()
 
 var notificationId by mutableIntStateOf(0)
 var channel_id by mutableStateOf("")
 
-val requestAttempts = mutableMapOf<Int, Int>()
-
-suspend fun <T> IGDBApiRequest(requestId: Int? = null, apiRequest: () -> T): T? = withContext(Dispatchers.IO) {
-    try {
+suspend fun <T> SafeRequest(apiRequest: suspend () -> T): T? {
+    return try {
         apiRequest()
-    } catch (e: RequestException) {
-        val response = e.request.response().second;
-        val key = requestId ?: apiRequest.hashCode()
-        if ((response.statusCode == 401) && requestAttempts.getOrDefault(apiRequest.hashCode(), 0) < 3) {
-            requestAttempts[key] = requestAttempts.getOrDefault(key, 0) + 1
-            Log.i("IGDBApiRequest", "Retrying request")
-            return@withContext IGDBApiRequest(key, apiRequest)
+    } catch (e: Exception) {
+        if (e is UnknownHostException || e.cause is UnknownHostException) {
+            Log.e("IGDBApiRequest", "No internet connection")
+        } else {
+            Log.e("IGDBApiRequest", e.toString())
         }
-        Log.e("IGDBApiRequest", e.request.toString())
-        Log.e("IGDBApiRequest", response.toString())
         null
     }
 }
@@ -49,6 +46,21 @@ fun Context.findActivity(): FragmentActivity {
     }
     throw IllegalStateException("no activity")
 }
+
+val Http = HttpClient(Android) {
+    developmentMode = BuildConfig.DEBUG
+    install(Logging) {
+        logger = object : Logger {
+            override fun log(message: String) {
+                Log.d("Http", message)
+            }
+        }
+        level = LogLevel.INFO
+    }
+    install(HttpCache)
+}
+
+lateinit var IGDBClient: IgdbClient
 
 fun Activity.restartActivity() {
     recreate()

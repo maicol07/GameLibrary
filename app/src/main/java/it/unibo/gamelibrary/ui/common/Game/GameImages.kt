@@ -22,8 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.api.igdb.utils.ImageSize
-import com.api.igdb.utils.imageBuilder
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -32,7 +30,9 @@ import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.components.Fullscreen
 import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
-import proto.Game
+import ru.pixnews.igdbclient.model.Game
+import ru.pixnews.igdbclient.model.IgdbImageSize
+import ru.pixnews.igdbclient.util.igdbImageUrl
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -77,9 +77,9 @@ fun GameCoverImage(
     }) {
         GlideImage(
             {
-                if (game.cover.imageId != "") imageBuilder(
-                    game.cover.imageId,
-                    ImageSize.COVER_BIG
+                if (game.cover != null && game.cover!!.image_id != "") igdbImageUrl(
+                    game.cover!!.image_id,
+                    IgdbImageSize.COVER_BIG
                 ) else R.drawable.no_image
             },
             imageOptions = ImageOptions(
@@ -131,8 +131,8 @@ fun GameArtwork(
 
     GlideImage(
         {
-            if (game.artworksCount > 0) {
-                imageBuilder(game.getArtworks(0).imageId, ImageSize.FHD)
+            if (game.artworks.isNotEmpty()) {
+                igdbImageUrl(game.artworks[0].image_id, IgdbImageSize.H1080P)
             } else {
                 R.drawable.no_image
             }
@@ -158,8 +158,8 @@ fun GameArtwork(
 fun GameScreenshot(game: Game, contentDescription: String, modifier: Modifier = Modifier) {
     GlideImage(
         {
-            if (game.screenshotsCount > 0) {
-                imageBuilder(game.getScreenshots(0).imageId, ImageSize.SCREENSHOT_BIG)
+            if (game.screenshots.isNotEmpty()) {
+                igdbImageUrl(game.screenshots[0].image_id, IgdbImageSize.SCREENSHOT_BIG)
             } else {
                 R.drawable.no_image
             }

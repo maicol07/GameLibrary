@@ -28,7 +28,7 @@ import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
 import me.vponomarenko.compose.shimmer.shimmer
-import proto.Game
+import ru.pixnews.igdbclient.model.Game
 
 @Destination
 @Composable
@@ -63,7 +63,7 @@ fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
         modifier = modifier
     ) {
         items(viewModel.libraryEntries, key = { it.id }) {
-            val game = viewModel.games[it.gameId.toLong()] ?: Game.getDefaultInstance()
+            val game = viewModel.games[it.gameId.toLong()] ?: Game()
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier

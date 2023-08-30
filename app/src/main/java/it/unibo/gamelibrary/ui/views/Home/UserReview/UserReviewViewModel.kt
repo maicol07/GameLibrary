@@ -3,15 +3,14 @@ package it.unibo.gamelibrary.ui.views.Home.UserReview
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.api.igdb.apicalypse.APICalypse
-import com.api.igdb.request.IGDBWrapper
-import com.api.igdb.request.games
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
-import it.unibo.gamelibrary.utils.IGDBApiRequest
+import it.unibo.gamelibrary.utils.IGDBClient
+import it.unibo.gamelibrary.utils.SafeRequest
 import kotlinx.coroutines.launch
-import proto.Game
+import ru.pixnews.igdbclient.getGames
+import ru.pixnews.igdbclient.model.Game
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,28 +27,27 @@ class UserReviewViewModel @Inject constructor(
     }
 
     fun getGame(gameId: Int) = viewModelScope.launch {
-        val games = IGDBApiRequest {
-            IGDBWrapper.games(
-                APICalypse()
-                    .fields(
-                        listOf(
-                            "name",
-                            "artworks.image_id",
-                            "cover.image_id",
-                            "involved_companies.*",
-                            "involved_companies.company.name",
-                            "genres.name",
-                            "genres.slug",
-                            "screenshots.image_id",
-                            "summary",
-                            "release_dates.human",
-                            "release_dates.platform.name",
-                            "release_dates.platform.platform_logo.url"
-                        ).joinToString(",")
-                    )
-                    .where("id = $gameId")
-            )
+        val result = SafeRequest {
+            IGDBClient.getGames {
+                fields(
+                    "name",
+                    "artworks.image_id",
+                    "cover.image_id",
+                    "involved_companies.*",
+                    "involved_companies.company.name",
+                    "genres.name",
+                    "genres.slug",
+                    "screenshots.image_id",
+                    "summary",
+                    "release_dates.human",
+                    "release_dates.platform.name",
+                    "release_dates.platform.platform_logo.url"
+                )
+                where("id = $gameId")
+            }
         }
-        game[gameId] = games?.get(0)
+        if (result != null) {
+            game[gameId] = result.games.firstOrNull()
+        }
     }
 }

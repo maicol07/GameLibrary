@@ -1,6 +1,5 @@
 package it.unibo.gamelibrary.ui.common.components.GameCardView
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -13,7 +12,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import it.unibo.gamelibrary.ui.views.GameView.GameDetails
 import it.unibo.gamelibrary.ui.views.GameView.GameHeader
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
-import proto.Game
+import ru.pixnews.igdbclient.model.Game
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

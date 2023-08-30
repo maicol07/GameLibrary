@@ -26,16 +26,16 @@ compose-shimmer = "1.0.0"
 coroutines = "1.7.3"
 datastore = "1.0.0"
 firebase-bom = "32.2.2"
-fuel = "2.3.1"
 gms-play-services-auth = "20.6.0"
 gms-play-services-location = "21.0.1"
-gson = "2.10"
 hilt = "2.47"
 hilt-navigation-compose = "1.0.0"
-igdb-api-jvm = "1.0.11"
+igdbclient = "0.1"
+ktor = "2.3.3"
 landscapist = "2.2.7"
 room = "2.5.2"
 security-crypto = "1.1.0-alpha06"
+slf4j = "1.7.36"
 customactivityoncrash = "2.4.0"
 
 # Dependencies - Test
@@ -74,17 +74,15 @@ customactivityoncrash = { group = "cat.ereza", name = "customactivityoncrash", v
 datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
-fuel-android = { module = "com.github.kittinunf.fuel:fuel-android", version.ref = "fuel" }
-fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", version.ref = "fuel" }
-fuel-gson = { module = "com.github.kittinunf.fuel:fuel-gson", version.ref = "fuel" }
 gms-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gms-play-services-auth" }
 gms-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "gms-play-services-location" }
-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
-igdb-api-jvm = { group = "io.github.husnjak", name = "igdb-api-jvm", version.ref = "igdb-api-jvm" }
+igdbclient = { group = "ru.pixnews.igdbclient", name = "igdbclient-ktor", version.ref = "igdbclient" }
+ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 landscapist-animation = { group = "com.github.skydoves", name = "landscapist-animation", version.ref = "landscapist" }
@@ -94,6 +92,7 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
 
 # Dependencies - Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }

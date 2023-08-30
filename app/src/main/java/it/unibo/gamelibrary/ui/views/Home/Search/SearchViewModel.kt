@@ -7,21 +7,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.api.igdb.apicalypse.APICalypse
-import com.api.igdb.apicalypse.Sort
-import com.api.igdb.request.IGDBWrapper
-import com.api.igdb.request.games
-import com.api.igdb.request.genres
-import com.api.igdb.request.platforms
-import com.google.protobuf.GeneratedMessageV3
+import com.squareup.wire.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
-import it.unibo.gamelibrary.utils.IGDBApiRequest
+import it.unibo.gamelibrary.utils.IGDBClient
+import it.unibo.gamelibrary.utils.SafeRequest
 import kotlinx.coroutines.launch
-import proto.Game
-import proto.Genre
-import proto.Platform
+import ru.pixnews.igdbclient.apicalypse.ApicalypseQueryBuilder
+import ru.pixnews.igdbclient.apicalypse.SortOrder
+import ru.pixnews.igdbclient.getGames
+import ru.pixnews.igdbclient.getGenres
+import ru.pixnews.igdbclient.getPlatforms
+import ru.pixnews.igdbclient.model.Game
+import ru.pixnews.igdbclient.model.Genre
+import ru.pixnews.igdbclient.model.Platform
 import javax.inject.Inject
 
 enum class SearchType(val text: String) {
@@ -54,7 +54,7 @@ class SearchViewModel @Inject constructor(
 
     var searchType by mutableStateOf(SearchType.GAMES)
 
-    val gamesSearch = SearchTypeObject<Game, GeneratedMessageV3>(
+    val gamesSearch = SearchTypeObject<Game, Message<out Message<*, Nothing>, Nothing>>(
         filters = mapOf(
             FilterType.PLATFORMS to FilterState(platforms),
             FilterType.GENRES to FilterState(genres),
@@ -69,48 +69,48 @@ class SearchViewModel @Inject constructor(
     }
 
     fun search() {
-        val query = APICalypse()
-            .fields("id,name,cover.image_id")
-            .limit(500)
+        fetchSearchedGames {
+            fields("id", "name", "cover.image_id")
+            limit(500)
 
-        if (gamesSearch.query.isNotEmpty()) {
-            query.search(gamesSearch.query)
-        }
+            if (gamesSearch.query.isNotEmpty()) {
+                search(gamesSearch.query)
+            }
 
-        val where = mutableListOf<String>()
+            val whereFragments = mutableListOf<String>()
 
-        for ((filter, state) in gamesSearch.filters) {
-            if (state.selected.isNotEmpty()) {
-                where.add(
-                    "${filter.apiField} = (${
-                        state.selected.joinToString(",") {
-                            when (it) {
-                                is Platform -> it.id.toString()
-                                is Genre -> it.id.toString()
-                                else -> ""
-                            }
+            for ((filter, state) in gamesSearch.filters) {
+                if (state.selected.isNotEmpty()) {
+                    val ids = state.selected.joinToString(",") {
+                        when (it) {
+                            is Platform -> it.id.toString()
+                            is Genre -> it.id.toString()
+                            else -> ""
                         }
-                    })")
+                    }
+                    whereFragments.add("${filter.apiField} = ($ids)")
+                }
+            }
+
+            if (!gamesSearch.showDLCs) {
+                whereFragments.add("parent_game = null")
+            }
+
+            if (whereFragments.isNotEmpty()) {
+                where(whereFragments.joinToString(" & "))
             }
         }
-
-        if (!gamesSearch.showDLCs) {
-            where.add("parent_game = null")
-        }
-
-        if (where.isNotEmpty()) {
-            query.where(where.joinToString(" & "))
-        }
-
-        fetchSearchedGames(query)
         fetchSearchedUsers(usersSearch.query)
     }
 
-    private fun fetchSearchedGames(query: APICalypse) {
+    private fun fetchSearchedGames(query: ApicalypseQueryBuilder.() -> Unit) {
         gamesSearch.inProgress = true
         viewModelScope.launch {
             gamesSearch.results.clear()
-            IGDBApiRequest { IGDBWrapper.games(query) }?.let { gamesSearch.results.addAll(it) }
+            val result = SafeRequest { IGDBClient.getGames(query) }
+            if (result != null) {
+                gamesSearch.results.addAll(result.games)
+            }
             gamesSearch.inProgress = false
         }
     }
@@ -127,23 +127,31 @@ class SearchViewModel @Inject constructor(
     private fun fetchPlaforms() {
         viewModelScope.launch {
             platforms.clear()
-            IGDBApiRequest {
-                IGDBWrapper.platforms(
-                    APICalypse()
-                        .fields("slug,name,platform_logo.url")
-                        .sort("generation", Sort.DESCENDING)
-                        .where("generation != null")
-                        .limit(30)
-                )
-            }?.let { platforms.addAll(it) }
+            val result = SafeRequest {
+                IGDBClient.getPlatforms {
+                    fields("slug", "name", "platform_logo.url")
+                    sort("generation", SortOrder.DESC)
+                    where("generation != null")
+                    limit(30)
+                }
+            }
+            if (result != null) {
+                platforms.addAll(result.platforms)
+            }
         }
     }
 
     private fun fetchGenres() {
         viewModelScope.launch {
             genres.clear()
-            IGDBApiRequest { IGDBWrapper.genres(APICalypse().fields("slug,name").limit(25)) }?.let {
-                genres.addAll(it)
+            val result = SafeRequest {
+                IGDBClient.getGenres {
+                    fields("slug", "name")
+                    limit(25)
+                }
+            }
+            if (result != null) {
+                genres.addAll(result.genres)
             }
         }
     }

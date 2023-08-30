@@ -43,14 +43,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.glide.GlideImage
-import it.unibo.gamelibrary.BuildConfig
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.common.components.GameCardView.GameCardView
 import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
@@ -58,11 +56,7 @@ import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
-import proto.Game
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Objects
+import ru.pixnews.igdbclient.model.Game
 
 @Destination
 @Composable()

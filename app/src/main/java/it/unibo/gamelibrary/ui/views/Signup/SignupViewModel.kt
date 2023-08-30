@@ -9,10 +9,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.api.igdb.apicalypse.APICalypse
-import com.api.igdb.apicalypse.Sort
-import com.api.igdb.request.IGDBWrapper
-import com.api.igdb.request.companies
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
@@ -22,11 +18,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
-import it.unibo.gamelibrary.utils.IGDBApiRequest
+import it.unibo.gamelibrary.utils.IGDBClient
+import it.unibo.gamelibrary.utils.SafeRequest
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import proto.Company
+import ru.pixnews.igdbclient.apicalypse.SortOrder
+import ru.pixnews.igdbclient.getCompanies
+import ru.pixnews.igdbclient.model.Company
 import javax.inject.Inject
 
 @HiltViewModel
@@ -129,35 +128,29 @@ class SignupViewModel @Inject constructor(
     fun getListCompanies(name: String = "") {
         job?.cancel()
         job = viewModelScope.launch {
-            publisherOptions =
-                IGDBApiRequest {
-                    IGDBWrapper.companies(
-                        APICalypse()
-                            .fields("name")
-                            .sort("name", Sort.ASCENDING)
-                            .limit(50)
-                            .where(
-                                "name ~ *\"${name}\"*"
-                            )
-                    )
-                } ?: emptyList()
+            val result = SafeRequest {
+                IGDBClient.getCompanies {
+                    fields("name")
+                    where("name ~ *\"${name}\"*")
+                    limit(50)
+                    sort("name", SortOrder.ASC)
+                }
+            }
+            publisherOptions = result?.companies ?: emptyList()
         }
     }
 
     private fun getSlugByCompany(name: String): Job {
         return viewModelScope.launch {
-            publisherSlug =
-                IGDBApiRequest {
-                    IGDBWrapper.companies(
-                        APICalypse()
-                            .fields("slug")
-                            .sort("slug", Sort.ASCENDING)
-                            .limit(1)
-                            .where(
-                                "name = \"$name\""
-                            )
-                    )
-                }?.get(0)?.slug
+            val result = SafeRequest {
+                IGDBClient.getCompanies {
+                    fields("slug")
+                    where("name = \"${name}\"")
+                    sort("slug", SortOrder.ASC)
+                    limit(1)
+                }
+            }
+            publisherSlug = result?.companies?.firstOrNull()?.slug
             Log.i("Slug", publisherSlug ?: "slug")
         }
     }

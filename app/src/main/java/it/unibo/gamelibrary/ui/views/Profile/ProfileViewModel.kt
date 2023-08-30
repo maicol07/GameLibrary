@@ -9,9 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.api.igdb.apicalypse.APICalypse
-import com.api.igdb.request.IGDBWrapper
-import com.api.igdb.request.companies
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,10 +17,12 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.FollowRepository
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
-import it.unibo.gamelibrary.utils.IGDBApiRequest
+import it.unibo.gamelibrary.utils.IGDBClient
+import it.unibo.gamelibrary.utils.SafeRequest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import proto.Game
+import ru.pixnews.igdbclient.getCompanies
+import ru.pixnews.igdbclient.model.Game
 import javax.inject.Inject
 
 
@@ -61,34 +60,32 @@ class ProfileViewModel @Inject constructor(
 
     fun getPublisherGames(){
         viewModelScope.launch {
-            var publisher = IGDBApiRequest {
-                IGDBWrapper.companies(
-                    APICalypse()
-                        .fields(
-                            listOf(
-                                "published, slug, published.name, published.cover.image_id",
-                                "published.name",
-                                "published.artworks.image_id",
-                                "published.cover.image_id",
-                                "published.first_release_date",
-                                "published.involved_companies.*",
-                                "published.involved_companies.company.name",
-                                "published.genres.name",
-                                "published.genres.slug",
-                                "published.screenshots.image_id",
-                                "published.summary",
-                                "published.release_dates.human",
-                                "published.release_dates.platform.name",
-                                "published.release_dates.platform.platform_logo.url",
-                            ).joinToString(",")
-                        )
-                        .where("slug = \"${user?.publisherName}\"")
-                        .limit(1)
-                )
-            }?.get(0)
+            val result = SafeRequest {
+                IGDBClient.getCompanies {
+                    fields(
+                        "published, slug, published.name, published.cover.image_id",
+                        "published.name",
+                        "published.artworks.image_id",
+                        "published.cover.image_id",
+                        "published.first_release_date",
+                        "published.involved_companies.*",
+                        "published.involved_companies.company.name",
+                        "published.genres.name",
+                        "published.genres.slug",
+                        "published.screenshots.image_id",
+                        "published.summary",
+                        "published.release_dates.human",
+                        "published.release_dates.platform.name",
+                        "published.release_dates.platform.platform_logo.url"
+                    )
+                    where("slug = \"${user?.publisherName}\"")
+                    limit(1)
+                }
+            }
+            val publisher = result?.companies?.firstOrNull()
             publisherGames.clear()
-            publisher?.publishedList?.let { publisherGames.addAll(it) }
-            publisherGames.sortByDescending { it.firstReleaseDate.seconds }
+            publisher?.published?.let { publisherGames.addAll(it) }
+            publisherGames.sortByDescending { it.first_release_date?.epochSecond }
         }
     }
 
