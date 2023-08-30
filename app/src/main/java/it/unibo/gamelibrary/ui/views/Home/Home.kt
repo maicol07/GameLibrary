@@ -31,7 +31,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.coil.CoilImage
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.placeholder
 import io.github.fornewid.placeholder.material3.shimmer
@@ -139,8 +139,8 @@ fun HomeSection(
             items(items = if(list.isEmpty()){loadingList}else{list}) { game ->
 
                 Column {
-                    GlideImage(
-                        {
+                    CoilImage(
+                        imageModel = {
                             if (game.cover != null) igdbImageUrl(
                                 game.cover!!.image_id,
                                 IgdbImageSize.COVER_BIG

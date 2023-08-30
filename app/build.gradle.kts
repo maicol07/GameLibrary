@@ -100,7 +100,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.landscapist.animation)
-    implementation(libs.landscapist.glide)
+    implementation(libs.landscapist.coil)
     implementation(libs.material.icons.extended)
     implementation(libs.placeholder)
     ksp(libs.room.compiler)

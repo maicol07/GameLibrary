@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.Game.icon
@@ -201,8 +201,8 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                         .clip(imageShape)
                                         .shadow(100.dp, imageShape)
                                     if (it.image != null && it.image != "") {
-                                        GlideImage(
-                                            {
+                                        CoilImage(
+                                            imageModel = {
                                                 Uri.parse(it.image)
                                             },
                                             imageOptions = ImageOptions(
@@ -317,8 +317,8 @@ fun FiltersBottomSheet(viewModel: SearchViewModel = hiltViewModel()) {
                                     when (value) {
                                         is Platform -> {
                                             if (value.platform_logo !== null && value.platform_logo!!.id.toInt() != 0) {
-                                                GlideImage(
-                                                    {
+                                                CoilImage(
+                                                    imageModel = {
                                                         "https:${value.platform_logo!!.url}"
                                                     },
                                                     imageOptions = ImageOptions(

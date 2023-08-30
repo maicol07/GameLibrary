@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.data.model.User
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -42,8 +42,8 @@ fun UserBar(user: User, link: Boolean, navigator: DestinationsNavigator?){
             ),
     ){
         if(user.hasImage()) {
-            GlideImage(
-                {
+            CoilImage(
+                imageModel = {
                     user.image
                 },
                 modifier = Modifier

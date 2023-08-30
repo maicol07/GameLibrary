@@ -48,7 +48,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.common.components.GameCardView.GameCardView
 import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
@@ -283,8 +283,8 @@ private fun EditButton(
         ) {
             Column {
                 if (viewModel.newImage.value != Uri.EMPTY) {
-                    GlideImage(
-                        {
+                    CoilImage(
+                        imageModel = {
                             viewModel.newImage.value
                         },
                         modifier = Modifier.size(256.dp)

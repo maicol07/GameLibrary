@@ -69,7 +69,7 @@ import com.mahmoudalim.compose_rating_bar.RatingBarView
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.coil.CoilImage
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.placeholder
 import io.github.fornewid.placeholder.material3.shimmer
@@ -248,8 +248,8 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
                     onClick = { /*TODO*/ },
                     leadingIcon = {
                         if (it.platform?.platform_logo != null) {
-                            GlideImage(
-                                { "https://${it.platform?.platform_logo!!.url}" },
+                            CoilImage(
+                                imageModel = { "https://${it.platform?.platform_logo!!.url}" },
                                 previewPlaceholder = R.drawable.square_enix_logo,
                                 imageOptions = ImageOptions(contentScale = ContentScale.FillBounds),
                                 modifier = Modifier

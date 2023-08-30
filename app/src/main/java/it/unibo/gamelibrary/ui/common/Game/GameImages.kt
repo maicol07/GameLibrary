@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
+import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.components.Fullscreen
@@ -75,8 +75,8 @@ fun GameCoverImage(
             }
         }
     }) {
-        GlideImage(
-            {
+        CoilImage(
+            imageModel = {
                 if (game.cover != null && game.cover!!.image_id != "") igdbImageUrl(
                     game.cover!!.image_id,
                     IgdbImageSize.COVER_BIG
@@ -129,8 +129,8 @@ fun GameArtwork(
         modifier
     }
 
-    GlideImage(
-        {
+    CoilImage(
+        imageModel = {
             if (game.artworks.isNotEmpty()) {
                 igdbImageUrl(game.artworks[0].image_id, IgdbImageSize.H1080P)
             } else {
@@ -156,8 +156,8 @@ fun GameArtwork(
 
 @Composable
 fun GameScreenshot(game: Game, contentDescription: String, modifier: Modifier = Modifier) {
-    GlideImage(
-        {
+    CoilImage(
+        imageModel = {
             if (game.screenshots.isNotEmpty()) {
                 igdbImageUrl(game.screenshots[0].image_id, IgdbImageSize.SCREENSHOT_BIG)
             } else {

@@ -85,7 +85,7 @@ ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 landscapist-animation = { group = "com.github.skydoves", name = "landscapist-animation", version.ref = "landscapist" }
-landscapist-glide = { group = "com.github.skydoves", name = "landscapist-glide", version.ref = "landscapist" }
+landscapist-coil = { group = "com.github.skydoves", name = "landscapist-coil", version.ref = "landscapist" }
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 placeholder = { group = "io.github.fornewid", name = "placeholder-material3", version.ref = "placeholder" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
