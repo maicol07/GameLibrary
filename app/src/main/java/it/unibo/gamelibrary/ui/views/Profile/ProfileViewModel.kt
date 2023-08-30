@@ -123,36 +123,45 @@ class ProfileViewModel @Inject constructor(
 
     fun applyChanges(context: Context) {
 
-        val inputStream: InputStream? = context.contentResolver.openInputStream(newImage.value)
-        val yourDrawable = Drawable.createFromStream(inputStream, newImage.toString())
-        inputStream?.close()
+        var savedUri = Uri.EMPTY
+        if(newImage.value != Uri.EMPTY){ //save image to internal storage
+            val inputStream: InputStream? = context.contentResolver.openInputStream(newImage.value)
+            val yourDrawable = Drawable.createFromStream(inputStream, newImage.toString())
+            inputStream?.close()
 
-        val cw = ContextWrapper(context.applicationContext)
-        val directory = cw.getDir("imageDir", Context.MODE_PRIVATE)
-        val file = File(directory, System.currentTimeMillis().toString() + ".jpg")
+            val cw = ContextWrapper(context.applicationContext)
+            val directory = cw.getDir("imageDir", Context.MODE_PRIVATE)
+            val file = File(directory, System.currentTimeMillis().toString() + ".jpg")
 
-        val savedUri = file.toUri()
+            savedUri = file.toUri()
 
-        if (!file.exists()) {
-            Log.d("path", file.toString())
-            var fos: FileOutputStream?
-            try {
-                fos = FileOutputStream(file)
-                //TODO controlla se sui telefoni degli altrir funziona Jpeg o se serve png
-                yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-                fos.flush()
-                fos.close()
+            if (!file.exists()) {
+                Log.d("path", file.toString())
+                var fos: FileOutputStream?
+                try {
+                    fos = FileOutputStream(file)
+                    //TODO controlla se sui telefoni degli altrir funziona Jpeg o se serve png
+                    yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                    fos.flush()
+                    fos.close()
 
-            } catch (e: IOException) {
-                e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
         }
+
         viewModelScope.launch {
-            if (newImage.value != Uri.parse(user?.image)) {
+            if (newImage.value != Uri.EMPTY) {
 
-                Uri.parse(user?.image).path?.let { File(it).delete() }// delete old image from internal storage
-
-                repository.setImage(user!!.uid, savedUri.toString())
+                if(user?.hasImage() == true){
+                    if(Uri.parse(user?.image) != newImage.value){
+                        Uri.parse(user?.image).path?.let { File(it).delete() }// delete old image from internal storage
+                        repository.setImage(user!!.uid, savedUri.toString())
+                    }
+                }else{
+                    repository.setImage(user!!.uid, savedUri.toString())
+                }
             }
             if (newBio.value != (user?.bio ?: "")) {
                 repository.setBio(user!!.uid, newBio.value)
