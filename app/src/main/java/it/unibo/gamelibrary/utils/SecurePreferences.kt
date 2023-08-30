@@ -18,7 +18,7 @@ class SecurePreferences(context: Context) {
         sharedPreferences.edit().putString(key, value).apply()
     }
 
-    fun getString(key: String, defaultValue: String): String {
+    fun getString(key: String, defaultValue: String? = null): String? {
         return sharedPreferences.getString(key, defaultValue) ?: defaultValue
     }
 
