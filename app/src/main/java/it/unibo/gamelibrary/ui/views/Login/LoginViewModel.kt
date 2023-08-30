@@ -26,6 +26,7 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.snackbarHostState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -49,7 +50,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             var usernameOrEmail = fields["usernameOrEmail"]!!
             if (!isEmail) {
-                val user = repository.getUserByUsername(usernameOrEmail)
+                val user = repository.getUserByUsername(usernameOrEmail).first()
                 usernameOrEmail = user?.email ?: ""
             }
             Log.i("Email", usernameOrEmail)
@@ -60,7 +61,7 @@ class LoginViewModel @Inject constructor(
                             var isPublisher = false
                             viewModelScope.launch {
                                 isPublisher =
-                                    repository.getUserByUid(auth.currentUser?.uid!!)?.isPublisher == true
+                                    repository.getUserByUid(auth.currentUser?.uid!!).first()?.isPublisher == true
                             }.invokeOnCompletion {
                                 if (isPublisher){
                                     insertUserIfNotExist(
@@ -114,7 +115,7 @@ class LoginViewModel @Inject constructor(
                         var isUserPublisher = false
                         viewModelScope.launch {
                             isUserPublisher =
-                                repository.getUserByUid(auth.currentUser?.uid!!)?.isPublisher == true
+                                repository.getUserByUid(auth.currentUser?.uid!!).first()?.isPublisher == true
                         }.invokeOnCompletion {
                             if (isUserPublisher){
                                 insertUserIfNotExist(
@@ -206,7 +207,7 @@ class LoginViewModel @Inject constructor(
                                      isPublisher: Boolean = false,
                                      publisherName: String? = null){
         viewModelScope.launch {
-            if(repository.getUserByUid(auth.currentUser?.uid!!) == null) {
+            if(repository.getUserByUid(auth.currentUser?.uid!!).first() == null) {
                 repository.insertUser(
                     if (isPublisher)
                         User(

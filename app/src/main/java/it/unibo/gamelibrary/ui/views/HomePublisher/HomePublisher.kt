@@ -17,7 +17,6 @@ fun HomePublisher(
     TopAppBarState.actions = { }
     TopAppBarState.title = "Home"
 
-    viewModel.fetchGamesAndPosts()
     LazyColumn {
         item {
             HomeSection(

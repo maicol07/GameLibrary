@@ -3,18 +3,15 @@ package it.unibo.gamelibrary.data.repository
 import androidx.annotation.WorkerThread
 import it.unibo.gamelibrary.data.dao.FollowDao
 import it.unibo.gamelibrary.data.model.Follow
+import kotlinx.coroutines.flow.Flow
 
 class FollowRepository(private val followDao: FollowDao) {
 
     @WorkerThread
-    suspend fun getFollowed(uid: String): List<Follow> {
-        return followDao.getFollowed(uid)
-    }
+    fun getFollowed(uid: String): Flow<List<Follow>> = followDao.getFollowed(uid)
 
     @WorkerThread
-    suspend fun getFollowers(uid: String): List<Follow> {
-        return followDao.getFollowers(uid)
-    }
+    fun getFollowers(uid: String): Flow<List<Follow>> = followDao.getFollowers(uid)
 
     @WorkerThread
     suspend fun follow(uid1: String, uid2: String) {

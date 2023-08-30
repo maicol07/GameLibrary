@@ -14,6 +14,7 @@ import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getGames
 import ru.pixnews.igdbclient.model.Game
@@ -27,14 +28,15 @@ class LibraryViewModel @Inject constructor(
     val games = mutableStateMapOf<Long, Game>()
     var loading by mutableStateOf(true)
     init {
-        fetchLibraryEntries().invokeOnCompletion {
-            fetchGames(libraryEntries.map { it.gameId })
-        }
+        fetchLibraryEntries()
     }
 
     fun fetchLibraryEntries() = viewModelScope.launch {
-        libraryEntries.clear()
-        libraryEntries.addAll(libraryRepository.getUserLibraryEntries(Firebase.auth.currentUser!!.uid))
+        libraryRepository.getUserLibraryEntries(Firebase.auth.currentUser!!.uid).collectLatest {
+            libraryEntries.clear()
+            libraryEntries.addAll(it)
+            fetchGames(libraryEntries.map { it.gameId })
+        }
     }
 
     fun fetchGames(ids: List<Int>) = viewModelScope.launch {

@@ -13,6 +13,7 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.apicalypse.ApicalypseQueryBuilder
 import ru.pixnews.igdbclient.apicalypse.SortOrder
@@ -119,7 +120,7 @@ class SearchViewModel @Inject constructor(
         usersSearch.inProgress = true
         viewModelScope.launch {
             usersSearch.results.clear()
-            usersSearch.results.addAll(userRepository.searchUser(query))
+            usersSearch.results.addAll(userRepository.searchUser(query).first())
             usersSearch.inProgress = false
         }
     }

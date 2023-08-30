@@ -8,6 +8,7 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getGames
 import ru.pixnews.igdbclient.model.Game
@@ -22,7 +23,7 @@ class UserReviewViewModel @Inject constructor(
 
     fun getUser(uid: String) {
         viewModelScope.launch {
-            user[uid] = userRepository.getUserByUid(uid)
+            user[uid] = userRepository.getUserByUid(uid).first()
         }
     }
 

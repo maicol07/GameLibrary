@@ -25,6 +25,7 @@ import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
 import it.unibo.gamelibrary.utils.snackbarHostState
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getGames
 import ru.pixnews.igdbclient.model.Game
@@ -85,11 +86,12 @@ class GameViewViewModel @Inject constructor(
     }
 
     private fun getUserLibraryEntry(gameId: Int, userId: String) = viewModelScope.launch {
-        libraryEntry.entry =
-            libraryRepository.getLibraryEntryByUserAndGame(userId, gameId.toString())
-        libraryEntry.status = libraryEntry.entry?.status
-        libraryEntry.rating.intValue = libraryEntry.entry?.rating ?: 0
-        libraryEntry.notes = libraryEntry.entry?.notes ?: ""
+        libraryRepository.getLibraryEntryByUserAndGame(userId, gameId.toString()).collectLatest {
+            libraryEntry.entry = it
+            libraryEntry.status = it?.status
+            libraryEntry.rating.intValue = it?.rating ?: 0
+            libraryEntry.notes = it?.notes ?: ""
+        }
     }
 
     fun saveGameToLibrary() {
@@ -113,7 +115,6 @@ class GameViewViewModel @Inject constructor(
                     notes = libraryEntry.notes
                 )
                 libraryRepository.insertEntry(libraryEntry.entry!!)
-                getUserLibraryEntry(game!!.id.toInt(), Firebase.auth.currentUser!!.uid)
                 viewModelScope.launch { snackbarHostState.showSnackbar("Game added to library!") }
             }
 

@@ -20,6 +20,8 @@ import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getCompanies
 import ru.pixnews.igdbclient.model.Game
@@ -46,9 +48,9 @@ class ProfileViewModel @Inject constructor(
     var showProfileEditDialog by mutableStateOf(false)
     var uri: Uri? = null
 
-    fun getUser(uid: String) {
+    fun setUser(uid: String) {
         viewModelScope.launch {
-            user = repository.getUserByUid(uid)
+            user = repository.getUserByUid(uid).first()
             newBio.value = user?.bio ?: ""
             newImage.value = Uri.parse(user?.image ?: "")
             newUsername.value = user?.username ?: ""
@@ -56,6 +58,10 @@ class ProfileViewModel @Inject constructor(
                 getPublisherGames()
             }
         }
+
+        getLibrary(uid)
+        getFollowers(uid)
+        getFollowed(uid)
     }
 
     fun getPublisherGames(){
@@ -91,8 +97,10 @@ class ProfileViewModel @Inject constructor(
 
     fun getLibrary(uid: String) {
         viewModelScope.launch {
-            userLibrary.clear()
-            userLibrary.addAll(libraryRepository.getUserLibraryEntries(uid))
+            libraryRepository.getUserLibraryEntries(uid).collectLatest {
+                userLibrary.clear()
+                userLibrary.addAll(it)
+            }
         }
     }
 
@@ -116,21 +124,25 @@ class ProfileViewModel @Inject constructor(
             if (newUsername.value != (user?.username ?: "")) {
                 repository.setUsername(user!!.uid, newUsername.value)
             }
-            getUser(uid = user!!.uid)
+            setUser(uid = user!!.uid)
         }
     }
 
     fun getFollowed(uid: String): Job {
         return viewModelScope.launch {
-            followed.clear()
-            followed.addAll(followRepository.getFollowed(uid).map { it.followed })
+            followRepository.getFollowed(uid).collectLatest {
+                followed.clear()
+                followed.addAll(it.map { it.followed })
+            }
         }
     }
 
     fun getFollowers(uid: String): Job {
         return viewModelScope.launch {
-            followers.clear()
-            followers.addAll(followRepository.getFollowers(uid).map { it.follower })
+            followRepository.getFollowers(uid).collectLatest {
+                followed.clear()
+                followed.addAll(it.map { it.follower })
+            }
         }
     }
 
@@ -153,7 +165,7 @@ class ProfileViewModel @Inject constructor(
         users.clear()
         viewModelScope.launch {
             uids.forEach{
-                users.add(repository.getUserByUid(it)!!)
+                users.add(repository.getUserByUid(it).first()!!)
             }
 
         }

@@ -67,10 +67,9 @@ fun Profile(
 ) {
     val context = LocalContext.current
     val uid = userID ?: Firebase.auth.currentUser!!.uid
-    viewModel.getUser(uid)
-    viewModel.getLibrary(uid)
-    viewModel.getFollowers(uid)
-    viewModel.getFollowed(uid)
+    if (viewModel.user == null) {
+        viewModel.setUser(uid)
+    }
 
     TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
     TopAppBarState.customTitle = {

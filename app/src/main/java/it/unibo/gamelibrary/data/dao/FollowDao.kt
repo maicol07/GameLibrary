@@ -3,16 +3,17 @@ package it.unibo.gamelibrary.data.dao
 import androidx.room.Dao
 import androidx.room.Query
 import it.unibo.gamelibrary.data.model.Follow
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FollowDao {
     //trova i seguiti da userID
     @Query("SELECT * FROM followers WHERE follower = :userId")
-    suspend fun getFollowed(userId: String): List<Follow>
+    fun getFollowed(userId: String): Flow<List<Follow>>
 
     //trova i seguaci di userID
     @Query("SELECT * FROM followers WHERE followed = :userId")
-    suspend fun getFollowers(userId: String): List<Follow>
+    fun getFollowers(userId: String): Flow<List<Follow>>
 
     //TODO cerca utenti per testare
     @Query("INSERT INTO followers VALUES (:follower, :followed)")

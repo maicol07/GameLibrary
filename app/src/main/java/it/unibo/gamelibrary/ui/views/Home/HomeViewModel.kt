@@ -15,6 +15,8 @@ import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.IgdbEndpoint
 import ru.pixnews.igdbclient.apicalypse.SortOrder
@@ -91,13 +93,16 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             user = userRepository.getUserByUid(
                 Firebase.auth.currentUser?.uid!!
-            )
+            ).first()
         }
     }
 
     private fun fetchPosts() {
         viewModelScope.launch {
-            posts.addAll(libraryRepository.getAll())
+            libraryRepository.getAll().collectLatest {
+                posts.clear()
+                posts.addAll(it)
+            }
         }
     }
 }

@@ -8,20 +8,21 @@ import androidx.room.Transaction
 import androidx.room.Update
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.UserWithLibraryEntries
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LibraryDao {
     @Query("SELECT * FROM library")
-    suspend fun getAll(): List<LibraryEntry>
+    fun getAll(): Flow<List<LibraryEntry>>
 
     @Query("SELECT * FROM library WHERE uid = :userId")
-    suspend fun getUserLibrary(userId: String): List<LibraryEntry>
+    fun getUserLibrary(userId: String): Flow<List<LibraryEntry>>
 
     @Query("SELECT * FROM library WHERE id = :id")
-    suspend fun getLibrary(id: String): LibraryEntry?
+    fun getLibrary(id: String): Flow<LibraryEntry?>
 
     @Query("SELECT * FROM library WHERE gameId = :gameId")
-    suspend fun getLibraryEntriesByGame(gameId: String): List<LibraryEntry>
+    fun getLibraryEntriesByGame(gameId: String): Flow<List<LibraryEntry>>
 
     @Insert
     suspend fun add(libraryEntry: LibraryEntry)
@@ -34,9 +35,9 @@ interface LibraryDao {
 
     @Transaction
     @Query("SELECT * FROM users")
-    suspend fun getUsersAndLibrary(): List<UserWithLibraryEntries>
+    fun getUsersAndLibrary(): Flow<List<UserWithLibraryEntries>>
 
     // Get library entry by user id and game id
     @Query("SELECT * FROM library WHERE uid = :userId AND gameId = :gameId")
-    suspend fun getLibraryEntryByUserAndGame(userId: String, gameId: String): LibraryEntry?
+    fun getLibraryEntryByUserAndGame(userId: String, gameId: String): Flow<LibraryEntry?>
 }

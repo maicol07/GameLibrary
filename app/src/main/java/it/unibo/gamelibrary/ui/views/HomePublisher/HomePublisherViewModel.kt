@@ -15,6 +15,8 @@ import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getCompanies
 import ru.pixnews.igdbclient.model.Company
@@ -31,9 +33,14 @@ class HomePublisherViewModel @Inject constructor(
     private var publisher by mutableStateOf<Company?>(null)
     var posts = mutableStateListOf<LibraryEntry>()
 
-    fun fetchGamesAndPosts() {
+    init {
+        fetchGames()
+        fetchPosts()
+    }
+
+    fun fetchGames() {
         viewModelScope.launch {
-            val publisherName = userRepository.getUserByUid(auth.currentUser?.uid!!)?.publisherName
+            val publisherName = userRepository.getUserByUid(auth.currentUser?.uid!!).first()?.publisherName
             val response = SafeRequest {
                 IGDBClient.getCompanies {
                     fields(
@@ -49,8 +56,6 @@ class HomePublisherViewModel @Inject constructor(
             publisher = response?.companies?.firstOrNull()
             games.clear()
             games.addAll(publisher!!.published.sortedByDescending { it.first_release_date?.epochSecond ?: 0 })
-
-            fetchPosts()
         }
     }
 
@@ -58,7 +63,9 @@ class HomePublisherViewModel @Inject constructor(
         viewModelScope.launch {
             posts.clear()
             for (game in games) {
-                posts.addAll(libraryRepository.getCollectionsByGame(game))
+                libraryRepository.getCollectionsByGame(game).collectLatest {
+                    posts.addAll(it)
+                }
             }
         }
     }

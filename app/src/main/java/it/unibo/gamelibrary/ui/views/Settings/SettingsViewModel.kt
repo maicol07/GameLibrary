@@ -48,6 +48,7 @@ import it.unibo.gamelibrary.interfaces.HasBiometrics
 import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
 import it.unibo.gamelibrary.utils.findActivity
 import it.unibo.gamelibrary.utils.snackbarHostState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Locale
@@ -270,7 +271,7 @@ class SettingsViewModel @Inject constructor(
 
     fun getAddress() {
         viewModelScope.launch {
-            addressUser = repository.getUserByUid(auth.currentUser?.uid!!)?.address
+            addressUser = repository.getUserByUid(auth.currentUser?.uid!!).first()?.address
         }
     }
 

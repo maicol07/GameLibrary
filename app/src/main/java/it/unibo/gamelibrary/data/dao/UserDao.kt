@@ -6,17 +6,18 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import it.unibo.gamelibrary.data.model.User
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
     @Query("SELECT * FROM users")
-    suspend fun getAll(): List<User>
+    fun getAll(): Flow<List<User>>
 
     @Query("SELECT * FROM users WHERE username = :username")
-    suspend fun getUserByUsername(username: String): User?
+    fun getUserByUsername(username: String): Flow<User?>
 
     @Query("SELECT * FROM users WHERE uid = :uid")
-    suspend fun getUserByUid(uid: String): User?
+    fun getUserByUid(uid: String): Flow<User?>
 
     @Insert
     suspend fun insertUser(user: User)
@@ -44,5 +45,5 @@ interface UserDao {
 
     // Search user by name, surname or username
     @Query("SELECT * FROM users WHERE username LIKE '%' || :query || '%' OR name LIKE '%' || :query || '%' OR surname LIKE '%' || :query || '%'")
-    suspend fun searchUser(query: String): List<User>
+    fun searchUser(query: String): Flow<List<User>>
 }

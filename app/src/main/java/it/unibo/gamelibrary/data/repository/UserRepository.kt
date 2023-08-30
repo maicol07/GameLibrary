@@ -3,23 +3,19 @@ package it.unibo.gamelibrary.data.repository
 import androidx.annotation.WorkerThread
 import it.unibo.gamelibrary.data.dao.UserDao
 import it.unibo.gamelibrary.data.model.User
+import kotlinx.coroutines.flow.Flow
 
 class UserRepository(private val userDao: UserDao) {
     //val allUser: List<User> = userDao.getAll()
     @WorkerThread
-    suspend fun getAll(): List<User> {
-        return userDao.getAll()
-    }
+    fun getAll(): Flow<List<User>> = userDao.getAll()
 
     @WorkerThread
-    suspend fun getUserByUsername(username: String): User? {
-        return userDao.getUserByUsername(username)
-    }
+    fun getUserByUsername(username: String): Flow<User?> =
+        userDao.getUserByUsername(username)
 
     @WorkerThread
-    suspend fun getUserByUid(uid: String): User? {
-        return userDao.getUserByUid(uid)
-    }
+    fun getUserByUid(uid: String): Flow<User?> = userDao.getUserByUid(uid)
 
     @WorkerThread
     suspend fun insertUser(user: User) {
@@ -62,7 +58,5 @@ class UserRepository(private val userDao: UserDao) {
     }
 
     @WorkerThread
-    suspend fun searchUser(query: String): List<User> {
-        return userDao.searchUser(query)
-    }
+    fun searchUser(query: String): Flow<List<User>> = userDao.searchUser(query)
 }
