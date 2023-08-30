@@ -37,9 +37,6 @@ class HomeViewModel @Inject constructor(
 
     var user by mutableStateOf<User?>(null)
 
-    //"users" used in testing.
-    var users = mutableStateListOf<User>()
-
     init {
         viewModelScope.launch {
             val response = SafeRequest {
