@@ -84,6 +84,7 @@ class HomeViewModel @Inject constructor(
                 @Suppress("UNCHECKED_CAST")
                 (response?.get(index)?.results as List<Game>?)?.let { value.addAll(it) }
             }
+            fetchPosts()
         }
     }
     fun getUser() {
