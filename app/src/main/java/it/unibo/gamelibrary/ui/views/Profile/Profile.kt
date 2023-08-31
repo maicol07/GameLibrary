@@ -254,7 +254,9 @@ private fun EditButton(
         val context = LocalContext.current
         val cameraLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-                viewModel.tempUriNewImage?.let { viewModel.newImage.value = it }
+                if(it){
+                    viewModel.tempUriNewImage?.let { viewModel.newImage.value = it }
+                }
             }
 
         val permissionLauncher = rememberLauncherForActivityResult(
