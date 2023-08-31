@@ -123,35 +123,35 @@ class ProfileViewModel @Inject constructor(
 
     fun applyChanges(context: Context) {
 
-        var savedUri = Uri.EMPTY
-        if(newImage.value != Uri.EMPTY){ //save image to internal storage
-            val inputStream: InputStream? = context.contentResolver.openInputStream(newImage.value)
-            val yourDrawable = Drawable.createFromStream(inputStream, newImage.toString())
-            inputStream?.close()
+        viewModelScope.launch {
+            var savedUri = Uri.EMPTY
+            if(newImage.value != Uri.EMPTY){ //save image to internal storage
+                val inputStream: InputStream? = context.contentResolver.openInputStream(newImage.value)
+                val yourDrawable = Drawable.createFromStream(inputStream, newImage.toString())
+                inputStream?.close()
 
-            val cw = ContextWrapper(context.applicationContext)
-            val directory = cw.getDir("imageDir", Context.MODE_PRIVATE)
-            val file = File(directory, System.currentTimeMillis().toString() + ".jpg")
+                val cw = ContextWrapper(context.applicationContext)
+                val directory = cw.getDir("imageDir", Context.MODE_PRIVATE)
+                val file = File(directory, System.currentTimeMillis().toString() + ".jpg")
 
-            savedUri = file.toUri()
+                savedUri = file.toUri()
 
-            if (!file.exists()) {
-                Log.d("path", file.toString())
-                var fos: FileOutputStream?
-                try {
-                    fos = FileOutputStream(file)
-                    //TODO controlla se sui telefoni degli altrir funziona Jpeg o se serve png
-                    yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-                    fos.flush()
-                    fos.close()
+                if (!file.exists()) {
+                    Log.d("path", file.toString())
+                    var fos: FileOutputStream?
+                    try {
+                        fos = FileOutputStream(file)
+                        //TODO controlla se sui telefoni degli altrir funziona Jpeg o se serve png
+                        yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                        fos.flush()
+                        fos.close()
 
-                } catch (e: IOException) {
-                    e.printStackTrace()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
                 }
             }
-        }
 
-        viewModelScope.launch {
             if (newImage.value != Uri.EMPTY) {
 
                 if(user?.hasImage() == true){
