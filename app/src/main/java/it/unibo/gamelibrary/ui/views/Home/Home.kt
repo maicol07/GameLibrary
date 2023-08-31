@@ -36,6 +36,7 @@ import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.placeholder
 import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
 import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.Home.Search.SearchBar
@@ -99,7 +100,7 @@ fun Home(
                             }
 
                             items(
-                                viewModel.posts,
+                                viewModel.posts.filter { entry: LibraryEntry -> entry.uid != viewModel.user?.uid },
                                 key = { it.id })
                             {
                                 UserReview(it, navigator, showUser = true)
