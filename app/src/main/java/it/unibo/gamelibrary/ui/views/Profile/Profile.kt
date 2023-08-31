@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -84,7 +86,7 @@ fun Profile(
         }
     }
 
-    LazyColumn {
+    LazyColumn (Modifier.fillMaxHeight()){
         item {//bio, follow
             Row {
                 Text(
@@ -115,9 +117,22 @@ fun Profile(
         if (checkInternetConnection(context)) {
             //reviews di questo user
             if (viewModel.user?.isPublisher == false) {
-                items(viewModel.userLibrary)
-                {
-                    UserReview(it, navigator, showUser = false)
+                if(viewModel.userLibrary.isNotEmpty()){
+                    items(viewModel.userLibrary)
+                    {
+                        UserReview(it, navigator, showUser = false)
+                    }
+                }else{
+                    item{
+                        Column (verticalArrangement = Arrangement.Center, modifier = Modifier.fillParentMaxHeight(0.7F)){
+                            Text(text = "No reviews yet. You can find games you played in Home or by searching them by name!",
+                                modifier = Modifier
+                                    .padding(start = 8.dp, end = 8.dp, bottom = 50.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
             } else {
                 items(viewModel.publisherGames) { game: Game ->
