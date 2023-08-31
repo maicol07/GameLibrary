@@ -35,6 +35,7 @@ import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.placeholder
 import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.data.model.LibraryEntry
+import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
@@ -80,7 +81,9 @@ fun UserReview(
 
                         Text(//game name
                             text = viewModel.game[review.gameId]?.name ?: "",
-                            modifier = Modifier.fillMaxWidth().padding(4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
                             fontWeight = FontWeight.Bold
                         )
                         Row {
@@ -91,7 +94,10 @@ fun UserReview(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp)
                         }
-                        //TODO status?
+                        Row (Modifier.padding(top = 6.dp)){
+                            Icon(imageVector = review.status.unselectedIcon, contentDescription = review.status.text)
+                            Text(text = review.status.text)
+                        }
                     }
 
                 }
@@ -125,14 +131,18 @@ fun UserReview(
                 viewModel.game[review.gameId] ?: Game(),
                 contentDescription = "",
                 modifier = if(viewModel.game[review.gameId] != null) {
-                    Modifier.width(150.dp).height(200.dp)
+                    Modifier
+                        .width(150.dp)
+                        .height(200.dp)
                         .combinedClickable(
                             onClick = { navigator.navigate(GameViewNavDestination(review.gameId)) },
                         )
                         .clip(RoundedCornerShape(8.dp))
                     }else{
-                        Modifier.width(150.dp).height(200.dp)
-                            .placeholder(visible = true, highlight = PlaceholderHighlight.shimmer())
+                    Modifier
+                        .width(150.dp)
+                        .height(200.dp)
+                        .placeholder(visible = true, highlight = PlaceholderHighlight.shimmer())
                     }
             )
         }
