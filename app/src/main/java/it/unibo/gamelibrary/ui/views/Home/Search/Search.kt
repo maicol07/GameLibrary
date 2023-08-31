@@ -194,7 +194,7 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                             )
                                         }
                                 ) {
-                                    val imageShape = RoundedCornerShape(16.dp)
+                                    val imageShape = RoundedCornerShape(128.dp)
                                     val imageModifier = Modifier
                                         .size(100.dp)
                                         .padding(8.dp)
@@ -206,7 +206,7 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                                 Uri.parse(it.image)
                                             },
                                             imageOptions = ImageOptions(
-                                                contentScale = ContentScale.FillBounds,
+                                                contentScale = ContentScale.Crop,
                                                 alignment = Alignment.Center
                                             ),
                                             modifier = imageModifier
