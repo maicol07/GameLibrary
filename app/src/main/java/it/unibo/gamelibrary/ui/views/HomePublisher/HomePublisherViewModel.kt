@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getCompanies
 import ru.pixnews.igdbclient.model.Company
+import ru.pixnews.igdbclient.model.CompanyResult
 import ru.pixnews.igdbclient.model.Game
 import javax.inject.Inject
 
@@ -39,9 +40,11 @@ class HomePublisherViewModel @Inject constructor(
     }
 
     fun fetchGames() {
+        var response: CompanyResult? = null
         viewModelScope.launch {
-            val publisherName = userRepository.getUserByUid(auth.currentUser?.uid!!).first()?.publisherName
-            val response = SafeRequest {
+            val publisherName =
+                userRepository.getUserByUid(auth.currentUser?.uid!!).first()?.publisherName
+            response = SafeRequest {
                 IGDBClient.getCompanies {
                     fields(
                         "slug",
@@ -49,13 +52,14 @@ class HomePublisherViewModel @Inject constructor(
                         "published.cover.image_id",
                         "published.first_release_date"
                     )
-                    where("slug = \"$publisherName\"")
+                    where("slug = \"${publisherName}\"")
                     limit(1)
                 }
             }
+        }.invokeOnCompletion {
             publisher = response?.companies?.firstOrNull()
             games.clear()
-            games.addAll(publisher!!.published.sortedByDescending { it.first_release_date?.epochSecond ?: 0 })
+            games.addAll(publisher?.published?.sortedByDescending { it.first_release_date?.epochSecond ?: 0 } ?: emptyList())
         }
     }
 
