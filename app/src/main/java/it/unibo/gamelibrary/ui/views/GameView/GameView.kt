@@ -71,8 +71,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
-import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.Game.GameArtwork
@@ -151,7 +151,7 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = f
         val backgroundModifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer())
+            .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
         if (game.artworks.isNotEmpty()) {
             GameArtwork(game, "", backgroundModifier)
         } else {
@@ -166,7 +166,7 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = f
                 game,
                 modifier = Modifier
                     .size(100.dp, 150.dp)
-                    .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()),
+                    .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()),
                 contentDescription = "${game.name} cover",
                 fullscreenable = true
             )
@@ -176,7 +176,7 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = f
                 modifier = Modifier
                     .offset(8.dp, 100.dp)
                     .padding(end = 8.dp)
-                    .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()),
+                    .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -214,7 +214,7 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
                         )
                     },
                     modifier = Modifier.padding(end = 8.dp)
-                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()),
+                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()),
                     leadingIcon = {
                         if (icon is ImageVector) {
                             Icon(
@@ -236,7 +236,7 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
             Text(
                 text = "Game hasn't been released yet",
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer())
+                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
             )
             // TODO: Get future platforms
         }
@@ -266,7 +266,7 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
             Text(
                 text = "No genres",
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer())
+                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
             )
         }
         LazyRow {
@@ -299,7 +299,7 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
 //        }
 
 
-        Text(text = game.summary, modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.shimmer()))
+        Text(text = game.summary, modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()))
     }
 }
 

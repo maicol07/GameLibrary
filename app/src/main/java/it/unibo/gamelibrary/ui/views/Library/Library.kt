@@ -25,8 +25,8 @@ import androidx.navigation.NavController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
-import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
@@ -73,7 +73,7 @@ fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
                 GameCoverImage(
                     game = game,
                     modifier = Modifier.height(175.dp)
-                        .placeholder(visible = viewModel.loading, highlight = PlaceholderHighlight.shimmer()),
+                        .placeholder(visible = viewModel.loading, highlight = PlaceholderHighlight.fade()),
                     status = it.status
                 )
                 Text(
@@ -81,7 +81,7 @@ fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(4.dp)
-                        .placeholder(visible = viewModel.loading, highlight = PlaceholderHighlight.shimmer()),
+                        .placeholder(visible = viewModel.loading, highlight = PlaceholderHighlight.fade()),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

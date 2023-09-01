@@ -33,8 +33,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
-import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
@@ -157,7 +157,7 @@ fun HomeSection(
                             .height(200.dp)
                             .padding(5.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .placeholder(visible = list.isEmpty(), highlight = PlaceholderHighlight.shimmer())
+                            .placeholder(visible = list.isEmpty(), highlight = PlaceholderHighlight.fade())
                             .combinedClickable(
                                 onClick = { navigator.navigate(GameViewNavDestination(gameId = game.id.toInt())) },
                             ),
@@ -168,7 +168,7 @@ fun HomeSection(
                         modifier = Modifier
                             .width(153.dp)
                             .padding(start = 5.dp, top = 2.dp)
-                            .placeholder(visible = list.isEmpty(), highlight = PlaceholderHighlight.shimmer()),
+                            .placeholder(visible = list.isEmpty(), highlight = PlaceholderHighlight.fade()),
                         maxLines = 1
                     )
                 }

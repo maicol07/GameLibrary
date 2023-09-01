@@ -32,10 +32,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
+import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
-import io.github.fornewid.placeholder.material3.shimmer
 import it.unibo.gamelibrary.data.model.LibraryEntry
-import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.components.UserBar
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
@@ -142,7 +141,7 @@ fun UserReview(
                     Modifier
                         .width(150.dp)
                         .height(200.dp)
-                        .placeholder(visible = true, highlight = PlaceholderHighlight.shimmer())
+                        .placeholder(visible = true, highlight = PlaceholderHighlight.fade())
                     }
             )
         }
