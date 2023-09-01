@@ -30,8 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -55,6 +57,8 @@ import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import dagger.hilt.android.AndroidEntryPoint
+import it.unibo.gamelibrary.data.model.User
+import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
 import it.unibo.gamelibrary.ui.views.BiometricLock.BiometricLockScreen
 import it.unibo.gamelibrary.ui.views.NavGraphs
@@ -73,7 +77,10 @@ import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.TopAppBarState
 import it.unibo.gamelibrary.utils.channel_id
 import it.unibo.gamelibrary.utils.snackbarHostState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.IgdbClient
 import ru.pixnews.igdbclient.ktor.IgdbKtorEngine
 import java.util.UUID
@@ -92,9 +99,14 @@ class MainActivity : FragmentActivity() {
             TopAppBarState.restoreDefaults()
         }
     }
+    private lateinit var userRepository: UserRepository
+    private var user by mutableStateOf<User?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        userRepository = UserRepository(
+            (application as GameLibraryApplication).database.userDao()
+        )
 
         IGDBClient = IgdbClient(IgdbKtorEngine) {
             twitchAuth {
@@ -107,6 +119,12 @@ class MainActivity : FragmentActivity() {
                 backgroundDispatcher = Dispatchers.IO
             }
         }
+
+        auth.addAuthStateListener {
+            setCurrentUser(it)
+        }
+
+        setCurrentUser(auth)
 
         createNotificationChannel()
 
@@ -264,46 +282,52 @@ class MainActivity : FragmentActivity() {
 
         NavigationBar {
             for (destination in NavBarDestinations.values()) {
-                val isCurrentDestOnBackStack = navController.isRouteOnBackStack(destination.direction)
-                NavigationBarItem(
-                    selected =
-                        if(currentDestination.route == "profile?userID={userID}" && navController.currentBackStackEntry?.arguments?.getString("userID") != null){
-                            false
-                        }
-                        else{
-                            currentDestination == destination.direction
-                        },
-                    onClick = {
-                        if (isCurrentDestOnBackStack) {
-                            // When we click again on a bottom bar item and it was already selected
-                            // we want to pop the back stack until the initial destination of this bottom bar item
-                            navController.popBackStack(destination.direction, false)
-                            return@NavigationBarItem
-                        }
-
-                        navController.navigate(destination.direction.route) {
-                            // Pop up to the root of the graph to
-                            // avoid building up a large stack of destinations
-                            // on the back stack as users select items
-                            popUpTo(NavGraphs.root) {
-                                saveState = true
+                if (destination != NavBarDestinations.Library || user?.isPublisher == false) {
+                    val isCurrentDestOnBackStack =
+                        navController.isRouteOnBackStack(destination.direction)
+                    NavigationBarItem(
+                        selected =
+                            if (currentDestination.route == "profile?userID={userID}" && navController.currentBackStackEntry?.arguments?.getString(
+                                    "userID"
+                                ) != null
+                            ) {
+                                false
+                            } else {
+                                currentDestination == destination.direction
+                            },
+                        onClick = {
+                            if (isCurrentDestOnBackStack) {
+                                // When we click again on a bottom bar item and it was already selected
+                                // we want to pop the back stack until the initial destination of this bottom bar item
+                                navController.popBackStack(destination.direction, false)
+                                return@NavigationBarItem
                             }
 
-                            // Avoid multiple copies of the same destination when
-                            // reselecting the same item
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
-                        }
-                    },
-                    icon = {
-                        Icon(
-                            destination.icon,
-                            contentDescription = stringResource(destination.label)
-                        )
-                    },
-                    label = { Text(stringResource(destination.label)) },
-                )
+                            navController.navigate(destination.direction.route) {
+                                // Pop up to the root of the graph to
+                                // avoid building up a large stack of destinations
+                                // on the back stack as users select items
+                                popUpTo(NavGraphs.root) {
+                                    saveState = true
+                                }
+
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                destination.icon,
+                                contentDescription = stringResource(destination.label)
+                            )
+                        },
+                        label = { Text(stringResource(destination.label)) },
+                    )
+
+                }
             }
         }
     }
@@ -322,6 +346,13 @@ class MainActivity : FragmentActivity() {
         val notificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun setCurrentUser(auth: FirebaseAuth){
+        CoroutineScope(Dispatchers.Main).launch {
+            val uid = auth.currentUser?.uid
+            user = if (uid != null) userRepository.getUserByUid(uid).first() else null
+        }
     }
 
 }
