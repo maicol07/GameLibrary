@@ -30,6 +30,5 @@ fun GameCardView(
             .wrapContentHeight()
     ) {
         GameHeader(game = game)
-        GameDetails(game = game)
     }
 }

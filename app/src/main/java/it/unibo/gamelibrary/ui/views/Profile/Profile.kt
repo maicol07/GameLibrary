@@ -60,6 +60,8 @@ import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
+import ru.pixnews.igdbclient.util.igdbImageUrl
+import java.util.Locale
 
 @Destination
 @Composable()
@@ -73,7 +75,6 @@ fun Profile(
     if (viewModel.user == null) {
         viewModel.setUser(uid)
     }
-
 
     TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
     TopAppBarState.customTitle = {
@@ -95,6 +96,9 @@ fun Profile(
                     } else {
                         "nothing here yet"
                     }, modifier = Modifier.padding(12.dp))
+            }
+            if(viewModel.user?.isPublisher == true){
+                PublisherInfo(viewModel)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -143,6 +147,30 @@ fun Profile(
     if (!checkInternetConnection(context)) {
         NoInternetConnection()
     }
+}
+
+@Composable
+private fun PublisherInfo(viewModel: ProfileViewModel){
+    Column(Modifier.padding(8.dp)) {
+        Text(text = "Info about this publisher")
+        Text(text = "name: " + viewModel.publisher?.name.toString())
+        //if(viewModel.publisher?.country != 0){Text(text = "country: " + Locale.getISOCountries(Locale.IsoCountryCode.PART3))}
+        if(viewModel.publisher?.logo != null){
+            Row {
+                Text(text = "company logo: ")
+                CoilImage(
+                    imageModel = {
+                        viewModel.publisher?.logo?.image_id?.let { igdbImageUrl(it) }
+                    },
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+            }
+        }
+
+        if(viewModel.publisher?.websites?.isNotEmpty() == true){Text(text = "website: " + viewModel.publisher?.websites?.get(0)?.url)}
+    }
+
 }
 
 @Composable

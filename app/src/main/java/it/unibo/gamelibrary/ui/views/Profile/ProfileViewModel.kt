@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getCompanies
+import ru.pixnews.igdbclient.model.Company
 import ru.pixnews.igdbclient.model.Game
 import java.io.File
 import java.io.FileOutputStream
@@ -53,9 +54,11 @@ class ProfileViewModel @Inject constructor(
         mutableStateListOf<String>()//seguaci e seguiti dell'utente di cui si viualizza il profilo
     var followers = mutableStateListOf<String>()
     var users = mutableStateListOf<User>()
-    var publisherGames = mutableStateListOf<Game>()
     var showProfileEditDialog by mutableStateOf(false)
     var tempUriNewImage: Uri? = null
+
+    var publisherGames = mutableStateListOf<Game>()
+    var publisher by mutableStateOf<Company?>(null)
 
     fun setUser(uid: String) {
         viewModelScope.launch {
@@ -65,11 +68,30 @@ class ProfileViewModel @Inject constructor(
             newUsername.value = user?.username ?: ""
             if(user?.isPublisher == true){
                 getPublisherGames()
+                getPublisherInfo()
             }
         }
         getLibrary(uid)
         getFollowers(uid)
         getFollowed(uid)
+    }
+
+    fun getPublisherInfo(){
+        viewModelScope.launch {
+            val result = SafeRequest {
+                IGDBClient.getCompanies {
+                    fields(
+                        "name",
+                        "country",
+                        "start_date",
+                        "websites.url",
+                        "logo.image_id"
+                    )
+                    where("slug = \"${user?.publisherName}\"")
+                }
+            }
+            publisher = result?.companies?.firstOrNull()
+        }
     }
 
     fun getPublisherGames(){
