@@ -107,6 +107,8 @@ fun GameArtwork(
     modifier: Modifier = Modifier,
     fullscreenable: Boolean = false,
     fullscreenModifier: Modifier = Modifier,
+    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
+    shadowElevation: Dp = 16.dp,
 ) {
     val fullscreenState = remember { mutableStateOf(false) }
 
@@ -149,13 +151,20 @@ fun GameArtwork(
         modifier = modifier
             .fillMaxWidth()
             .height(300.dp)
-            .shadow(16.dp)
+            .clip(shape)
+            .shadow(shadowElevation, shape)
             .then(clickableModifier),
     )
 }
 
 @Composable
-fun GameScreenshot(game: Game, contentDescription: String, modifier: Modifier = Modifier) {
+fun GameScreenshot(
+    game: Game,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
+    shadowElevation: Dp = 16.dp
+) {
     CoilImage(
         imageModel = {
             if (game.screenshots.isNotEmpty()) {
@@ -172,6 +181,7 @@ fun GameScreenshot(game: Game, contentDescription: String, modifier: Modifier = 
         modifier = modifier
             .fillMaxWidth()
             .height(300.dp)
-            .shadow(16.dp),
+            .clip(shape)
+            .shadow(shadowElevation, shape),
     )
 }
