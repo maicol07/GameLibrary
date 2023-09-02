@@ -67,7 +67,6 @@ class ProfileViewModel @Inject constructor(
                 getPublisherGames()
             }
         }
-
         getLibrary(uid)
         getFollowers(uid)
         getFollowed(uid)
@@ -78,7 +77,10 @@ class ProfileViewModel @Inject constructor(
             val result = SafeRequest {
                 IGDBClient.getCompanies {
                     fields(
-                        "published, slug, published.name, published.cover.image_id",
+                        "published",
+                        "slug",
+                        "published.name",
+                        "published.cover.image_id",
                         "published.name",
                         "published.artworks.image_id",
                         "published.cover.image_id",
