@@ -15,6 +15,7 @@ import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -34,39 +35,36 @@ class HomePublisherViewModel @Inject constructor(
     var posts = mutableStateListOf<LibraryEntry>()
 
     init {
-        fetchGames()
-        fetchPosts()
+        fetchGames().invokeOnCompletion {
+            fetchPosts()
+        }
     }
 
-    fun fetchGames() {
-        viewModelScope.launch {
-            val publisherName =
-                userRepository.getUserByUid(auth.currentUser?.uid!!).first()?.publisherName
-            val response = SafeRequest {
-                IGDBClient.getCompanies {
-                    fields(
-                        "slug",
-                        "published.name",
-                        "published.cover.image_id",
-                        "published.first_release_date"
-                    )
-                    where("slug = \"${publisherName}\"")
-                    limit(1)
-                }
+    private fun fetchGames(): Job = viewModelScope.launch {
+        val publisherName =
+            userRepository.getUserByUid(auth.currentUser?.uid!!).first()?.publisherName
+        val response = SafeRequest {
+            IGDBClient.getCompanies {
+                fields(
+                    "slug",
+                    "published.name",
+                    "published.cover.image_id",
+                    "published.first_release_date"
+                )
+                where("slug = \"${publisherName}\"")
+                limit(1)
             }
-            publisher = response?.companies?.firstOrNull()
-            games.clear()
-            games.addAll(publisher?.published?.sortedByDescending { it.first_release_date?.epochSecond ?: 0 } ?: emptyList())
         }
+        publisher = response?.companies?.firstOrNull()
+        games.clear()
+        games.addAll(publisher?.published?.sortedByDescending { it.first_release_date?.epochSecond ?: 0 } ?: emptyList())
     }
 
     private fun fetchPosts() {
         viewModelScope.launch {
-            posts.clear()
-            for (game in games) {
-                libraryRepository.getCollectionsByGame(game).collectLatest {
-                    posts.addAll(it)
-                }
+            libraryRepository.getLibraryEntriesByGames(games).collectLatest {
+                posts.clear()
+                posts.addAll(it)
             }
         }
     }
