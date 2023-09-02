@@ -43,7 +43,6 @@ data class LibraryEntry(
     @ColumnInfo var gameId: Int,
     @ColumnInfo var status: LibraryEntryStatus,
     @ColumnInfo var rating: Int? = null,
-    @ColumnInfo var notes: String? = null
-//  @ColumnInfo(name = "created_at") val createdAt: Long, //forse servono per ordinare in ordine NEW!
-//  @ColumnInfo(name = "modified_at") val modifiedAt: Long
+    @ColumnInfo var notes: String? = null,
+    @ColumnInfo(name = "last_modified") val lastModified: Long = System.currentTimeMillis()
 )

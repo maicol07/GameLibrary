@@ -17,7 +17,7 @@ import it.unibo.gamelibrary.data.model.User
         LibraryEntry::class,
         Follow::class
    ],
-    version = 8
+    version = 9
 )
 abstract class GameLibraryDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
@@ -35,7 +35,6 @@ abstract class GameLibraryDatabase : RoomDatabase() {
                     GameLibraryDatabase::class.java,
                     "game_library"
                 )
-                    .fallbackToDestructiveMigration() // TODO: remove this on final release
                     .build()
                 INSTANCE = instance
 
