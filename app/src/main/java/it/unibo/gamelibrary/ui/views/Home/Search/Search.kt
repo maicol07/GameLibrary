@@ -58,7 +58,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.navigation.NavController
+import com.ramcosta.composedestinations.navigation.navigate
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.data.model.User
@@ -76,7 +77,7 @@ private var currentSearch by mutableStateOf<SearchTypeObject<*, *>?>(null)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hiltViewModel()) {
+fun SearchBar(navController: NavController, viewModel: SearchViewModel = hiltViewModel()) {
     var active by rememberSaveable { mutableStateOf(false) }
     currentSearch = when (viewModel.searchType) {
         SearchType.GAMES -> viewModel.gamesSearch
@@ -161,7 +162,7 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(16.dp))
                                         .clickable {
-                                            navigator.navigate(
+                                            navController.navigate(
                                                 GameViewNavDestination(it.id.toInt())
                                             )
                                         }
@@ -187,7 +188,7 @@ fun SearchBar(navigator: DestinationsNavigator, viewModel: SearchViewModel = hil
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(16.dp))
                                         .clickable {
-                                            navigator.navigate(
+                                            navController.navigate(
                                                 ProfileDestination(
                                                     it.uid
                                                 )

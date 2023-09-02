@@ -18,13 +18,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.navigation.NavController
+import com.ramcosta.composedestinations.navigation.navigate
 import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.data.model.User
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun UserBar(user: User, link: Boolean, navigator: DestinationsNavigator?){
+fun UserBar(user: User, link: Boolean, navController: NavController?){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -34,6 +35,7 @@ fun UserBar(user: User, link: Boolean, navigator: DestinationsNavigator?){
                     if (link) {
                         navigator?.navigate(
                             it.unibo.gamelibrary.ui.views.destinations.ProfileDestination(
+                        navController?.navigate(
                                 user.uid
                             )
                         )

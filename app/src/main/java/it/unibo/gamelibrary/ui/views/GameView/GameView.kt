@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.alorma.compose.settings.storage.datastore.GenericPreferenceDataStoreSettingValueState
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -66,7 +67,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.mahmoudalim.compose_rating_bar.RatingBarView
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
@@ -103,7 +103,7 @@ private lateinit var notShowAgain: GenericPreferenceDataStoreSettingValueState<B
     ]
 )
 @Composable
-fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel(), navigator: DestinationsNavigator) {
+fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel(), navController: NavController) {
     if (checkInternetConnection(LocalContext.current)) {
         TopAppBarState.title = "Loading..."
         var modifier: Modifier = Modifier
@@ -113,7 +113,7 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel(), nav
             modifier = modifier
                 .fillMaxWidth()
         }
-        GameView(game = (viewModel.game ?: Game()), modifier, navigator = navigator)
+        GameView(game = (viewModel.game ?: Game()), modifier, navController = navController)
         notShowAgain = rememberPreferenceDataStoreBooleanSettingState(
             key = "notShowAgain",
             defaultValue = false
@@ -133,7 +133,7 @@ fun GameView(
     @PreviewParameter(GameParameterProvider::class) game: Game,
     modifier: Modifier = Modifier,
     viewModel: GameViewViewModel = hiltViewModel(),
-    navigator: DestinationsNavigator
+    navController: NavController
 ) {
     TopAppBarState.title = game.name
     if (viewModel.currentUser != null && viewModel.game != null) {
@@ -166,6 +166,7 @@ fun GameView(
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         GameHeader(game, isLoading = viewModel.isLoading)
         GameDetails(game, isLoading = viewModel.isLoading, libraryEntries = viewModel.libraryEntries, navigator = navigator)
+        GameDetails(game, isLoading = viewModel.isLoading, libraryEntries = viewModel.libraryEntries, navController = navController)
     }
     if (viewModel.isGameLibraryEditOpen) {
         GameViewGameLibraryEditDialog(game)
@@ -218,7 +219,7 @@ fun GameDetails(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     libraryEntries: List<LibraryEntry> = listOf(),
-    navigator: DestinationsNavigator
+    navController: NavController
 ) {
     Column(modifier.padding(16.dp, 65.dp, 16.dp, 0.dp)) {
         LazyRow {
@@ -379,7 +380,7 @@ fun GameDetails(
         }
         LazyRow {
             items(libraryEntries) {
-                UserReview(review = it, navigator = navigator)
+                UserReview(review = it, navController = navController)
             }
         }
     }

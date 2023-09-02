@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.navigation.NavController
+import com.ramcosta.composedestinations.navigation.navigate
 import it.unibo.gamelibrary.ui.views.GameView.GameDetails
 import it.unibo.gamelibrary.ui.views.GameView.GameHeader
 import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
@@ -18,11 +20,11 @@ import ru.pixnews.igdbclient.model.Game
 @Composable
 fun GameCardView(
     game: Game,
-    navigator: DestinationsNavigator,
+    navController: NavController,
 ) {
     Card(
         onClick = {
-            navigator.navigate(GameViewNavDestination(game.id.toInt()))
+            navController.navigate(GameViewNavDestination(game.id.toInt()))
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -30,6 +32,6 @@ fun GameCardView(
             .wrapContentHeight()
     ) {
         GameHeader(game = game)
-        GameDetails(game = game, navigator = navigator)
+        GameDetails(game = game, navController = navController)
     }
 }

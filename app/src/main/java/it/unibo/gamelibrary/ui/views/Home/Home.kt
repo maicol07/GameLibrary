@@ -25,11 +25,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.navigate
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
@@ -39,10 +40,10 @@ import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
 import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
+import it.unibo.gamelibrary.ui.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.Home.Search.SearchBar
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.ui.views.HomePublisher.HomePublisher
-import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.IgdbImageSize
 import ru.pixnews.igdbclient.util.igdbImageUrl
@@ -51,7 +52,7 @@ import ru.pixnews.igdbclient.util.igdbImageUrl
 @Destination
 @Composable
 fun Home(
-    navigator: DestinationsNavigator,
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     TopAppBarState.show = false
@@ -61,7 +62,7 @@ fun Home(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            SearchBar(navigator)
+            SearchBar(navController)
         }
         if (checkInternetConnection(LocalContext.current)) {
             Spacer(modifier = Modifier.size(8.dp))
@@ -70,32 +71,32 @@ fun Home(
                     viewModel.getUser()
                 } else {
                     if (viewModel.user?.isPublisher == true) {
-                        HomePublisher(navigator = navigator)
+                        HomePublisher(navController = navController)
                     } else {
                         LazyColumn {
                             item {
                                 HomeSection(
                                     title = "Popular Games",
                                     viewModel.popularGames,
-                                    navigator
+                                    navController
                                 )
                                 Spacer(Modifier.size(8.dp))
                                 HomeSection(
                                     title = "Most Loved Games",
                                     viewModel.mostLovedGames,
-                                    navigator
+                                    navController
                                 )
                                 Spacer(Modifier.size(8.dp))
                                 HomeSection(
                                     title = "Recently Released Games",
                                     viewModel.newGames,
-                                    navigator
+                                    navController
                                 )
                                 Spacer(Modifier.size(8.dp))
                                 HomeSection(
                                     title = "Upcoming Games",
                                     viewModel.upcomingGames,
-                                    navigator
+                                    navController
                                 )
                             }
 
@@ -103,7 +104,7 @@ fun Home(
                                 viewModel.posts.filter { entry: LibraryEntry -> entry.uid != viewModel.user?.uid },
                                 key = { it.id })
                             {
-                                UserReview(it, navigator, showUser = true)
+                                UserReview(it, navController, showUser = true)
                             }
                         }
                     }
@@ -120,7 +121,7 @@ fun Home(
 fun HomeSection(
     title: String,
     list: MutableList<ru.pixnews.igdbclient.model.Game>,
-    navigator: DestinationsNavigator
+    navController: NavController
 ) {
     Column {
         Text(
@@ -159,7 +160,7 @@ fun HomeSection(
                             .clip(RoundedCornerShape(16.dp))
                             .placeholder(visible = list.isEmpty(), highlight = PlaceholderHighlight.fade())
                             .combinedClickable(
-                                onClick = { navigator.navigate(GameViewNavDestination(gameId = game.id.toInt())) },
+                                onClick = { navController.navigate(GameViewNavDestination(gameId = game.id.toInt())) },
                             ),
                     )
                     Text(

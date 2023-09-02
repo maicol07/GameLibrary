@@ -4,14 +4,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.navigation.NavController
 import it.unibo.gamelibrary.ui.views.Home.HomeSection
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
 
 @Composable
 fun HomePublisher(
-    navigator: DestinationsNavigator,
+    navController: NavController,
     viewModel: HomePublisherViewModel = hiltViewModel()
 ) {
     TopAppBarState.actions = { }
@@ -22,7 +22,7 @@ fun HomePublisher(
             HomeSection(
                 title = "My games",
                 viewModel.games,
-                navigator
+                navController
             )
         }
 
@@ -30,7 +30,7 @@ fun HomePublisher(
             viewModel.posts.sortedByDescending { it.lastModified },
             key = { it.id })
         {
-            UserReview(it, navigator)
+            UserReview(it, navController)
         }
     }
 }

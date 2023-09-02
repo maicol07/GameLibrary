@@ -30,7 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.navigation.NavController
+import com.ramcosta.composedestinations.navigation.navigate
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
@@ -44,7 +45,7 @@ import ru.pixnews.igdbclient.model.Game
 @Composable
 fun UserReview(
     review: LibraryEntry,
-    navigator: DestinationsNavigator,
+    navController: NavController,
     showUser: Boolean = true,
     viewModel: UserReviewViewModel = hiltViewModel(),
 ) {
@@ -117,7 +118,7 @@ fun UserReview(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         //username and profile image
-                        viewModel.user[review.uid]?.let { UserBar(user = it, link = true, navigator = navigator) }
+                        viewModel.user[review.uid]?.let { UserBar(user = it, link = true, navController = navController) }
                     }
                 }
             }
@@ -134,7 +135,7 @@ fun UserReview(
                         .width(150.dp)
                         .height(200.dp)
                         .combinedClickable(
-                            onClick = { navigator.navigate(GameViewNavDestination(review.gameId)) },
+                            onClick = { navController.navigate(GameViewNavDestination(review.gameId)) },
                         )
                         .clip(RoundedCornerShape(8.dp))
                     }else{

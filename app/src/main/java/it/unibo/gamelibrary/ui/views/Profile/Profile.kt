@@ -47,10 +47,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.common.components.GameCardView.GameCardView
@@ -65,7 +65,7 @@ import ru.pixnews.igdbclient.model.Game
 @Composable
 fun Profile(
     viewModel: ProfileViewModel = hiltViewModel(),
-    navigator: DestinationsNavigator,
+    navController: NavController,
     userID: String?,
 ) {
     val context = LocalContext.current
@@ -80,7 +80,7 @@ fun Profile(
             verticalAlignment = Alignment.CenterVertically
         ){
             if(viewModel.user != null){
-                UserBar(user = viewModel.user!!, link = false, navigator = null)
+                UserBar(user = viewModel.user!!, link = false, navController = null)
             }
         }
     }
@@ -99,8 +99,8 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                FollowList(viewModel = viewModel, followers = false, navigator)
-                FollowList(viewModel = viewModel, followers = true, navigator)
+                FollowList(viewModel = viewModel, followers = false, navController)
+                FollowList(viewModel = viewModel, followers = true, navController)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -119,7 +119,7 @@ fun Profile(
                 if (viewModel.userLibrary.isNotEmpty()) {
                     items(viewModel.userLibrary.sortedByDescending { it.lastModified }, key = { it.id })
                     {
-                        UserReview(it, navigator, showUser = false)
+                        UserReview(it, navController, showUser = false)
                     }
                 } else {
                     item {
@@ -139,7 +139,7 @@ fun Profile(
                 }
             } else {
                 items(viewModel.publisherGames) { game: Game ->
-                    GameCardView(game = game, navigator = navigator)
+                    GameCardView(game = game, navController = navController)
                 }
             }
         }
@@ -178,7 +178,7 @@ private fun FollowButton(
 fun FollowList(
     viewModel: ProfileViewModel,
     followers: Boolean,
-    navigator: DestinationsNavigator
+    navController: NavController
 ){
     var showDialog by remember{ mutableStateOf(false) }
 
@@ -223,7 +223,7 @@ fun FollowList(
             if(viewModel.users.isNotEmpty()){
                 LazyColumn {
                     items(viewModel.users){ user ->
-                        UserBar(user = user, true, navigator = navigator)
+                        UserBar(user = user, true, navController = navController)
                     }
                 }
             }else{
