@@ -1,6 +1,7 @@
 package it.unibo.gamelibrary.utils
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.FabPosition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,3 +22,5 @@ object TopAppBarState {
 }
 
 var BottomBar by mutableStateOf<@Composable () -> Unit>({})
+var ScaffoldFab by mutableStateOf<@Composable () -> Unit>({})
+var ScaffoldFabPosition by mutableStateOf(FabPosition.End)

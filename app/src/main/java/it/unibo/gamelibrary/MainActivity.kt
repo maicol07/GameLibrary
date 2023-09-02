@@ -75,6 +75,8 @@ import it.unibo.gamelibrary.ui.views.startAppDestination
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.Http
 import it.unibo.gamelibrary.utils.IGDBClient
+import it.unibo.gamelibrary.utils.ScaffoldFab
+import it.unibo.gamelibrary.utils.ScaffoldFabPosition
 import it.unibo.gamelibrary.utils.TopAppBarState
 import it.unibo.gamelibrary.utils.channel_id
 import it.unibo.gamelibrary.utils.snackbarHostState
@@ -98,6 +100,8 @@ class MainActivity : FragmentActivity() {
         if (controller.currentDestination?.route !== currentDestination?.route) {
             currentDestination = destination
             TopAppBarState.restoreDefaults()
+            BottomBar = {}
+            ScaffoldFab = {}
         }
     }
     private lateinit var userRepository: UserRepository
@@ -203,8 +207,12 @@ class MainActivity : FragmentActivity() {
                                         navigateUp = { navController.navigateUp() }
                                     )
                                 }
-                            })
-                        {
+                            },
+                            floatingActionButton = {
+                                ScaffoldFab()
+                            },
+                            floatingActionButtonPosition = ScaffoldFabPosition
+                        ) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()

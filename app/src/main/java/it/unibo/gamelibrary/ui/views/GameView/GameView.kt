@@ -1,7 +1,6 @@
 package it.unibo.gamelibrary.ui.views.GameView
 
 import android.Manifest
-import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.os.Build
 import android.util.Log
@@ -86,6 +85,7 @@ import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.BottomBar
+import it.unibo.gamelibrary.utils.ScaffoldFab
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
 
@@ -136,8 +136,31 @@ fun GameView(
     navigator: DestinationsNavigator
 ) {
     TopAppBarState.title = game.name
-    BottomBar = {
-        GameViewBottomBar(viewModel)
+    if (viewModel.currentUser != null && viewModel.game != null) {
+        if (viewModel.currentUser!!.isPublisher) {
+            BottomBar = {}
+            ScaffoldFab = {
+                val context = LocalContext.current
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.shareGame(context)
+                    },
+                ) {
+                    Icon(
+                        Icons.Default.Share,
+                        contentDescription = "Share"
+                    )
+                }
+            }
+        } else {
+            ScaffoldFab = {}
+            BottomBar = {
+                GameViewBottomBar(viewModel)
+            }
+        }
+    } else {
+        ScaffoldFab = {}
+        BottomBar = {}
     }
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
@@ -364,21 +387,11 @@ fun GameDetails(
 
 @Composable
 fun GameViewBottomBar(viewModel: GameViewViewModel) {
-    val context = LocalContext.current
     BottomAppBar(
         actions = {
+            val context = LocalContext.current
             IconButton(onClick = {
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(
-                        Intent.EXTRA_TEXT,
-                        "https://game-library.app/game/${viewModel.game?.id}"
-                    )
-                    type = "text/plain"
-                }
-
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                context.startActivity(shareIntent)
+                viewModel.shareGame(context)
             }) {
                 Icon(
                     Icons.Default.Share,

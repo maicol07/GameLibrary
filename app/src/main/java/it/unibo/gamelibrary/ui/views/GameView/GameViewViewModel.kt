@@ -2,6 +2,7 @@ package it.unibo.gamelibrary.ui.views.GameView
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
@@ -22,7 +23,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import it.unibo.gamelibrary.NotificationWorker
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.LibraryEntryStatus
+import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.LibraryRepository
+import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
 import it.unibo.gamelibrary.utils.snackbarHostState
@@ -38,6 +41,7 @@ import javax.inject.Inject
 @SuppressLint("StaticFieldLeak") // False positive - https://stackoverflow.com/questions/66216839/inject-context-with-hilt-this-field-leaks-a-context-object
 class GameViewViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
+    private val userRepository: UserRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     interface LibraryEntryDetails {
@@ -60,6 +64,15 @@ class GameViewViewModel @Inject constructor(
     var openNotificationDialog by mutableStateOf(true)
     var notShowAgainNotification by mutableStateOf(false)
     var isLoading by mutableStateOf(true)
+    var currentUser by mutableStateOf<User?>(null)
+
+    init {
+        viewModelScope.launch {
+            userRepository.getUserByUid(Firebase.auth.currentUser!!.uid).collectLatest {
+                currentUser = it
+            }
+        }
+    }
 
     fun getGame(gameId: Int) = viewModelScope.launch {
         val result = SafeRequest {
@@ -164,5 +177,19 @@ class GameViewViewModel @Inject constructor(
                 )
 
         }
+    }
+
+    fun shareGame(context: Context) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "https://game-library.app/game/${game?.id}"
+            )
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        context.startActivity(shareIntent)
     }
 }
