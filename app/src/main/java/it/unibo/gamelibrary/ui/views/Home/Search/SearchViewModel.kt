@@ -107,9 +107,9 @@ class SearchViewModel @Inject constructor(
     private fun fetchSearchedGames(query: ApicalypseQueryBuilder.() -> Unit) {
         gamesSearch.inProgress = true
         viewModelScope.launch {
-            gamesSearch.results.clear()
             val result = SafeRequest { IGDBClient.getGames(query) }
             if (result != null) {
+                gamesSearch.results.clear()
                 gamesSearch.results.addAll(result.games)
             }
             gamesSearch.inProgress = false
@@ -119,8 +119,8 @@ class SearchViewModel @Inject constructor(
     private fun fetchSearchedUsers(query: String) {
         usersSearch.inProgress = true
         viewModelScope.launch {
-            usersSearch.results.clear()
             userRepository.searchUser(query).collectLatest {
+                usersSearch.results.clear()
                 usersSearch.results.addAll(it)
                 usersSearch.inProgress = false
             }
