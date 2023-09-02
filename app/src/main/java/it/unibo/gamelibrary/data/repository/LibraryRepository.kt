@@ -12,8 +12,12 @@ class LibraryRepository(private val libraryDao: LibraryDao) {
     fun getAll(): Flow<List<LibraryEntry>> = libraryDao.getAll()
 
     @WorkerThread
-    fun getCollectionsByGame(game: Game): Flow<List<LibraryEntry>> =
+    fun getLibraryEntriesByGame(game: Game): Flow<List<LibraryEntry>> =
         libraryDao.getLibraryEntriesByGame(game.id.toString())
+
+    @WorkerThread
+    fun getLibraryEntriesByGames(games: List<Game>): Flow<List<LibraryEntry>> =
+        libraryDao.getLibraryEntriesByGames(games.map { it.id })
 
     @WorkerThread
     fun getUserLibraryEntries(uid: String): Flow<List<LibraryEntry>> =

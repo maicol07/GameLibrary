@@ -143,7 +143,6 @@ class ProfileViewModel @Inject constructor(
                     var fos: FileOutputStream?
                     try {
                         fos = FileOutputStream(file)
-                        //TODO controlla se sui telefoni degli altrir funziona Jpeg o se serve png
                         yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
                         fos.flush()
                         fos.close()
@@ -187,8 +186,8 @@ class ProfileViewModel @Inject constructor(
     fun getFollowers(uid: String): Job {
         return viewModelScope.launch {
             followRepository.getFollowers(uid).collectLatest {
-                followed.clear()
-                followed.addAll(it.map { it.follower })
+                followers.clear()
+                followers.addAll(it.map { it.follower })
             }
         }
     }
@@ -205,6 +204,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun amIFollowing(): Boolean {
+        Log.i("AM_I_FOLLOWING", followers.contains(Firebase.auth.currentUser?.uid).toString() + ", "  )
         return followers.contains(Firebase.auth.currentUser?.uid)
     }
 

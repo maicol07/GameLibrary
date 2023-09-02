@@ -9,6 +9,7 @@ import androidx.room.Update
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.UserWithLibraryEntries
 import kotlinx.coroutines.flow.Flow
+import ru.pixnews.igdbclient.model.Game
 
 @Dao
 interface LibraryDao {
@@ -23,6 +24,9 @@ interface LibraryDao {
 
     @Query("SELECT * FROM library WHERE gameId = :gameId")
     fun getLibraryEntriesByGame(gameId: String): Flow<List<LibraryEntry>>
+
+    @Query("SELECT * FROM library WHERE gameId IN (:games)")
+    fun getLibraryEntriesByGames(games: List<Long>): Flow<List<LibraryEntry>>
 
     @Insert
     suspend fun add(libraryEntry: LibraryEntry)
