@@ -44,5 +44,5 @@ data class LibraryEntry(
     @ColumnInfo var status: LibraryEntryStatus,
     @ColumnInfo var rating: Int? = null,
     @ColumnInfo var notes: String? = null,
-    @ColumnInfo(name = "last_modified") val lastModified: Long = System.currentTimeMillis()
+    @ColumnInfo(name = "last_modified", defaultValue = "0") val lastModified: Long = System.currentTimeMillis()
 )

@@ -1,6 +1,7 @@
 package it.unibo.gamelibrary.data
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -17,6 +18,9 @@ import it.unibo.gamelibrary.data.model.User
         LibraryEntry::class,
         Follow::class
    ],
+    autoMigrations = [
+        AutoMigration (from = 8, to = 9)
+    ],
     version = 9
 )
 abstract class GameLibraryDatabase : RoomDatabase() {
