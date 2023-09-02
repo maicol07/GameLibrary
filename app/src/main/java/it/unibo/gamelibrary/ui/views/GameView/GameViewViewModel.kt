@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -54,6 +55,7 @@ class GameViewViewModel @Inject constructor(
         override var notes by mutableStateOf("")
         override var entry by mutableStateOf<LibraryEntry?>(null)
     }
+    val libraryEntries = mutableStateListOf<LibraryEntry>()
 
     var openNotificationDialog by mutableStateOf(true)
     var notShowAgainNotification by mutableStateOf(false)
@@ -91,6 +93,13 @@ class GameViewViewModel @Inject constructor(
             libraryEntry.status = it?.status
             libraryEntry.rating.intValue = it?.rating ?: 0
             libraryEntry.notes = it?.notes ?: ""
+        }
+    }
+
+    fun getLibraryEntries(gameId: Int) = viewModelScope.launch {
+        libraryRepository.getLibraryEntriesByGame(Game(gameId.toLong())).collectLatest {
+            libraryEntries.clear()
+            libraryEntries.addAll(it)
         }
     }
 

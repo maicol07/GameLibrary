@@ -30,6 +30,6 @@ fun GameCardView(
             .wrapContentHeight()
     ) {
         GameHeader(game = game)
-        GameDetails(game = game)
+        GameDetails(game = game, navigator = navigator)
     }
 }

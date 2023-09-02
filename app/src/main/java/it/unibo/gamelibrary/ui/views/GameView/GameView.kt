@@ -55,7 +55,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,12 +67,14 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.mahmoudalim.compose_rating_bar.RatingBarView
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
 import it.unibo.gamelibrary.R
+import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.model.LibraryEntryStatus
 import it.unibo.gamelibrary.ui.common.Game.GameArtwork
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
@@ -83,6 +84,7 @@ import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.common.components.NoInternetConnection
 import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.GameView.preview.GameParameterProvider
+import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
@@ -101,16 +103,17 @@ private lateinit var notShowAgain: GenericPreferenceDataStoreSettingValueState<B
     ]
 )
 @Composable
-fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
+fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel(), navigator: DestinationsNavigator) {
     if (checkInternetConnection(LocalContext.current)) {
         TopAppBarState.title = "Loading..."
         var modifier: Modifier = Modifier
         if (viewModel.game == null) {
             viewModel.getGame(gameId)
+            viewModel.getLibraryEntries(gameId)
             modifier = modifier
                 .fillMaxWidth()
         }
-        GameView(game = (viewModel.game ?: Game()), modifier)
+        GameView(game = (viewModel.game ?: Game()), modifier, navigator = navigator)
         notShowAgain = rememberPreferenceDataStoreBooleanSettingState(
             key = "notShowAgain",
             defaultValue = false
@@ -125,11 +128,12 @@ fun GameViewNav(gameId: Int, viewModel: GameViewViewModel = hiltViewModel()) {
 }
 
 @Composable
-@Preview
+//@Preview
 fun GameView(
     @PreviewParameter(GameParameterProvider::class) game: Game,
     modifier: Modifier = Modifier,
-    viewModel: GameViewViewModel = hiltViewModel()
+    viewModel: GameViewViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator
 ) {
     TopAppBarState.title = game.name
     BottomBar = {
@@ -138,7 +142,7 @@ fun GameView(
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         GameHeader(game, isLoading = viewModel.isLoading)
-        GameDetails(game, isLoading = viewModel.isLoading)
+        GameDetails(game, isLoading = viewModel.isLoading, libraryEntries = viewModel.libraryEntries, navigator = navigator)
     }
     if (viewModel.isGameLibraryEditOpen) {
         GameViewGameLibraryEditDialog(game)
@@ -186,7 +190,13 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = f
 
 
 @Composable
-fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = false) {
+fun GameDetails(
+    game: Game,
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
+    libraryEntries: List<LibraryEntry> = listOf(),
+    navigator: DestinationsNavigator
+) {
     Column(modifier.padding(16.dp, 65.dp, 16.dp, 0.dp)) {
         LazyRow {
             items(game.involved_companies, key = { it.id }) {
@@ -213,7 +223,8 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
                             })"
                         )
                     },
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier
+                        .padding(end = 8.dp)
                         .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()),
                     leadingIcon = {
                         if (icon is ImageVector) {
@@ -235,7 +246,6 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
         if (game.release_dates.isEmpty()) {
             Text(
                 text = "Game hasn't been released yet",
-                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
             )
             // TODO: Get future platforms
@@ -265,7 +275,6 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
         if (game.genres.isEmpty()) {
             Text(
                 text = "No genres",
-                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
             )
         }
@@ -293,13 +302,63 @@ fun GameDetails(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = 
                 )
             }
         }
-//        Text(text = "Other info", style = MaterialTheme.typography.headlineSmall)
-//        LazyColumn {
-//
-//        }
-
 
         Text(text = game.summary, modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()))
+
+        Text(text = "Screenshots", style = MaterialTheme.typography.headlineSmall)
+        if (game.screenshots.isEmpty()) {
+            Text(
+                text = "No screenshots",
+                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
+            )
+        }
+        LazyRow {
+            items(game.screenshots) {
+                GameScreenshot(
+                    game,
+                    it.image_id,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(300.dp, 150.dp)
+                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
+                )
+            }
+        }
+
+        Text(text = "Artworks", style = MaterialTheme.typography.headlineSmall)
+        if (game.artworks.isEmpty()) {
+            Text(
+                text = "No artworks",
+                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
+            )
+        }
+        LazyRow {
+            items(game.artworks) {
+                GameArtwork(
+                    game,
+                    it.image_id,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(300.dp, 150.dp)
+                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
+                )
+            }
+        }
+
+//        Text(text = "Other info", style = MaterialTheme.typography.headlineSmall)
+
+        Text(text = "Users reviews", style = MaterialTheme.typography.headlineSmall)
+        if (libraryEntries.isEmpty()) {
+            Text(
+                text = "No reviews",
+                modifier = Modifier.placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
+            )
+        }
+        LazyRow {
+            items(libraryEntries) {
+                UserReview(review = it, navigator = navigator)
+            }
+        }
     }
 }
 
