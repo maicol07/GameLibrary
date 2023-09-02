@@ -62,7 +62,7 @@ import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
 
 @Destination
-@Composable()
+@Composable
 fun Profile(
     viewModel: ProfileViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
@@ -73,7 +73,6 @@ fun Profile(
     if (viewModel.user == null) {
         viewModel.setUser(uid)
     }
-
 
     TopAppBarState.actions = {if(Firebase.auth.currentUser?.uid == uid){ EditButton(viewModel) } }
     TopAppBarState.customTitle = {
@@ -115,25 +114,30 @@ fun Profile(
         }
 
         if (checkInternetConnection(context)) {
-            //reviews di questo user
-            if(viewModel.userLibrary.isNotEmpty()){
-                items(viewModel.userLibrary)
-                {
-                    UserReview(it, navigator, showUser = false)
-                }
-            }else{
-                item{
-                    Column (verticalArrangement = Arrangement.Center, modifier = Modifier.fillParentMaxHeight(0.7F)){
-                        Text(text = "No reviews yet. You can find games you played in Home or by searching them by name!",
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp, bottom = 50.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
+            if(viewModel.user?.isPublisher == false) {
+                //reviews di questo user
+                if (viewModel.userLibrary.isNotEmpty()) {
+                    items(viewModel.userLibrary)
+                    {
+                        UserReview(it, navigator, showUser = false)
+                    }
+                } else {
+                    item {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillParentMaxHeight(0.7F)
+                        ) {
+                            Text(
+                                text = "No reviews yet. You can find games you played in Home or by searching them by name!",
+                                modifier = Modifier
+                                    .padding(start = 8.dp, end = 8.dp, bottom = 50.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
-            }
-            if (viewModel.user?.isPublisher == true) {
+            } else {
                 items(viewModel.publisherGames) { game: Game ->
                     GameCardView(game = game, navigator = navigator)
                 }
@@ -185,7 +189,7 @@ fun FollowList(
         else{
             viewModel.getUsers(viewModel.followed)
         }
-        showDialog = true;
+        showDialog = true
     }){
         Text(text =
             if(followers){ viewModel.followers.count().toString() + " followers"}
@@ -239,7 +243,7 @@ private fun EditButton(
         }
 
     IconButton(onClick = {
-        viewModel.showProfileEditDialog = true;
+        viewModel.showProfileEditDialog = true
     }){
         Icon(
             imageVector = Icons.Outlined.Edit,
@@ -254,7 +258,9 @@ private fun EditButton(
         val cameraLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
                 if(it){
-                    viewModel.tempUriNewImage?.let { viewModel.newImage.value = it }
+                    viewModel.tempUriNewImage?.let { uri ->
+                        viewModel.newImage.value = uri
+                    }
                 }
             }
 

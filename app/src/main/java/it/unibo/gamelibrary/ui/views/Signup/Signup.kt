@@ -68,9 +68,10 @@ fun SignupPage(
     val loginViewModel: LoginViewModel = hiltViewModel()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        loginViewModel.signInWithGoogle(result, context, navController)
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            loginViewModel.signInWithGoogle(result, context, navController)
+        }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,10 +80,13 @@ fun SignupPage(
         verticalArrangement = Arrangement.Center
     ) {
         Spacer(modifier = Modifier.size(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
             Switch(
                 checked = viewModel.isPublisher,
-                onCheckedChange = { viewModel.isPublisher = !viewModel.isPublisher}
+                onCheckedChange = { viewModel.isPublisher = !viewModel.isPublisher }
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text("Are you a publisher?")
@@ -95,7 +99,7 @@ fun SignupPage(
             ) {
                 Text(text = "Signup", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.size(16.dp))
-                if(!viewModel.isPublisher) {
+                if (!viewModel.isPublisher) {
                     TextField(
                         value = viewModel.fields["name"]!!,
                         onValueChange = { viewModel.fields["name"] = it },
@@ -206,7 +210,7 @@ fun SignupPage(
                     Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                     Text(text = "Signup")
                 }
-                if(!viewModel.isPublisher) {
+                if (!viewModel.isPublisher) {
                     Spacer(modifier = Modifier.size(16.dp))
                     Text("Or signup with:")
                     Spacer(modifier = Modifier.size(16.dp))
@@ -246,7 +250,7 @@ fun PublisherExposedDropdownMenu(viewModel: SignupViewModel = hiltViewModel()) {
         expanded = expanded,
         onExpandedChange = {
             expanded = !expanded
-       }
+        }
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
@@ -257,16 +261,16 @@ fun PublisherExposedDropdownMenu(viewModel: SignupViewModel = hiltViewModel()) {
                 viewModel.getListCompanies(it.text)
             },
             label = { Text("Publisher") },
-            leadingIcon = { Icon(Icons.Outlined.Business, "business")},
+            leadingIcon = { Icon(Icons.Outlined.Business, "business") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             isError = viewModel.publisherError,
-            supportingText = {if (viewModel.publisherError) Text("The publisher name doesn't exist")},
+            supportingText = { if (viewModel.publisherError) Text("The publisher name doesn't exist") },
         )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-        ){
+        ) {
             viewModel.publisherOptions.forEach { selectionOption ->
                 DropdownMenuItem(
                     text = { Text(selectionOption.name) },

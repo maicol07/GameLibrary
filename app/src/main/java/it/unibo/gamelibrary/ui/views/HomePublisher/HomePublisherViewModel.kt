@@ -57,7 +57,9 @@ class HomePublisherViewModel @Inject constructor(
         }
         publisher = response?.companies?.firstOrNull()
         games.clear()
-        games.addAll(publisher?.published?.sortedByDescending { it.first_release_date?.epochSecond ?: 0 } ?: emptyList())
+        games.addAll(publisher?.published?.sortedByDescending {
+            it.first_release_date?.epochSecond ?: 0
+        } ?: emptyList())
     }
 
     private fun fetchPosts() {

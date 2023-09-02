@@ -13,7 +13,7 @@ import it.unibo.gamelibrary.utils.TopAppBarState
 fun HomePublisher(
     navigator: DestinationsNavigator,
     viewModel: HomePublisherViewModel = hiltViewModel()
-){
+) {
     TopAppBarState.actions = { }
     TopAppBarState.title = "Home"
 

@@ -212,8 +212,8 @@ private fun ChangePasswordDialog(viewModel: SettingsViewModel = hiltViewModel())
     CustomDialog(
         onDismissRequest = { viewModel.openPasswordDialog = false },
         modifier = Modifier
-                .padding(16.dp)
-                .requiredWidth(320.dp),
+            .padding(16.dp)
+            .requiredWidth(320.dp),
         buttons = {
             TextButton(
                 onClick = { viewModel.openPasswordDialog = false }
