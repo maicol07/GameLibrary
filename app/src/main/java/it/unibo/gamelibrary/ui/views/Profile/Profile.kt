@@ -116,25 +116,24 @@ fun Profile(
 
         if (checkInternetConnection(context)) {
             //reviews di questo user
-            if (viewModel.user?.isPublisher == false) {
-                if(viewModel.userLibrary.isNotEmpty()){
-                    items(viewModel.userLibrary)
-                    {
-                        UserReview(it, navigator, showUser = false)
-                    }
-                }else{
-                    item{
-                        Column (verticalArrangement = Arrangement.Center, modifier = Modifier.fillParentMaxHeight(0.7F)){
-                            Text(text = "No reviews yet. You can find games you played in Home or by searching them by name!",
-                                modifier = Modifier
-                                    .padding(start = 8.dp, end = 8.dp, bottom = 50.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center
-                            )
-                        }
+            if(viewModel.userLibrary.isNotEmpty()){
+                items(viewModel.userLibrary)
+                {
+                    UserReview(it, navigator, showUser = false)
+                }
+            }else{
+                item{
+                    Column (verticalArrangement = Arrangement.Center, modifier = Modifier.fillParentMaxHeight(0.7F)){
+                        Text(text = "No reviews yet. You can find games you played in Home or by searching them by name!",
+                            modifier = Modifier
+                                .padding(start = 8.dp, end = 8.dp, bottom = 50.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
-            } else {
+            }
+            if (viewModel.user?.isPublisher == true) {
                 items(viewModel.publisherGames) { game: Game ->
                     GameCardView(game = game, navigator = navigator)
                 }
