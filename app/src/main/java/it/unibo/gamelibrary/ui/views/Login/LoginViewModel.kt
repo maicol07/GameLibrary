@@ -214,7 +214,7 @@ class LoginViewModel @Inject constructor(
                             uid = auth.currentUser?.uid!!,
                             username = username,
                             email = email,
-                            isPublisher = isPublisher,
+                            isPublisher = true,
                             publisherName = publisherName
                         )
                     else
@@ -224,7 +224,7 @@ class LoginViewModel @Inject constructor(
                             surname = surname,
                             username = username,
                             email = email,
-                            isPublisher = isPublisher
+                            isPublisher = false
                         )
                 )
             }

@@ -87,7 +87,7 @@ class SignupViewModel @Inject constructor(
                                     repository.insertUser(user!!)
                                 }
                                 auth.currentUser?.updateProfile(userProfileChangeRequest {
-                                    displayName = if (isPublisher) publisherField.text else "${user?.name} ${user?.surname}"
+                                    displayName = "${user?.name} ${user?.surname}"
                                 })
                                 navController.navigate(HomeDestination())
                             } else {
@@ -103,7 +103,7 @@ class SignupViewModel @Inject constructor(
                                         repository.insertUser(user!!)
                                     }
                                     auth.currentUser?.updateProfile(userProfileChangeRequest {
-                                        displayName = if (isPublisher) publisherField.text else "${user?.name} ${user?.surname}"
+                                        displayName = publisherField.text
                                     })
                                     navController.navigate(HomeDestination())
                                 }
