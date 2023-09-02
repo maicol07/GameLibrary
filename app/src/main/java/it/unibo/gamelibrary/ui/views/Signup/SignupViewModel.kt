@@ -120,7 +120,7 @@ class SignupViewModel @Inject constructor(
                             }
                         }
                     }
-                }
+            }
             isSignupButtonPressed = false
         }
     }
@@ -140,19 +140,16 @@ class SignupViewModel @Inject constructor(
         }
     }
 
-    private fun getSlugByCompany(name: String): Job {
-        return viewModelScope.launch {
-            val result = SafeRequest {
-                IGDBClient.getCompanies {
-                    fields("slug")
-                    where("name = \"${name}\"")
-                    sort("slug", SortOrder.ASC)
-                    limit(1)
-                }
+    private fun getSlugByCompany(name: String): Job = viewModelScope.launch {
+        val result = SafeRequest {
+            IGDBClient.getCompanies {
+                fields("slug")
+                where("name = \"${name}\"")
+                sort("slug", SortOrder.ASC)
+                limit(1)
             }
-            publisherSlug = result?.companies?.firstOrNull()?.slug
-            Log.i("Slug", publisherSlug ?: "slug")
         }
+        publisherSlug = result?.companies?.firstOrNull()?.slug
     }
 
     private fun validate(field: String, validate: (field: String) -> Boolean): Boolean {
@@ -173,8 +170,9 @@ class SignupViewModel @Inject constructor(
                 }
             }
         }
-        if(isPublisher) {
-            publisherError = publisherField.text.isEmpty() || !publisherOptions.map { it.name }.contains(publisherField.text)
+        if (isPublisher) {
+            publisherError = publisherField.text.isEmpty() || !publisherOptions.map { it.name }
+                .contains(publisherField.text)
         }
         for (value in fieldsErrors.values) {
             if (value) {

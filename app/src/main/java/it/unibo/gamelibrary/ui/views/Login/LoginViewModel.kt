@@ -61,9 +61,10 @@ class LoginViewModel @Inject constructor(
                             var isPublisher = false
                             viewModelScope.launch {
                                 isPublisher =
-                                    repository.getUserByUid(auth.currentUser?.uid!!).first()?.isPublisher == true
+                                    repository.getUserByUid(auth.currentUser?.uid!!)
+                                        .first()?.isPublisher == true
                             }.invokeOnCompletion {
-                                if (isPublisher){
+                                if (isPublisher) {
                                     insertUserIfNotExist(
                                         username = auth.currentUser?.displayName!!,
                                         email = usernameOrEmail,
@@ -94,7 +95,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController){
+    fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController) {
         if (result.resultCode != Activity.RESULT_OK) {
             viewModelScope.launch {
                 snackbarHostState.showSnackbar("Google login cancelled")
@@ -115,9 +116,10 @@ class LoginViewModel @Inject constructor(
                         var isUserPublisher = false
                         viewModelScope.launch {
                             isUserPublisher =
-                                repository.getUserByUid(auth.currentUser?.uid!!).first()?.isPublisher == true
+                                repository.getUserByUid(auth.currentUser?.uid!!)
+                                    .first()?.isPublisher == true
                         }.invokeOnCompletion {
-                            if (isUserPublisher){
+                            if (isUserPublisher) {
                                 insertUserIfNotExist(
                                     username = credential.displayName!!,
                                     email = credential.id,
@@ -200,14 +202,16 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun insertUserIfNotExist(name: String? = null,
-                                     surname: String? = null,
-                                     username: String,
-                                     email: String,
-                                     isPublisher: Boolean = false,
-                                     publisherName: String? = null){
+    private fun insertUserIfNotExist(
+        name: String? = null,
+        surname: String? = null,
+        username: String,
+        email: String,
+        isPublisher: Boolean = false,
+        publisherName: String? = null
+    ) {
         viewModelScope.launch {
-            if(repository.getUserByUid(auth.currentUser?.uid!!).first() == null) {
+            if (repository.getUserByUid(auth.currentUser?.uid!!).first() == null) {
                 repository.insertUser(
                     if (isPublisher)
                         User(
