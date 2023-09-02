@@ -44,6 +44,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.alorma.compose.settings.storage.base.getValue
 import com.alorma.compose.settings.storage.datastore.rememberPreferenceDataStoreBooleanSettingState
@@ -279,24 +280,28 @@ class MainActivity : FragmentActivity() {
     ) {
         val currentDestination: Destination = (navController.currentDestinationAsState().value
             ?: NavGraphs.root.startAppDestination) as Destination
+        val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
         NavigationBar {
             for (destination in NavBarDestinations.values()) {
                 if (destination != NavBarDestinations.Library || user?.isPublisher == false) {
                     val isCurrentDestOnBackStack =
                         navController.isRouteOnBackStack(destination.direction)
+                    val userIdArgument = currentBackStackEntry?.arguments?.getString("userID")
                     NavigationBarItem(
-                        selected =
-                            if (currentDestination.route == "profile?userID={userID}" && navController.currentBackStackEntry?.arguments?.getString(
-                                    "userID"
-                                ) != null
-                            ) {
-                                false
-                            } else {
-                                currentDestination == destination.direction
-                            },
+                        selected = currentDestination == destination.direction && when (destination) {
+                            NavBarDestinations.Profile -> {
+                                userIdArgument === null || userIdArgument == auth.currentUser?.uid
+                            }
+                            else -> true
+                        },
                         onClick = {
-                            if (isCurrentDestOnBackStack) {
+                            if (isCurrentDestOnBackStack && when (destination) {
+                                    NavBarDestinations.Profile -> {
+                                        userIdArgument === null || userIdArgument === auth.currentUser?.uid
+                                    }
+                                    else -> true
+                                }) {
                                 // When we click again on a bottom bar item and it was already selected
                                 // we want to pop the back stack until the initial destination of this bottom bar item
                                 navController.popBackStack(destination.direction, false)
