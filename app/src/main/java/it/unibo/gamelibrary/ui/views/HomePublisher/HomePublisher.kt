@@ -27,7 +27,7 @@ fun HomePublisher(
         }
 
         items(
-            viewModel.posts,
+            viewModel.posts.sortedByDescending { it.lastModified },
             key = { it.id })
         {
             UserReview(it, navigator)
