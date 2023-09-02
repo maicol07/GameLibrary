@@ -117,7 +117,7 @@ fun Profile(
             if(viewModel.user?.isPublisher == false) {
                 //reviews di questo user
                 if (viewModel.userLibrary.isNotEmpty()) {
-                    items(viewModel.userLibrary)
+                    items(viewModel.userLibrary.sortedByDescending { it.lastModified }, key = { it.id })
                     {
                         UserReview(it, navigator, showUser = false)
                     }
