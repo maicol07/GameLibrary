@@ -24,7 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.Secrets
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
-import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
+import it.unibo.gamelibrary.ui.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

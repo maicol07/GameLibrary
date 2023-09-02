@@ -38,7 +38,7 @@ import io.github.fornewid.placeholder.material3.placeholder
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.components.UserBar
-import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
+import it.unibo.gamelibrary.ui.destinations.GameViewNavDestination
 import ru.pixnews.igdbclient.model.Game
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

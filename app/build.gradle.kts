@@ -109,6 +109,7 @@ dependencies {
     implementation(libs.security.crypto)
     implementation(libs.security.crypto.ktx)
     implementation(libs.slf4j.simple)
+    implementation(libs.zoomable)
 
 
     // Test

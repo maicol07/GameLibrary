@@ -33,9 +33,8 @@ fun UserBar(user: User, link: Boolean, navController: NavController?){
             .combinedClickable(
                 onClick = {
                     if (link) {
-                        navigator?.navigate(
-                            it.unibo.gamelibrary.ui.views.destinations.ProfileDestination(
                         navController?.navigate(
+                            it.unibo.gamelibrary.ui.destinations.ProfileDestination(
                                 user.uid
                             )
                         )

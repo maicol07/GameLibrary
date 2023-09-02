@@ -164,8 +164,7 @@ fun GameView(
     }
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        GameHeader(game, isLoading = viewModel.isLoading)
-        GameDetails(game, isLoading = viewModel.isLoading, libraryEntries = viewModel.libraryEntries, navigator = navigator)
+        GameHeader(game, isLoading = viewModel.isLoading, navController = navController)
         GameDetails(game, isLoading = viewModel.isLoading, libraryEntries = viewModel.libraryEntries, navController = navController)
     }
     if (viewModel.isGameLibraryEditOpen) {
@@ -174,7 +173,7 @@ fun GameView(
 }
 
 @Composable
-fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = false) {
+fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = false, navController: NavController? = null) {
     Box(modifier) {
         val backgroundModifier = Modifier
             .fillMaxWidth()
@@ -196,7 +195,8 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = f
                     .size(100.dp, 150.dp)
                     .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()),
                 contentDescription = "${game.name} cover",
-                fullscreenable = true
+                fullscreenable = true,
+                navController = navController
             )
             Text(
                 text = game.name,

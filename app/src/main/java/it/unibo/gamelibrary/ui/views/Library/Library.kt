@@ -28,7 +28,7 @@ import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.material3.fade
 import io.github.fornewid.placeholder.material3.placeholder
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
-import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
+import it.unibo.gamelibrary.ui.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
 

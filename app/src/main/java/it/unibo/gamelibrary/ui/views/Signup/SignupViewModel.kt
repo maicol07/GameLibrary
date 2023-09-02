@@ -17,7 +17,7 @@ import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
-import it.unibo.gamelibrary.ui.views.destinations.HomeDestination
+import it.unibo.gamelibrary.ui.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
 import it.unibo.gamelibrary.utils.snackbarHostState

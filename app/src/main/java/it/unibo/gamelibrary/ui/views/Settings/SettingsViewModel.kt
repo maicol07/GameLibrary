@@ -45,7 +45,7 @@ import it.unibo.gamelibrary.MainActivity
 import it.unibo.gamelibrary.Secrets
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.interfaces.HasBiometrics
-import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
+import it.unibo.gamelibrary.ui.destinations.LoginPageDestination
 import it.unibo.gamelibrary.utils.findActivity
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.flow.first

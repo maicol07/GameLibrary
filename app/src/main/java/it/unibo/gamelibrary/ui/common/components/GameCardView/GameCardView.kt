@@ -8,12 +8,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import androidx.navigation.NavController
 import com.ramcosta.composedestinations.navigation.navigate
+import it.unibo.gamelibrary.ui.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.GameView.GameDetails
 import it.unibo.gamelibrary.ui.views.GameView.GameHeader
-import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import ru.pixnews.igdbclient.model.Game
 
 @OptIn(ExperimentalMaterial3Api::class)

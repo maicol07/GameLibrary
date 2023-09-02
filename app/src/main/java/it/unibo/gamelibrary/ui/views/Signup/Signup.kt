@@ -54,8 +54,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.ui.common.components.PasswordTextfield
+import it.unibo.gamelibrary.ui.destinations.LoginPageDestination
 import it.unibo.gamelibrary.ui.views.Login.LoginViewModel
-import it.unibo.gamelibrary.ui.views.destinations.LoginPageDestination
 import kotlinx.coroutines.launch
 
 @Destination

@@ -65,8 +65,8 @@ import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.ui.common.Game.GameCoverImage
 import it.unibo.gamelibrary.ui.common.Game.icon
-import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
-import it.unibo.gamelibrary.ui.views.destinations.ProfileDestination
+import it.unibo.gamelibrary.ui.destinations.GameViewNavDestination
+import it.unibo.gamelibrary.ui.destinations.ProfileDestination
 import ru.pixnews.igdbclient.model.Game
 import ru.pixnews.igdbclient.model.Genre
 import ru.pixnews.igdbclient.model.Platform

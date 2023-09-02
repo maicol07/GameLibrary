@@ -37,6 +37,7 @@ room = "2.5.2"
 security-crypto = "1.1.0-alpha06"
 slf4j = "1.7.36"
 customactivityoncrash = "2.4.0"
+zoomable = "0.5.0"
 
 # Dependencies - Test
 junit = "4.13.2"
@@ -94,6 +95,7 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
 security-crypto-ktx = { group = "androidx.security", name = "security-crypto-ktx", version.ref = "security-crypto" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
+zoomable = { group = "me.saket.telephoto", name = "zoomable-android", version.ref = "zoomable" }
 
 # Dependencies - Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
