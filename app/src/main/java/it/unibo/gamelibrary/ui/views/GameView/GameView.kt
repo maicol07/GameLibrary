@@ -180,9 +180,9 @@ fun GameHeader(game: Game, modifier: Modifier = Modifier, isLoading: Boolean = f
             .height(200.dp)
             .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
         if (game.artworks.isNotEmpty()) {
-            GameArtwork(game, "", backgroundModifier)
+            GameArtwork(game, "", backgroundModifier, shape = RoundedCornerShape(0), fullscreenable = true, navController = navController)
         } else {
-            GameScreenshot(game, "", backgroundModifier)
+            GameScreenshot(game, "", backgroundModifier, shape = RoundedCornerShape(0), fullscreenable = true, navController = navController)
         }
         Row(
             Modifier
@@ -344,7 +344,9 @@ fun GameDetails(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .size(300.dp, 150.dp)
-                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
+                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()),
+                    fullscreenable = true,
+                    navController = navController
                 )
             }
         }
@@ -364,7 +366,9 @@ fun GameDetails(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .size(300.dp, 150.dp)
-                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade())
+                        .placeholder(visible = isLoading, highlight = PlaceholderHighlight.fade()),
+                    fullscreenable = true,
+                    navController = navController
                 )
             }
         }
