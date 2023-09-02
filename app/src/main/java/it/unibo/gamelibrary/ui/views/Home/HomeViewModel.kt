@@ -42,13 +42,13 @@ class HomeViewModel @Inject constructor(
             val response = SafeRequest {
                 IGDBClient.multiquery {
                     query(IgdbEndpoint.GAME, "Most loved") {
-                        fields("*", "cover.image_id")
+                        fields("name", "cover.image_id")
                         sort("rating", SortOrder.DESC)
                         where("parent_game = null & follows > 200")
                         limit(50)
                     }
                     query(IgdbEndpoint.GAME, "Upcoming") {
-                        fields("*", "cover.image_id")
+                        fields("name", "cover.image_id")
                         sort("first_release_date", SortOrder.ASC)
                         where(
                             "parent_game = null & first_release_date > " + java.time.Instant.now()
@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor(
                         limit(50)
                     }
                     query(IgdbEndpoint.GAME, "Popular") {
-                        fields("*", "cover.image_id")
+                        fields("name", "cover.image_id")
                         sort("rating", SortOrder.DESC)
                         val yearSec = 31556926
                         where(
@@ -69,7 +69,7 @@ class HomeViewModel @Inject constructor(
                         limit(50)
                     }
                     query(IgdbEndpoint.GAME, "New") {
-                        fields("*", "cover.image_id")
+                        fields("name", "cover.image_id")
                         sort("first_release_date", SortOrder.DESC)
                         where(
                             "parent_game = null & first_release_date < " + java.time.Instant.now()

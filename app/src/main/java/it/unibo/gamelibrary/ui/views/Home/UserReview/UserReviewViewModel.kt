@@ -34,17 +34,7 @@ class UserReviewViewModel @Inject constructor(
             IGDBClient.getGames {
                 fields(
                     "name",
-                    "artworks.image_id",
-                    "cover.image_id",
-                    "involved_companies.*",
-                    "involved_companies.company.name",
-                    "genres.name",
-                    "genres.slug",
-                    "screenshots.image_id",
-                    "summary",
-                    "release_dates.human",
-                    "release_dates.platform.name",
-                    "release_dates.platform.platform_logo.url"
+                    "cover.image_id"
                 )
                 where("id = $gameId")
             }

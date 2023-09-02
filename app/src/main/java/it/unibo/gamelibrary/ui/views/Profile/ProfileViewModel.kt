@@ -143,7 +143,6 @@ class ProfileViewModel @Inject constructor(
                     var fos: FileOutputStream?
                     try {
                         fos = FileOutputStream(file)
-                        //TODO controlla se sui telefoni degli altrir funziona Jpeg o se serve png
                         yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
                         fos.flush()
                         fos.close()
@@ -194,7 +193,6 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun toggleFollow(uid1: String, uid2: String) {
-
         viewModelScope.launch {
             if (amIFollowing()) {
                 followRepository.unfollow(uid1, uid2)
