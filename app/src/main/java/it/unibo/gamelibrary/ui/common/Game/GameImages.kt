@@ -2,7 +2,6 @@ package it.unibo.gamelibrary.ui.common.Game
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
@@ -68,10 +67,9 @@ fun GameImage(
             alignment = alignment
         ),
         previewPlaceholder = R.drawable.ffviirebirth,
-        modifier = Modifier
+        modifier = clickableModifier
             .clip(shape)
-            .shadow(shadowElevation, shape)
-            .then(clickableModifier),
+            .shadow(shadowElevation, shape),
         component = rememberImageComponent {
             CrossfadePlugin()
         }
@@ -124,9 +122,7 @@ fun GameArtwork(
 ) {
     GameImage(
         imageId = if (game.artworks.isNotEmpty()) game.artworks[0].image_id else null,
-        modifier = Modifier
-            .height(300.dp)
-            .then(modifier),
+        modifier = modifier,
         contentDescription = contentDescription,
         fullscreenable = fullscreenable,
         navController = navController,
@@ -148,9 +144,7 @@ fun GameScreenshot(
     GameImage(
         imageId = if (game.screenshots.isNotEmpty()) game.screenshots[0].image_id else null,
         imageSize = IgdbImageSize.SCREENSHOT_HUGE,
-        modifier = Modifier
-            .height(300.dp)
-            .then(modifier),
+        modifier = modifier,
         contentDescription = contentDescription,
         fullscreenable = fullscreenable,
         navController = navController,
