@@ -49,6 +49,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.neovisionaries.i18n.CountryCode
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.coil.CoilImage
@@ -153,10 +154,27 @@ fun Profile(
 private fun PublisherInfo(viewModel: ProfileViewModel){
     Column(Modifier.padding(8.dp)) {
         Text(text = "Info about this publisher")
-        Text(text = "name: " + viewModel.publisher?.name.toString())
-        //if(viewModel.publisher?.country != 0){Text(text = "country: " + Locale.getISOCountries(Locale.IsoCountryCode.PART3))}
+        Row (
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(4.dp).fillMaxWidth()
+        ){
+            Text(text = "name: ")
+            Text(text = viewModel.publisher?.name.toString())
+        }
+
+        if(viewModel.publisher?.country != 0){
+            Row (horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
+            ){
+                Text(text = "country: " )
+                Text(text = viewModel.publisher?.let { CountryCode.getByCode(it.country).getName() }.toString())
+            }
+
+        }
         if(viewModel.publisher?.logo != null){
-            Row {
+            Row (horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
+            ){
                 Text(text = "company logo: ")
                 CoilImage(
                     imageModel = {
@@ -167,8 +185,14 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
                 )
             }
         }
-
-        if(viewModel.publisher?.websites?.isNotEmpty() == true){Text(text = "website: " + viewModel.publisher?.websites?.get(0)?.url)}
+        if(viewModel.publisher?.websites?.isNotEmpty() == true){
+            Row (horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
+            ){
+                Text(text = "website: ")
+                Text(text = viewModel.publisher?.websites?.get(0)?.url.toString())
+            }
+        }
     }
 
 }
@@ -327,7 +351,9 @@ private fun EditButton(
                         imageModel = {
                             viewModel.newImage.value
                         },
-                        modifier = Modifier.size(256.dp).clip(RoundedCornerShape(128.dp))
+                        modifier = Modifier
+                            .size(256.dp)
+                            .clip(RoundedCornerShape(128.dp))
                     )
                 } else {
                     Image(
