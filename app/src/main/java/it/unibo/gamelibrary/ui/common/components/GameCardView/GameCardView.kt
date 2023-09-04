@@ -1,7 +1,9 @@
 package it.unibo.gamelibrary.ui.common.components.GameCardView
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,5 +32,6 @@ fun GameCardView(
             .wrapContentHeight()
     ) {
         GameHeader(game = game)
+        Spacer(Modifier.size(60.dp))
     }
 }
