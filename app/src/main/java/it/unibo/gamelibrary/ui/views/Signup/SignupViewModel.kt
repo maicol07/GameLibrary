@@ -1,5 +1,6 @@
 package it.unibo.gamelibrary.ui.views.Signup
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -88,6 +89,7 @@ class SignupViewModel @Inject constructor(
                                 }
                                 auth.currentUser?.updateProfile(userProfileChangeRequest {
                                     displayName = "${user?.name} ${user?.surname}"
+                                    photoUri = null
                                 })
                                 navController.navigate(HomeDestination())
                             } else {
@@ -104,6 +106,7 @@ class SignupViewModel @Inject constructor(
                                     }
                                     auth.currentUser?.updateProfile(userProfileChangeRequest {
                                         displayName = publisherField.text
+                                        photoUri = Uri.parse("https://prova.com")
                                     })
                                     navController.navigate(HomeDestination())
                                 }

@@ -58,32 +58,25 @@ class LoginViewModel @Inject constructor(
                 auth.signInWithEmailAndPassword(usernameOrEmail, fields["password"]!!)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            var isPublisher = false
-                            viewModelScope.launch {
-                                isPublisher =
-                                    repository.getUserByUid(auth.currentUser?.uid!!)
-                                        .first()?.isPublisher == true
-                            }.invokeOnCompletion {
-                                if (isPublisher) {
-                                    insertUserIfNotExist(
-                                        username = auth.currentUser?.displayName!!,
-                                        email = usernameOrEmail,
-                                        isPublisher = true,
-                                        publisherName = auth.currentUser!!.displayName
-                                    )
-                                } else {
-                                    val displayName = auth.currentUser?.displayName?.split(" ")
-                                    val name = displayName?.get(0) ?: ""
-                                    val surname =
-                                        if (displayName?.get(1) == null) "" else displayName[1]
-                                    insertUserIfNotExist(
-                                        name,
-                                        surname,
-                                        "${name}_${surname}",
-                                        usernameOrEmail
-                                    )
-                                }
-                                navController.navigate(HomeDestination())
+                            val isPublisher = auth.currentUser?.photoUrl != null
+                            if (isPublisher) {
+                                insertUserIfNotExist(
+                                    username = auth.currentUser?.displayName!!,
+                                    email = usernameOrEmail,
+                                    isPublisher = true,
+                                    publisherName = auth.currentUser!!.displayName
+                                ).invokeOnCompletion { navController.navigate(HomeDestination()) }
+                            } else {
+                                val displayName = auth.currentUser?.displayName?.split(" ")
+                                val name = displayName?.get(0) ?: ""
+                                val surname =
+                                    if (displayName?.getOrNull(1) == null) "" else displayName[1]
+                                insertUserIfNotExist(
+                                    name,
+                                    if (surname == "") null else surname,
+                                    if (surname == "") name else "${name}_${surname}",
+                                    usernameOrEmail
+                                ).invokeOnCompletion { navController.navigate(HomeDestination()) }
                             }
                         } else {
                             errorValidation()
@@ -209,29 +202,27 @@ class LoginViewModel @Inject constructor(
         email: String,
         isPublisher: Boolean = false,
         publisherName: String? = null
-    ) {
-        viewModelScope.launch {
-            if (repository.getUserByUid(auth.currentUser?.uid!!).first() == null) {
-                repository.insertUser(
-                    if (isPublisher)
-                        User(
-                            uid = auth.currentUser?.uid!!,
-                            username = username,
-                            email = email,
-                            isPublisher = true,
-                            publisherName = publisherName
-                        )
-                    else
-                        User(
-                            uid = auth.currentUser?.uid!!,
-                            name = name,
-                            surname = surname,
-                            username = username,
-                            email = email,
-                            isPublisher = false
-                        )
-                )
-            }
+    ) = viewModelScope.launch {
+        if (repository.getUserByUid(auth.currentUser?.uid!!).first() == null) {
+            repository.insertUser(
+                if (isPublisher)
+                    User(
+                        uid = auth.currentUser?.uid!!,
+                        username = username,
+                        email = email,
+                        isPublisher = true,
+                        publisherName = publisherName
+                    )
+                else
+                    User(
+                        uid = auth.currentUser?.uid!!,
+                        name = name,
+                        surname = surname,
+                        username = username,
+                        email = email,
+                        isPublisher = false
+                    )
+            )
         }
     }
 }
