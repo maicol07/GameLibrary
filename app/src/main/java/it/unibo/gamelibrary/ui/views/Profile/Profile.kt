@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -162,12 +163,12 @@ fun Profile(
 @Composable
 private fun PublisherInfo(viewModel: ProfileViewModel){
     Column(Modifier.padding(8.dp)) {
-        Text(text = "Info about this publisher")
+        Text(text = "Publisher info:", fontWeight = FontWeight.Bold)
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.padding(4.dp).fillMaxWidth()
         ){
-            Text(text = "name: ")
+            Text(text = "Name: ")
             Text(text = viewModel.publisher?.name.toString())
         }
 
@@ -175,7 +176,7 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
             Row (horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.padding(4.dp).fillMaxWidth()
             ){
-                Text(text = "country: " )
+                Text(text = "Country: " )
                 Text(text = viewModel.publisher?.let { CountryCode.getByCode(it.country).getName() }.toString())
             }
 
@@ -184,7 +185,7 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
             Row (horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.padding(4.dp).fillMaxWidth()
             ){
-                Text(text = "company logo: ")
+                Text(text = "Company logo: ")
                 CoilImage(
                     imageModel = {
                         viewModel.publisher?.logo?.image_id?.let { igdbImageUrl(it) }
@@ -198,7 +199,7 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
             Row (horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.padding(4.dp).fillMaxWidth()
             ){
-                Text(text = "website: ")
+                Text(text = "Website: ")
                 Text(text = viewModel.publisher?.websites?.get(0)?.url.toString())
             }
         }
@@ -341,17 +342,18 @@ private fun EditButton(
                     },
                     shape = RoundedCornerShape(50.dp),
                 ) {
-                    Text(text = "Done")
+                    Text(text = "Cancel")
                 }
 
                 //apply-changes button
                 TextButton(
                     onClick = {
                         viewModel.applyChanges(context)
+                        viewModel.showProfileEditDialog = false
                     },
                     shape = RoundedCornerShape(50.dp),
                 ) {
-                    Text(text = "Apply")
+                    Text(text = "Save")
                 }
             }
         ) {
@@ -367,7 +369,7 @@ private fun EditButton(
                             .clip(RoundedCornerShape(128.dp))
                     )
                 } else {
-                    Image(
+                    Icon(
                         Icons.Outlined.AccountCircle,
                         "profile image is not set",
                         modifier = Modifier.size(256.dp)
