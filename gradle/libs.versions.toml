@@ -46,6 +46,7 @@ espresso-core = "3.5.1"
 activity-compose = "1.7.2"
 compose-bom = "2023.08.00"
 work-runtime-ktx = "2.8.1"
+nv-i18n = "1.29"
 
 [libraries]
 # Dependencies
@@ -104,6 +105,7 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+nv-i18n = { group = "com.neovisionaries", name = "nv-i18n", version.ref = "nv-i18n" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

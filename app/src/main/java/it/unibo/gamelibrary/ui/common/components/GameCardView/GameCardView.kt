@@ -1,7 +1,9 @@
 package it.unibo.gamelibrary.ui.common.components.GameCardView
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ramcosta.composedestinations.navigation.navigate
 import it.unibo.gamelibrary.ui.destinations.GameViewNavDestination
-import it.unibo.gamelibrary.ui.views.GameView.GameDetails
 import it.unibo.gamelibrary.ui.views.GameView.GameHeader
 import ru.pixnews.igdbclient.model.Game
 
@@ -31,6 +32,6 @@ fun GameCardView(
             .wrapContentHeight()
     ) {
         GameHeader(game = game)
-        GameDetails(game = game, navController = navController)
+        Spacer(Modifier.size(70.dp))
     }
 }
