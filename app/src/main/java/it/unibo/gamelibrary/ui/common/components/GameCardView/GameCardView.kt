@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ramcosta.composedestinations.navigation.navigate
+import it.unibo.gamelibrary.ui.destinations.GameViewNavDestination
 import it.unibo.gamelibrary.ui.views.GameView.GameHeader
-import it.unibo.gamelibrary.ui.views.destinations.GameViewNavDestination
 import ru.pixnews.igdbclient.model.Game
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,6 +32,6 @@ fun GameCardView(
             .wrapContentHeight()
     ) {
         GameHeader(game = game)
-        Spacer(Modifier.size(60.dp))
+        Spacer(Modifier.size(70.dp))
     }
 }
