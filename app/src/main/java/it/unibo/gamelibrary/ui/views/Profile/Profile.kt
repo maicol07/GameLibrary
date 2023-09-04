@@ -23,14 +23,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material.icons.outlined.PersonRemoveAlt1
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -42,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,7 +67,6 @@ import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
 import ru.pixnews.igdbclient.util.igdbImageUrl
-import java.util.Locale
 
 @Destination
 @Composable
@@ -370,10 +374,8 @@ private fun EditButton(
                     )
                 }
 
-                Spacer(modifier = Modifier.size(16.dp))
-
                 Row (
-                    horizontalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier.fillMaxWidth()
                 ){
 
@@ -381,9 +383,15 @@ private fun EditButton(
                     TextButton(
                         onClick = {
                             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                        }
+                        },
+                        modifier = Modifier.size(64.dp),
+                        colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onBackground, containerColor = MaterialTheme.colorScheme.background),
                     ) {
-                        Text(text = "Select Image")
+                        Icon(
+                            Icons.Default.PhotoLibrary,
+                            contentDescription = "Select Image",
+                            modifier = Modifier.scale(1.75f)
+                        )
                     }
 
                     //take-picture-from-camera button
@@ -400,9 +408,15 @@ private fun EditButton(
                                 // Request a permission
                                 permissionLauncher.launch(Manifest.permission.CAMERA)
                             }
-                        }
-                    ) {
-                        Text(text = "Take a picture")
+                        },
+                        modifier = Modifier.size(64.dp),
+                        colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onBackground, containerColor = MaterialTheme.colorScheme.background),
+                        ) {
+                        Icon(
+                            Icons.Default.CameraAlt,
+                            contentDescription = "Take a picture",
+                            modifier = Modifier.scale(1.75f)
+                        )
                     }
                 }
 
