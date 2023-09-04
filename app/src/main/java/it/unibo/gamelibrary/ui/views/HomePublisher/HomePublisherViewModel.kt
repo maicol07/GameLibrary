@@ -64,7 +64,7 @@ class HomePublisherViewModel @Inject constructor(
 
     private fun fetchPosts() {
         viewModelScope.launch {
-            libraryRepository.getLibraryEntriesByGames(games).collectLatest {
+            libraryRepository.getLibraryEntriesByGames(games, "last_modified").collectLatest {
                 posts.clear()
                 posts.addAll(it)
             }

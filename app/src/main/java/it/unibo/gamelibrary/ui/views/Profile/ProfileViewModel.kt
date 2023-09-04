@@ -108,7 +108,7 @@ class ProfileViewModel @Inject constructor(
 
     fun getLibrary(uid: String) {
         viewModelScope.launch {
-            libraryRepository.getUserLibraryEntries(uid).collectLatest {
+            libraryRepository.getUserLibraryEntries(uid, "last_modified").collectLatest {
                 userLibrary.clear()
                 userLibrary.addAll(it)
             }

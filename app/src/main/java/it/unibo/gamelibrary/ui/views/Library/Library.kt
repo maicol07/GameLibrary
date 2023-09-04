@@ -58,7 +58,7 @@ fun LibraryContent(viewModel: LibraryViewModel, navController: NavController) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
         state = state
     ) {
-        items(viewModel.libraryEntries.sortedByDescending { it.lastModified }, key = { it.id }) {
+        items(viewModel.libraryEntries, key = { it.id }) {
             val game = viewModel.games[it.gameId.toLong()] ?: Game()
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

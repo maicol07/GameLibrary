@@ -32,7 +32,7 @@ class LibraryViewModel @Inject constructor(
     }
 
     fun fetchLibraryEntries() = viewModelScope.launch {
-        libraryRepository.getUserLibraryEntries(Firebase.auth.currentUser!!.uid).collectLatest {
+        libraryRepository.getUserLibraryEntries(Firebase.auth.currentUser!!.uid, "last_modified").collectLatest {
             libraryEntries.clear()
             libraryEntries.addAll(it)
             fetchGames(libraryEntries.map { it.gameId })

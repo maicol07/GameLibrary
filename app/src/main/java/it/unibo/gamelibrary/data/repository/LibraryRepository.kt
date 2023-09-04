@@ -9,19 +9,19 @@ import ru.pixnews.igdbclient.model.Game
 class LibraryRepository(private val libraryDao: LibraryDao) {
     //val allUser: List<User> = collectionDao.getAll()
     @WorkerThread
-    fun getAll(): Flow<List<LibraryEntry>> = libraryDao.getAll()
+    fun getAll(orderBy: String = "id"): Flow<List<LibraryEntry>> = libraryDao.getAll(orderBy)
 
     @WorkerThread
-    fun getLibraryEntriesByGame(game: Game): Flow<List<LibraryEntry>> =
-        libraryDao.getLibraryEntriesByGame(game.id.toString())
+    fun getLibraryEntriesByGame(game: Game, sortBy: String = "id"): Flow<List<LibraryEntry>> =
+        libraryDao.getLibraryEntriesByGame(game.id.toString(), sortBy)
 
     @WorkerThread
-    fun getLibraryEntriesByGames(games: List<Game>): Flow<List<LibraryEntry>> =
-        libraryDao.getLibraryEntriesByGames(games.map { it.id })
+    fun getLibraryEntriesByGames(games: List<Game>, orderBy: String = "id"): Flow<List<LibraryEntry>> =
+        libraryDao.getLibraryEntriesByGames(games.map { it.id }, orderBy)
 
     @WorkerThread
-    fun getUserLibraryEntries(uid: String): Flow<List<LibraryEntry>> =
-        libraryDao.getUserLibrary(uid)
+    fun getUserLibraryEntries(uid: String, orderBy: String = "id"): Flow<List<LibraryEntry>> =
+        libraryDao.getUserLibrary(uid, orderBy)
 
     @WorkerThread
     fun getCollection(id: String): Flow<LibraryEntry?> = libraryDao.getLibrary(id)
