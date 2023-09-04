@@ -50,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.neovisionaries.i18n.CountryCode
 import com.ramcosta.composedestinations.annotation.Destination
 import com.skydoves.landscapist.coil.CoilImage
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
@@ -60,6 +61,8 @@ import it.unibo.gamelibrary.ui.common.components.checkInternetConnection
 import it.unibo.gamelibrary.ui.views.Home.UserReview.UserReview
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
+import ru.pixnews.igdbclient.util.igdbImageUrl
+import java.util.Locale
 
 @Destination
 @Composable
@@ -94,6 +97,9 @@ fun Profile(
                     } else {
                         "nothing here yet"
                     }, modifier = Modifier.padding(12.dp))
+            }
+            if(viewModel.user?.isPublisher == true){
+                PublisherInfo(viewModel)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -147,6 +153,53 @@ fun Profile(
     if (!checkInternetConnection(context)) {
         NoInternetConnection()
     }
+}
+
+@Composable
+private fun PublisherInfo(viewModel: ProfileViewModel){
+    Column(Modifier.padding(8.dp)) {
+        Text(text = "Info about this publisher")
+        Row (
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(4.dp).fillMaxWidth()
+        ){
+            Text(text = "name: ")
+            Text(text = viewModel.publisher?.name.toString())
+        }
+
+        if(viewModel.publisher?.country != 0){
+            Row (horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
+            ){
+                Text(text = "country: " )
+                Text(text = viewModel.publisher?.let { CountryCode.getByCode(it.country).getName() }.toString())
+            }
+
+        }
+        if(viewModel.publisher?.logo != null){
+            Row (horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
+            ){
+                Text(text = "company logo: ")
+                CoilImage(
+                    imageModel = {
+                        viewModel.publisher?.logo?.image_id?.let { igdbImageUrl(it) }
+                    },
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+            }
+        }
+        if(viewModel.publisher?.websites?.isNotEmpty() == true){
+            Row (horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
+            ){
+                Text(text = "website: ")
+                Text(text = viewModel.publisher?.websites?.get(0)?.url.toString())
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -305,7 +358,9 @@ private fun EditButton(
                         imageModel = {
                             viewModel.newImage.value
                         },
-                        modifier = Modifier.size(256.dp).clip(RoundedCornerShape(128.dp))
+                        modifier = Modifier
+                            .size(256.dp)
+                            .clip(RoundedCornerShape(128.dp))
                     )
                 } else {
                     Image(

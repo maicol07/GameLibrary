@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.biometric)
     implementation(libs.compose.destinations.core)
+    implementation(libs.nv.i18n)
     ksp(libs.compose.destinations.ksp)
     implementation(libs.compose.ratingbar)
     implementation(libs.compose.settings.m3)
