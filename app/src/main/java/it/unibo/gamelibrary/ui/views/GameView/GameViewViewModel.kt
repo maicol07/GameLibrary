@@ -110,7 +110,7 @@ class GameViewViewModel @Inject constructor(
     }
 
     fun getLibraryEntries(gameId: Int) = viewModelScope.launch {
-        libraryRepository.getLibraryEntriesByGame(Game(gameId.toLong())).collectLatest {
+        libraryRepository.getLibraryEntriesByGame(Game(gameId.toLong()), "last_modified").collectLatest {
             libraryEntries.clear()
             libraryEntries.addAll(it)
         }
