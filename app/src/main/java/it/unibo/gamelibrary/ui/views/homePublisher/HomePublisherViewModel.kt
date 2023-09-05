@@ -14,7 +14,7 @@ import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -43,7 +43,7 @@ class HomePublisherViewModel @Inject constructor(
     private fun fetchGames(): Job = viewModelScope.launch {
         val publisherName =
             userRepository.getUserByUid(auth.currentUser?.uid!!).first()?.publisherName
-        val response = SafeRequest {
+        val response = safeRequest {
             IGDBClient.getCompanies {
                 fields(
                     "slug",

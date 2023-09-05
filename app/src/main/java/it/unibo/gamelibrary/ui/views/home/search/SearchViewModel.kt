@@ -12,7 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.apicalypse.ApicalypseQueryBuilder
@@ -107,7 +107,7 @@ class SearchViewModel @Inject constructor(
     private fun fetchSearchedGames(query: ApicalypseQueryBuilder.() -> Unit) {
         gamesSearch.inProgress = true
         viewModelScope.launch {
-            val result = SafeRequest { IGDBClient.getGames(query) }
+            val result = safeRequest { IGDBClient.getGames(query) }
             if (result != null) {
                 gamesSearch.results.clear()
                 gamesSearch.results.addAll(result.games)
@@ -130,7 +130,7 @@ class SearchViewModel @Inject constructor(
     private fun fetchPlaforms() {
         viewModelScope.launch {
             platforms.clear()
-            val result = SafeRequest {
+            val result = safeRequest {
                 IGDBClient.getPlatforms {
                     fields("slug", "name", "platform_logo.url")
                     sort("generation", SortOrder.DESC)
@@ -147,7 +147,7 @@ class SearchViewModel @Inject constructor(
     private fun fetchGenres() {
         viewModelScope.launch {
             genres.clear()
-            val result = SafeRequest {
+            val result = safeRequest {
                 IGDBClient.getGenres {
                     fields("slug", "name")
                     limit(25)

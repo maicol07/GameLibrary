@@ -13,7 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.LibraryEntry
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getGames
@@ -41,7 +41,7 @@ class LibraryViewModel @Inject constructor(
 
     fun fetchGames(ids: List<Int>) = viewModelScope.launch {
         if (ids.isEmpty()) return@launch
-        val result = SafeRequest {
+        val result = safeRequest {
             IGDBClient.getGames {
                 fields(
                     "id",

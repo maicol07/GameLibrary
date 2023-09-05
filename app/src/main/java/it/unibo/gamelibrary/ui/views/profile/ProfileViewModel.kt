@@ -23,7 +23,7 @@ import it.unibo.gamelibrary.data.repository.FollowRepository
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -78,7 +78,7 @@ class ProfileViewModel @Inject constructor(
 
     fun getPublisherInfo(){
         viewModelScope.launch {
-            val result = SafeRequest {
+            val result = safeRequest {
                 IGDBClient.getCompanies {
                     fields(
                         "name",
@@ -96,7 +96,7 @@ class ProfileViewModel @Inject constructor(
 
     fun getPublisherGames(){
         viewModelScope.launch {
-            val result = SafeRequest {
+            val result = safeRequest {
                 IGDBClient.getCompanies {
                     fields(
                         "published",

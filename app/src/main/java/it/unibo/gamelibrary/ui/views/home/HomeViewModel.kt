@@ -14,7 +14,7 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val response = SafeRequest {
+            val response = safeRequest {
                 IGDBClient.multiquery {
                     query(IgdbEndpoint.GAME, "Most loved") {
                         fields("name", "cover.image_id")

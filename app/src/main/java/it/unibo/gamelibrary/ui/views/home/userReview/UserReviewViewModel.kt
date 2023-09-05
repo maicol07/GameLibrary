@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getGames
@@ -30,7 +30,7 @@ class UserReviewViewModel @Inject constructor(
     }
 
     fun getGame(gameId: Int) = viewModelScope.launch {
-        val result = SafeRequest {
+        val result = safeRequest {
             IGDBClient.getGames {
                 fields(
                     "name",

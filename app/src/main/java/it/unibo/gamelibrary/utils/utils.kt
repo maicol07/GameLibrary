@@ -25,7 +25,7 @@ val snackbarHostState = SnackbarHostState()
 var notificationId by mutableIntStateOf(0)
 var channel_id by mutableStateOf("")
 
-suspend fun <T> SafeRequest(apiRequest: suspend () -> T): T? {
+suspend fun <T> safeRequest(apiRequest: suspend () -> T): T? {
     return try {
         apiRequest()
     } catch (e: Exception) {

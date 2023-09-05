@@ -20,7 +20,7 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -131,7 +131,7 @@ class SignupViewModel @Inject constructor(
     fun getListCompanies(name: String = "") {
         job?.cancel()
         job = viewModelScope.launch {
-            val result = SafeRequest {
+            val result = safeRequest {
                 IGDBClient.getCompanies {
                     fields("name")
                     where("name ~ *\"${name}\"*")
@@ -144,7 +144,7 @@ class SignupViewModel @Inject constructor(
     }
 
     private fun getSlugByCompany(name: String): Job = viewModelScope.launch {
-        val result = SafeRequest {
+        val result = safeRequest {
             IGDBClient.getCompanies {
                 fields("slug")
                 where("name = \"${name}\"")

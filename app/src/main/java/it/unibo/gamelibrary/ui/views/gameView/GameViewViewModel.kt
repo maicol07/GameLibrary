@@ -27,7 +27,7 @@ import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
-import it.unibo.gamelibrary.utils.SafeRequest
+import it.unibo.gamelibrary.utils.safeRequest
 import it.unibo.gamelibrary.utils.snackbarHostState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -75,7 +75,7 @@ class GameViewViewModel @Inject constructor(
     }
 
     fun getGame(gameId: Int) = viewModelScope.launch {
-        val result = SafeRequest {
+        val result = safeRequest {
             IGDBClient.getGames {
                 fields(
                     "name",

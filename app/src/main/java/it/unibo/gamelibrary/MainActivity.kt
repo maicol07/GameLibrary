@@ -201,7 +201,6 @@ class MainActivity : FragmentActivity() {
                             topBar = {
                                 if (TopAppBarState.show && (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
                                     TopBar(
-                                        currentScreen = "Game Library",
                                         canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values()
                                             .map { it.direction }.contains(currentDestination),
                                         navigateUp = { navController.navigateUp() }
@@ -234,7 +233,6 @@ class MainActivity : FragmentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TopBar(//TopAppBar
-        currentScreen: String,
         canNavigateBack: Boolean,
         navigateUp: () -> Unit,
         modifier: Modifier = Modifier
