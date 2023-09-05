@@ -71,7 +71,7 @@ import it.unibo.gamelibrary.ui.destinations.SettingsPageDestination
 import it.unibo.gamelibrary.ui.destinations.SignupPageDestination
 import it.unibo.gamelibrary.ui.startAppDestination
 import it.unibo.gamelibrary.ui.theme.GameLibraryTheme
-import it.unibo.gamelibrary.ui.views.BiometricLock.BiometricLockScreen
+import it.unibo.gamelibrary.ui.views.biometricLock.BiometricLockScreen
 import it.unibo.gamelibrary.utils.BottomBar
 import it.unibo.gamelibrary.utils.Http
 import it.unibo.gamelibrary.utils.IGDBClient
