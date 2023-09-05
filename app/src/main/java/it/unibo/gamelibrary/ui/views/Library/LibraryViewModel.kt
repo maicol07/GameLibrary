@@ -31,15 +31,15 @@ class LibraryViewModel @Inject constructor(
         fetchLibraryEntries()
     }
 
-    fun fetchLibraryEntries() = viewModelScope.launch {
-        libraryRepository.getUserLibraryEntries(Firebase.auth.currentUser!!.uid, "last_modified").collectLatest {
-            libraryEntries.clear()
-            libraryEntries.addAll(it)
-            fetchGames(libraryEntries.map { it.gameId })
+    private fun fetchLibraryEntries() = viewModelScope.launch {
+        libraryRepository.getUserLibraryEntries(Firebase.auth.currentUser!!.uid, "last_modified").collectLatest { libraryEntries ->
+            this@LibraryViewModel.libraryEntries.clear()
+            this@LibraryViewModel.libraryEntries.addAll(libraryEntries)
+            fetchGames(this@LibraryViewModel.libraryEntries.map { it.gameId })
         }
     }
 
-    fun fetchGames(ids: List<Int>) = viewModelScope.launch {
+    private fun fetchGames(ids: List<Int>) = viewModelScope.launch {
         if (ids.isEmpty()) return@launch
         val result = SafeRequest {
             IGDBClient.getGames {

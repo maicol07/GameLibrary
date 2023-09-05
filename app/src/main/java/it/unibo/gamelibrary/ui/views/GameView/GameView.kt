@@ -1,7 +1,6 @@
 package it.unibo.gamelibrary.ui.views.GameView
 
 import android.Manifest
-import android.icu.text.SimpleDateFormat
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -89,7 +88,6 @@ import it.unibo.gamelibrary.utils.ScaffoldFab
 import it.unibo.gamelibrary.utils.TopAppBarState
 import ru.pixnews.igdbclient.model.Game
 
-private val dateFormatter = SimpleDateFormat.getDateInstance()
 private lateinit var notShowAgain: GenericPreferenceDataStoreSettingValueState<Boolean>
 
 @Destination(
@@ -223,24 +221,24 @@ fun GameDetails(
 ) {
     Column(modifier.padding(16.dp, 65.dp, 16.dp, 0.dp)) {
         LazyRow {
-            items(game.involved_companies, key = { it.id }) {
+            items(game.involved_companies, key = { it.id }) { involvedCompany ->
                 val roles = mapOf(
-                    "Developer" to it.developer,
-                    "Publisher" to it.publisher,
-                    "Porting" to it.porting,
-                    "Supporting" to it.supporting
+                    "Developer" to involvedCompany.developer,
+                    "Publisher" to involvedCompany.publisher,
+                    "Porting" to involvedCompany.porting,
+                    "Supporting" to involvedCompany.supporting
                 )
                 val icon: Any = when {
-                    it.porting -> Icons.Default.Business
-                    it.developer -> Icons.Default.Code
-                    it.publisher -> Icons.Default.Business
-                    it.supporting -> R.drawable.lifebuoy
+                    involvedCompany.porting -> Icons.Default.Business
+                    involvedCompany.developer -> Icons.Default.Code
+                    involvedCompany.publisher -> Icons.Default.Business
+                    involvedCompany.supporting -> R.drawable.lifebuoy
                     else -> Icons.Default.Business
                 }
                 AssistChip(
                     label = {
                         Text(
-                            text = "${it.company?.name} (${
+                            text = "${involvedCompany.company?.name} (${
                                 roles.filter { it.value }.keys.joinToString(
                                     ", "
                                 )

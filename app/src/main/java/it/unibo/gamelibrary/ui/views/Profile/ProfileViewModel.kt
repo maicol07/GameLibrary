@@ -51,7 +51,7 @@ class ProfileViewModel @Inject constructor(
     var newBio = mutableStateOf("")
     var newUsername = mutableStateOf("")
     var followed =
-        mutableStateListOf<String>()//seguaci e seguiti dell'utente di cui si viualizza il profilo
+        mutableStateListOf<String>()
     var followers = mutableStateListOf<String>()
     var users = mutableStateListOf<User>()
     var showProfileEditDialog by mutableStateOf(false)
@@ -76,7 +76,7 @@ class ProfileViewModel @Inject constructor(
         getFollowed(uid)
     }
 
-    fun getPublisherInfo(){
+    private fun getPublisherInfo(){
         viewModelScope.launch {
             val result = SafeRequest {
                 IGDBClient.getCompanies {
@@ -94,7 +94,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun getPublisherGames(){
+    private fun getPublisherGames(){
         viewModelScope.launch {
             val result = SafeRequest {
                 IGDBClient.getCompanies {
@@ -128,7 +128,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun getLibrary(uid: String) {
+    private fun getLibrary(uid: String) {
         viewModelScope.launch {
             libraryRepository.getUserLibraryEntries(uid, "last_modified").collectLatest {
                 userLibrary.clear()
@@ -162,7 +162,7 @@ class ProfileViewModel @Inject constructor(
 
                 if (!file.exists()) {
                     Log.d("path", file.toString())
-                    var fos: FileOutputStream?
+                    val fos: FileOutputStream?
                     try {
                         fos = FileOutputStream(file)
                         yourDrawable?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, fos)
@@ -196,20 +196,20 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun getFollowed(uid: String): Job {
+    private fun getFollowed(uid: String): Job {
         return viewModelScope.launch {
-            followRepository.getFollowed(uid).collectLatest {
+            followRepository.getFollowed(uid).collectLatest { followList ->
                 followed.clear()
-                followed.addAll(it.map { it.followed })
+                followed.addAll(followList.map { it.followed })
             }
         }
     }
 
-    fun getFollowers(uid: String): Job {
+    private fun getFollowers(uid: String): Job {
         return viewModelScope.launch {
-            followRepository.getFollowers(uid).collectLatest {
+            followRepository.getFollowers(uid).collectLatest { followerList ->
                 followers.clear()
-                followers.addAll(it.map { it.follower })
+                followers.addAll(followerList.map { it.follower })
             }
         }
     }

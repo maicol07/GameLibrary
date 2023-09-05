@@ -20,11 +20,12 @@ import it.unibo.gamelibrary.BuildConfig
 import ru.pixnews.igdbclient.IgdbClient
 import java.net.UnknownHostException
 
-val snackbarHostState = SnackbarHostState()
+val snackBarHostState = SnackbarHostState()
 
 var notificationId by mutableIntStateOf(0)
 var channel_id by mutableStateOf("")
 
+@Suppress("FunctionName")
 suspend fun <T> SafeRequest(apiRequest: suspend () -> T): T? {
     return try {
         apiRequest()

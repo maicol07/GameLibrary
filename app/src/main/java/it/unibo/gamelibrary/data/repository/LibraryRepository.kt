@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import ru.pixnews.igdbclient.model.Game
 
 class LibraryRepository(private val libraryDao: LibraryDao) {
-    //val allUser: List<User> = collectionDao.getAll()
     @WorkerThread
     fun getAll(orderBy: String = "id"): Flow<List<LibraryEntry>> = libraryDao.getAll(orderBy)
 

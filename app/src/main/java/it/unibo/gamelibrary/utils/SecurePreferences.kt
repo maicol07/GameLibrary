@@ -1,3 +1,5 @@
+package it.unibo.gamelibrary.utils
+
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -8,7 +10,7 @@ class SecurePreferences(context: Context) {
         (MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build())
     private val sharedPreferences = EncryptedSharedPreferences(
         context,
-        "gamelibrary_secure_preferences",
+        "gameLibrary_secure_preferences",
         masterKeyAlias,
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM

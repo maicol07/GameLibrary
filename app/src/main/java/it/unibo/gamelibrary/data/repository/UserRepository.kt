@@ -6,7 +6,6 @@ import it.unibo.gamelibrary.data.model.User
 import kotlinx.coroutines.flow.Flow
 
 class UserRepository(private val userDao: UserDao) {
-    //val allUser: List<User> = userDao.getAll()
     @WorkerThread
     fun getAll(): Flow<List<User>> = userDao.getAll()
 

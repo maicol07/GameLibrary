@@ -90,7 +90,6 @@ fun CrashScreen() {
         Text("An unexpected error occurred. Please restart the app.")
         val restart =
             remember {
-                @Suppress("KotlinConstantConditions")
                 config.isShowRestartButton && config.restartActivityClass != null
             }
         val context = LocalContext.current

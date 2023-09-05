@@ -111,7 +111,7 @@ fun SearchBar(navController: NavController, viewModel: SearchViewModel = hiltVie
         }
     ) {
         TabRow(selectedTabIndex = viewModel.searchType.ordinal) {
-            for (searchType in SearchType.values()) {
+            for (searchType in SearchType.entries) {
                 Tab(
                     text = { Text(searchType.text) },
                     selected = viewModel.searchType == searchType,
@@ -280,7 +280,7 @@ fun FiltersBottomSheet(viewModel: SearchViewModel = hiltViewModel()) {
                 )
             }
             for (filterType in FilterType.entries) {
-                val filter = currentSearch!!.filters[filterType]!!;
+                val filter = currentSearch!!.filters[filterType]!!
                 Text(
                     text = filterType.text,
                     style = MaterialTheme.typography.headlineSmall,

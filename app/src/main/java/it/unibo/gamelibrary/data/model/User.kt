@@ -7,7 +7,6 @@ import androidx.room.Entity
 import androidx.room.Relation
 import java.io.File
 
-
 data class UserWithLibraryEntries(
     @Embedded val user: User,
     @Relation(
@@ -28,9 +27,9 @@ data class User(
     @ColumnInfo var bio: String? = null,
     @ColumnInfo var isPublisher: Boolean = false,
     @ColumnInfo var publisherName: String? = null
-){
-    fun hasImage(): Boolean{
-        if(image != null && Uri.parse(image) != Uri.EMPTY){
+) {
+    fun hasImage(): Boolean {
+        if (image != null && Uri.parse(image) != Uri.EMPTY) {
             return Uri.parse(image).path?.let { File(it).exists() } == true
         }
         return false

@@ -50,8 +50,8 @@ data class SearchTypeObject<R, F>(
 class SearchViewModel @Inject constructor(
     private val userRepository: UserRepository,
 ) : ViewModel() {
-    val platforms = mutableStateListOf<Platform>()
-    val genres = mutableStateListOf<Genre>()
+    private val platforms = mutableStateListOf<Platform>()
+    private val genres = mutableStateListOf<Genre>()
 
     var searchType by mutableStateOf(SearchType.GAMES)
 
@@ -64,7 +64,7 @@ class SearchViewModel @Inject constructor(
     val usersSearch = SearchTypeObject<User, Any>()
 
     init {
-        fetchPlaforms()
+        fetchPlatforms()
         fetchGenres()
         search()
     }
@@ -127,7 +127,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPlaforms() {
+    private fun fetchPlatforms() {
         viewModelScope.launch {
             platforms.clear()
             val result = SafeRequest {

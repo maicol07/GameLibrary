@@ -132,7 +132,7 @@ fun HomeSection(
         )
         LazyRow {
 
-            var loadingList: MutableList<ru.pixnews.igdbclient.model.Game> = mutableListOf()
+            val loadingList: MutableList<ru.pixnews.igdbclient.model.Game> = mutableListOf()
             for(i in 1..5){
                 loadingList.add(ru.pixnews.igdbclient.model.Game())
             }

@@ -21,7 +21,7 @@ import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.destinations.HomeDestination
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
-import it.unibo.gamelibrary.utils.snackbarHostState
+import it.unibo.gamelibrary.utils.snackBarHostState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.apicalypse.SortOrder
@@ -119,7 +119,7 @@ class SignupViewModel @Inject constructor(
                                 task.exception
                             )
                             viewModelScope.launch {
-                                snackbarHostState.showSnackbar("User already registered")
+                                snackBarHostState.showSnackbar("User already registered")
                             }
                         }
                     }

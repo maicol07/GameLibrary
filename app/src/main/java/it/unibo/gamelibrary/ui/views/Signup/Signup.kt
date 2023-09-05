@@ -287,6 +287,3 @@ fun PublisherExposedDropdownMenu(viewModel: SignupViewModel = hiltViewModel()) {
         }
     }
 }
-
-//  TODO: [POSSIBILE BUG] Verificare se premendo signup più volte si creano più utenti (o comunque se viene chiamato più volte il metodo)
-//      [LOW PRIORITY] Vedere se c'è qualche design migliore per la pagina di signup

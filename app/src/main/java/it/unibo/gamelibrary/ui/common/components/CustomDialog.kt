@@ -211,11 +211,7 @@ fun AlertDialogFlowRow(
 
         val crossAxisLayoutSize = max(crossAxisSpace, constraints.minHeight)
 
-        val layoutWidth = mainAxisLayoutSize
-
-        val layoutHeight = crossAxisLayoutSize
-
-        layout(layoutWidth, layoutHeight) {
+        layout(mainAxisLayoutSize, crossAxisLayoutSize) {
             sequences.forEachIndexed { i, placeables ->
                 val childrenMainAxisSizes = IntArray(placeables.size) { j ->
                     placeables[j].width +

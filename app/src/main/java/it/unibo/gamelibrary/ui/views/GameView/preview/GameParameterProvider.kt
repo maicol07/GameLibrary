@@ -14,7 +14,6 @@ class GameParameterProvider : PreviewParameterProvider<Game> {
             Game(
                 id = 1025,
                 name = "Final Fantasy VII Rebirth",
-//                cover = "co2t3f.jpg",
                 involved_companies = listOf(
                     InvolvedCompany(
                         company = Company(

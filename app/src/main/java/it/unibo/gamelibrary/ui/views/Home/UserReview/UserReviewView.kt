@@ -49,7 +49,7 @@ fun UserReview(
     showUser: Boolean = true,
     viewModel: UserReviewViewModel = hiltViewModel(),
 ) {
-    Box(){
+    Box {
         Card(
             onClick = {},
             modifier = Modifier
@@ -57,20 +57,22 @@ fun UserReview(
                 .padding(top = 36.dp, start = 8.dp, end = 8.dp)
                 .wrapContentHeight()
         ) {
-            if(viewModel.game[review.gameId] == null){
+            if (viewModel.game[review.gameId] == null) {
                 viewModel.getGame(review.gameId)
             }
-            if(viewModel.user[review.uid] == null){
+            if (viewModel.user[review.uid] == null) {
                 viewModel.getUser(review.uid)
             }
 
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
 
-                Row (
+                Row(
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
 
                     Spacer(modifier = Modifier.size(170.dp))//creates space for game Image (below)
 
@@ -92,24 +94,31 @@ fun UserReview(
                             Text(
                                 text = rating.intValue.toString(),
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp)
+                                fontSize = 18.sp
+                            )
                         }
-                        Row (Modifier.padding(top = 6.dp)){
-                            Icon(imageVector = review.status.unselectedIcon, contentDescription = review.status.text)
+                        Row(Modifier.padding(top = 6.dp)) {
+                            Icon(
+                                imageVector = review.status.unselectedIcon,
+                                contentDescription = review.status.text
+                            )
                             Text(text = review.status.text)
                         }
                     }
 
                 }
 
-                //reviewText
                 Row(
-                    modifier = Modifier.padding(top = 12.dp, start = 8.dp, end = 8.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(
+                        top = 12.dp,
+                        start = 8.dp,
+                        end = 8.dp,
+                        bottom = 8.dp
+                    )
                 ) {
                     Text(text = review.notes ?: "")
                 }
 
-                //user image and username
                 if (showUser) {
                     Row(
                         modifier = Modifier
@@ -117,20 +126,24 @@ fun UserReview(
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        //username and profile image
-                        viewModel.user[review.uid]?.let { UserBar(user = it, link = true, navController = navController) }
+                        viewModel.user[review.uid]?.let {
+                            UserBar(
+                                user = it,
+                                link = true,
+                                navController = navController
+                            )
+                        }
                     }
                 }
             }
         }
-        //game image
         Box(
             modifier = Modifier.offset(16.dp, (13).dp)
-        ){
+        ) {
             GameCoverImage(
                 viewModel.game[review.gameId] ?: Game(),
                 contentDescription = "",
-                modifier = if(viewModel.game[review.gameId] != null) {
+                modifier = if (viewModel.game[review.gameId] != null) {
                     Modifier
                         .width(150.dp)
                         .height(200.dp)
@@ -138,12 +151,12 @@ fun UserReview(
                             onClick = { navController.navigate(GameViewNavDestination(review.gameId)) },
                         )
                         .clip(RoundedCornerShape(8.dp))
-                    }else{
+                } else {
                     Modifier
                         .width(150.dp)
                         .height(200.dp)
                         .placeholder(visible = true, highlight = PlaceholderHighlight.fade())
-                    }
+                }
             )
         }
     }

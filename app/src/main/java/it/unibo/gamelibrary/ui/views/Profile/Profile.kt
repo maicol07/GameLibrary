@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -126,7 +125,6 @@ fun Profile(
 
         if (checkInternetConnection(context)) {
             if(viewModel.user?.isPublisher == false) {
-                //reviews di questo user
                 if (viewModel.userLibrary.isNotEmpty()) {
                     items(viewModel.userLibrary, key = { it.id })
                     {
@@ -215,10 +213,10 @@ private fun FollowButton(
 ) {
     TextButton(
         onClick = {
-            if (viewModel.amIFollowing()) {//seguo già, se clicco = unfollow
-                viewModel.toggleFollow(me, other)//unfollow
+            if (viewModel.amIFollowing()) {
+                viewModel.toggleFollow(me, other)
             } else {
-                viewModel.toggleFollow(me, other)//follow
+                viewModel.toggleFollow(me, other)
             }
         }
     ) {
@@ -310,8 +308,6 @@ private fun EditButton(
     }
 
     if (viewModel.showProfileEditDialog) {
-
-        ////image from camera
         val context = LocalContext.current
         val cameraLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
@@ -345,7 +341,6 @@ private fun EditButton(
                     Text(text = "Cancel")
                 }
 
-                //apply-changes button
                 TextButton(
                     onClick = {
                         viewModel.applyChanges(context)
@@ -357,7 +352,6 @@ private fun EditButton(
                 }
             }
         ) {
-            //image preview
             Column {
                 if (viewModel.newImage.value != Uri.EMPTY) {
                     CoilImage(
@@ -380,8 +374,6 @@ private fun EditButton(
                     horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier.fillMaxWidth()
                 ){
-
-                    //select-picture-from-gallery button
                     TextButton(
                         onClick = {
                             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -396,7 +388,6 @@ private fun EditButton(
                         )
                     }
 
-                    //take-picture-from-camera button
                     TextButton(
                         onClick = {
                             viewModel.tempUriNewImage = createImageFile(context)
@@ -407,7 +398,6 @@ private fun EditButton(
                                 cameraLauncher.launch(viewModel.tempUriNewImage)
                             }
                             else {
-                                // Request a permission
                                 permissionLauncher.launch(Manifest.permission.CAMERA)
                             }
                         },

@@ -40,7 +40,6 @@ interface LibraryDao {
     @Query("SELECT * FROM users")
     fun getUsersAndLibrary(): Flow<List<UserWithLibraryEntries>>
 
-    // Get library entry by user id and game id
     @Query("SELECT * FROM library WHERE uid = :userId AND gameId = :gameId")
     fun getLibraryEntryByUserAndGame(userId: String, gameId: String): Flow<LibraryEntry?>
 }

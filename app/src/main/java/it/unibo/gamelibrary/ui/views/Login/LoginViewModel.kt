@@ -25,7 +25,7 @@ import it.unibo.gamelibrary.Secrets
 import it.unibo.gamelibrary.data.model.User
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.ui.destinations.HomeDestination
-import it.unibo.gamelibrary.utils.snackbarHostState
+import it.unibo.gamelibrary.utils.snackBarHostState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -91,7 +91,7 @@ class LoginViewModel @Inject constructor(
     fun signInWithGoogle(result: ActivityResult, context: Context, navController: NavController) {
         if (result.resultCode != Activity.RESULT_OK) {
             viewModelScope.launch {
-                snackbarHostState.showSnackbar("Google login cancelled")
+                snackBarHostState.showSnackbar("Google login cancelled")
             }
             return
         }
@@ -184,14 +184,14 @@ class LoginViewModel @Inject constructor(
             auth.sendPasswordResetEmail(emailResetPassword)
         }
         viewModelScope.launch {
-            snackbarHostState.showSnackbar(if (emailResetPassword.isNotEmpty()) "Password reset link sent" else "Impossible to send the email. Invalid email")
+            snackBarHostState.showSnackbar(if (emailResetPassword.isNotEmpty()) "Password reset link sent" else "Impossible to send the email. Invalid email")
         }
     }
 
     private fun errorValidation() {
         isError = true
         viewModelScope.launch {
-            snackbarHostState.showSnackbar("${if (isEmail) "Email" else "Username"} or password is incorrect")
+            snackBarHostState.showSnackbar("${if (isEmail) "Email" else "Username"} or password is incorrect")
         }
     }
 

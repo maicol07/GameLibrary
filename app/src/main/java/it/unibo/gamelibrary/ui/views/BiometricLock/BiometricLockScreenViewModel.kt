@@ -31,7 +31,7 @@ class BiometricLockScreenViewModel @Inject constructor() : ViewModel(), HasBiome
         showBiometricPrompt(context, locked)
     }
 
-    fun showBiometricPrompt(context: Context, locked: MutableState<Boolean>) {
+    private fun showBiometricPrompt(context: Context, locked: MutableState<Boolean>) {
         showBiometricPrompt(context, "Unlock GameLibrary", onSuccess = {
             locked.value = false
             TopAppBarState.show = oldTopAppBarShowState

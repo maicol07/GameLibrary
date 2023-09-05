@@ -25,7 +25,7 @@ val Genre.icon: Any?
             "fighting" -> Icons.Default.SportsMma
             "shooter" -> R.drawable.pistol
             "music" -> Icons.Default.MusicNote
-            "platform" -> Icons.Default.ViewInAr // TODO: Change with
+            "platform" -> Icons.Default.ViewInAr
             "puzzle" -> Icons.Default.Extension
             "racing" -> Icons.Default.SportsMotorsports
             "real-time-strategy-rts", "strategy", "turn-based-strategy-tbs", "tactical" -> R.drawable.strategy

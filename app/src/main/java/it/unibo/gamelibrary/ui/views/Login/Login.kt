@@ -139,7 +139,7 @@ fun LoginPage(
                 ) {
                     Icon(
                         painterResource(id = R.drawable.google),
-                        contentDescription = "signin"
+                        contentDescription = "sign in"
                     )
                     Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                     Text(text = "Google")

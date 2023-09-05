@@ -1,6 +1,6 @@
 package it.unibo.gamelibrary
 
-import SecurePreferences
+import it.unibo.gamelibrary.utils.SecurePreferences
 import android.content.Context
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -27,10 +27,8 @@ class TwitchTokenSecurePreferencesStorage(context: Context): TwitchTokenStorage 
             val loadedToken = prefs.getString("twitch_token")
             if (token == NO_TOKEN && loadedToken != null) {
                 token = TwitchTokenPayload(loadedToken)
-//                Log.d("TwitchTokenStorage", "Token loaded from prefs")
             }
 
-//            Log.d("TwitchTokenStorage", "Checking token validity")
             validateToken()
             token
         }
@@ -42,18 +40,15 @@ class TwitchTokenSecurePreferencesStorage(context: Context): TwitchTokenStorage 
     ): Boolean {
         return lock.withLock {
             if (oldToken == token) {
-//                Log.d("TwitchTokenStorage", "Updating token")
                 val newTokenString = newToken.getTwitchAccessToken()
 
                 if (newTokenString == null) {
-//                    Log.d("TwitchTokenStorage", "Token removed")
                     prefs.remove("twitch_token")
                 } else {
                     prefs.putString("twitch_token", newTokenString)
                 }
 
                 token = newToken
-//                Log.d("TwitchTokenStorage", "Token updated")
                 true
             } else {
                 false

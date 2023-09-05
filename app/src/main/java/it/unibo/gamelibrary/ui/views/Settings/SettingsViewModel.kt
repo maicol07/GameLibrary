@@ -47,7 +47,7 @@ import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.interfaces.HasBiometrics
 import it.unibo.gamelibrary.ui.destinations.LoginPageDestination
 import it.unibo.gamelibrary.utils.findActivity
-import it.unibo.gamelibrary.utils.snackbarHostState
+import it.unibo.gamelibrary.utils.snackBarHostState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -102,7 +102,7 @@ class SettingsViewModel @Inject constructor(
                     Log.i("Token", idToken.toString())
                     if (idToken != null) {
                         val credentials = GoogleAuthProvider.getCredential(idToken, null)
-                        reauthenticateAndChange(
+                        reAuthenticateAndChange(
                             credentials,
                             emailValue,
                             "Impossible to change the email. Please re-sign in"
@@ -114,13 +114,13 @@ class SettingsViewModel @Inject constructor(
                         }
                     } else {
                         viewModelScope.launch {
-                            snackbarHostState.showSnackbar("Impossible to change the email")
+                            snackBarHostState.showSnackbar("Impossible to change the email")
                         }
                     }
                 } else {
                     val credentials =
                         EmailAuthProvider.getCredential(auth.currentUser?.email!!, passwordValue)
-                    reauthenticateAndChange(
+                    reAuthenticateAndChange(
                         credentials,
                         emailValue,
                         "Impossible to change the email. Password is incorrect. Please re-sign in"
@@ -134,7 +134,7 @@ class SettingsViewModel @Inject constructor(
             }
         } else {
             viewModelScope.launch {
-                snackbarHostState.showSnackbar("Impossible to change the email. Invalid email")
+                snackBarHostState.showSnackbar("Impossible to change the email. Invalid email")
             }
         }
         openEmailDialog = false
@@ -152,7 +152,7 @@ class SettingsViewModel @Inject constructor(
                     Log.i("Token", idToken.toString())
                     if (idToken != null) {
                         val credentials = GoogleAuthProvider.getCredential(idToken, null)
-                        reauthenticateAndChange(
+                        reAuthenticateAndChange(
                             credentials,
                             passwordFields["new"]!!,
                             "Impossible to change the password"
@@ -161,7 +161,7 @@ class SettingsViewModel @Inject constructor(
                         }
                     } else {
                         viewModelScope.launch {
-                            snackbarHostState.showSnackbar("Impossible to change the password")
+                            snackBarHostState.showSnackbar("Impossible to change the password")
                         }
                     }
                 } else {
@@ -170,7 +170,7 @@ class SettingsViewModel @Inject constructor(
                             auth.currentUser?.email!!,
                             passwordFields["old"]!!
                         )
-                    reauthenticateAndChange(
+                    reAuthenticateAndChange(
                         credentials,
                         passwordFields["new"]!!,
                         "Impossible to change the password. Old password is incorrect"
@@ -181,7 +181,7 @@ class SettingsViewModel @Inject constructor(
             }
         } else {
             viewModelScope.launch {
-                snackbarHostState.showSnackbar("Impossible to change the password. New password and Confirm password are different")
+                snackBarHostState.showSnackbar("Impossible to change the password. New password and Confirm password are different")
             }
         }
         for (key in passwordFields.keys) {
@@ -292,7 +292,7 @@ class SettingsViewModel @Inject constructor(
                 if (addresses[0] != null) {
                     Log.d("ADDRESS", addresses[0].toString())
                     viewModelScope.launch {
-                        snackbarHostState.showSnackbar(
+                        snackBarHostState.showSnackbar(
                             "Address changed. Your new address is ${
                                 addresses[0].getAddressLine(
                                     0
@@ -302,7 +302,7 @@ class SettingsViewModel @Inject constructor(
                     }
                 } else {
                     viewModelScope.launch {
-                        snackbarHostState.showSnackbar("Impossible change address")
+                        snackBarHostState.showSnackbar("Impossible change address")
                     }
                 }
             }
@@ -318,7 +318,7 @@ class SettingsViewModel @Inject constructor(
             )?.get(0)
             if (address != null) {
                 viewModelScope.launch {
-                    snackbarHostState.showSnackbar(
+                    snackBarHostState.showSnackbar(
                         "Address changed. Your new address is ${
                             address.getAddressLine(
                                 0
@@ -328,13 +328,13 @@ class SettingsViewModel @Inject constructor(
                 }
             } else {
                 viewModelScope.launch {
-                    snackbarHostState.showSnackbar("Impossible change address")
+                    snackBarHostState.showSnackbar("Impossible change address")
                 }
             }
         }
     }
 
-    private fun reauthenticateAndChange(
+    private fun reAuthenticateAndChange(
         credentials: AuthCredential,
         field: String,
         error: String,
@@ -347,7 +347,7 @@ class SettingsViewModel @Inject constructor(
                     change.invoke(field)
                 } else {
                     viewModelScope.launch {
-                        snackbarHostState.showSnackbar(error)
+                        snackBarHostState.showSnackbar(error)
                     }
                 }
             }

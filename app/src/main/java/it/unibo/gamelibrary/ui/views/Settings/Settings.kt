@@ -49,7 +49,7 @@ import it.unibo.gamelibrary.R
 import it.unibo.gamelibrary.ui.common.components.CustomDialog
 import it.unibo.gamelibrary.ui.common.components.PasswordTextfield
 import it.unibo.gamelibrary.utils.TopAppBarState
-import it.unibo.gamelibrary.utils.snackbarHostState
+import it.unibo.gamelibrary.utils.snackBarHostState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -324,7 +324,7 @@ private fun CheckPermission(viewModel: SettingsViewModel = hiltViewModel()) {
                     onClick = {
                         locationPermissionsState.launchMultiplePermissionRequest()
                         viewModel.viewModelScope.launch {
-                            snackbarHostState.showSnackbar("Re-press the button to change your address")
+                            snackBarHostState.showSnackbar("Re-press the button to change your address")
                         }
                         viewModel.openLocationDialog = false
                     }

@@ -79,7 +79,7 @@ import it.unibo.gamelibrary.utils.ScaffoldFab
 import it.unibo.gamelibrary.utils.ScaffoldFabPosition
 import it.unibo.gamelibrary.utils.TopAppBarState
 import it.unibo.gamelibrary.utils.channel_id
-import it.unibo.gamelibrary.utils.snackbarHostState
+import it.unibo.gamelibrary.utils.snackBarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -93,17 +93,17 @@ class MainActivity : FragmentActivity() {
     val auth: FirebaseAuth = Firebase.auth
 
     private val secrets = Secrets()
-    private var biometricStarted = false
     private var currentDestination: NavDestination? = null
 
-    private val navControllerListener = NavController.OnDestinationChangedListener { controller, destination, arguments ->
-        if (controller.currentDestination?.route !== currentDestination?.route) {
-            currentDestination = destination
-            TopAppBarState.restoreDefaults()
-            BottomBar = {}
-            ScaffoldFab = {}
+    private val navControllerListener =
+        NavController.OnDestinationChangedListener { controller, destination, _ ->
+            if (controller.currentDestination?.route !== currentDestination?.route) {
+                currentDestination = destination
+                TopAppBarState.restoreDefaults()
+                BottomBar = {}
+                ScaffoldFab = {}
+            }
         }
-    }
     private lateinit var userRepository: UserRepository
     private var user by mutableStateOf<User?>(null)
 
@@ -161,6 +161,7 @@ class MainActivity : FragmentActivity() {
                             Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_CREATE -> {
                                 locked.value = true
                             }
+
                             else -> {}
                         }
                     }
@@ -186,10 +187,10 @@ class MainActivity : FragmentActivity() {
                     AnimatedVisibility(visible = !isLocked) {
                         Scaffold(
                             snackbarHost = {
-                                SnackbarHost(snackbarHostState)
+                                SnackbarHost(snackBarHostState)
                             },
                             bottomBar = {
-                                if (currentDestination in NavBarDestinations.values()
+                                if (currentDestination in NavBarDestinations.entries
                                         .map { it.direction }
                                 ) {
                                     NavBar(navController = navController)
@@ -201,8 +202,7 @@ class MainActivity : FragmentActivity() {
                             topBar = {
                                 if (TopAppBarState.show && (currentDestination != SignupPageDestination && currentDestination != LoginPageDestination)) {
                                     TopBar(
-                                        currentScreen = "Game Library",
-                                        canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.values()
+                                        canNavigateBack = navController.previousBackStackEntry != null && !NavBarDestinations.entries
                                             .map { it.direction }.contains(currentDestination),
                                         navigateUp = { navController.navigateUp() }
                                     )
@@ -233,8 +233,7 @@ class MainActivity : FragmentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun TopBar(//TopAppBar
-        currentScreen: String,
+    fun TopBar(
         canNavigateBack: Boolean,
         navigateUp: () -> Unit,
         modifier: Modifier = Modifier
@@ -249,7 +248,6 @@ class MainActivity : FragmentActivity() {
             },
             modifier = modifier,
             navigationIcon = {
-                //se si può navigare indietro (non home screen) allora appare la freccetta
                 if (canNavigateBack) {
                     IconButton(onClick = navigateUp) {
                         Icon(
@@ -291,7 +289,7 @@ class MainActivity : FragmentActivity() {
         val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
         NavigationBar {
-            for (destination in NavBarDestinations.values()) {
+            for (destination in NavBarDestinations.entries) {
                 if (destination != NavBarDestinations.Library || user?.isPublisher == false) {
                     val isCurrentDestOnBackStack =
                         navController.isRouteOnBackStack(destination.direction)
@@ -301,6 +299,7 @@ class MainActivity : FragmentActivity() {
                             NavBarDestinations.Profile -> {
                                 userIdArgument === null || userIdArgument == auth.currentUser?.uid
                             }
+
                             else -> true
                         },
                         onClick = {
@@ -308,8 +307,10 @@ class MainActivity : FragmentActivity() {
                                     NavBarDestinations.Profile -> {
                                         userIdArgument === null || userIdArgument === auth.currentUser?.uid
                                     }
+
                                     else -> true
-                                }) {
+                                }
+                            ) {
                                 // When we click again on a bottom bar item and it was already selected
                                 // we want to pop the back stack until the initial destination of this bottom bar item
                                 navController.popBackStack(destination.direction, false)
@@ -325,9 +326,9 @@ class MainActivity : FragmentActivity() {
                                 }
 
                                 // Avoid multiple copies of the same destination when
-                                // reselecting the same item
+                                // reSelecting the same item
                                 launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
+                                // Restore state when reSelecting a previously selected item
                                 restoreState = true
                             }
                         },
@@ -361,7 +362,7 @@ class MainActivity : FragmentActivity() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun setCurrentUser(auth: FirebaseAuth){
+    private fun setCurrentUser(auth: FirebaseAuth) {
         CoroutineScope(Dispatchers.Main).launch {
             val uid = auth.currentUser?.uid
             user = if (uid != null) userRepository.getUserByUid(uid).first() else null

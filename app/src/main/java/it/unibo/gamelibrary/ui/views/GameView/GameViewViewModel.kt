@@ -28,7 +28,7 @@ import it.unibo.gamelibrary.data.repository.LibraryRepository
 import it.unibo.gamelibrary.data.repository.UserRepository
 import it.unibo.gamelibrary.utils.IGDBClient
 import it.unibo.gamelibrary.utils.SafeRequest
-import it.unibo.gamelibrary.utils.snackbarHostState
+import it.unibo.gamelibrary.utils.snackBarHostState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pixnews.igdbclient.getGames
@@ -110,15 +110,16 @@ class GameViewViewModel @Inject constructor(
     }
 
     fun getLibraryEntries(gameId: Int) = viewModelScope.launch {
-        libraryRepository.getLibraryEntriesByGame(Game(gameId.toLong()), "last_modified").collectLatest {
-            libraryEntries.clear()
-            libraryEntries.addAll(it)
-        }
+        libraryRepository.getLibraryEntriesByGame(Game(gameId.toLong()), "last_modified")
+            .collectLatest {
+                libraryEntries.clear()
+                libraryEntries.addAll(it)
+            }
     }
 
     fun saveGameToLibrary() {
         if (libraryEntry.status === null) {
-            viewModelScope.launch { snackbarHostState.showSnackbar("Please select a status!") }
+            viewModelScope.launch { snackBarHostState.showSnackbar("Please select a status!") }
             return
         }
         viewModelScope.launch {
@@ -127,7 +128,7 @@ class GameViewViewModel @Inject constructor(
                 libraryEntry.entry!!.rating = libraryEntry.rating.intValue
                 libraryEntry.entry!!.notes = libraryEntry.notes
                 libraryRepository.updateEntry(libraryEntry.entry!!)
-                viewModelScope.launch { snackbarHostState.showSnackbar("Game in library updated!") }
+                viewModelScope.launch { snackBarHostState.showSnackbar("Game in library updated!") }
             } else {
                 libraryEntry.entry = LibraryEntry(
                     uid = Firebase.auth.currentUser!!.uid,
@@ -137,7 +138,7 @@ class GameViewViewModel @Inject constructor(
                     notes = libraryEntry.notes
                 )
                 libraryRepository.insertEntry(libraryEntry.entry!!)
-                viewModelScope.launch { snackbarHostState.showSnackbar("Game added to library!") }
+                viewModelScope.launch { snackBarHostState.showSnackbar("Game added to library!") }
             }
 
             enableNotification()
@@ -151,7 +152,7 @@ class GameViewViewModel @Inject constructor(
         libraryEntry.status = null
         libraryEntry.rating.intValue = 0
         libraryEntry.notes = ""
-        viewModelScope.launch { snackbarHostState.showSnackbar("Game removed from library!") }
+        viewModelScope.launch { snackBarHostState.showSnackbar("Game removed from library!") }
     }
 
     private fun enableNotification() {
