@@ -1,5 +1,5 @@
-val versionCode by extra(9)
-val versionName by extra("0.2")
+val versionCode by extra(10)
+val versionName by extra("0.2.1")
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
