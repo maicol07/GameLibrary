@@ -127,6 +127,7 @@ class GameViewViewModel @Inject constructor(
                 libraryEntry.entry!!.status = libraryEntry.status!!
                 libraryEntry.entry!!.rating = libraryEntry.rating.intValue
                 libraryEntry.entry!!.notes = libraryEntry.notes
+                libraryEntry.entry!!.lastModified = Instant.now().epochSecond
                 libraryRepository.updateEntry(libraryEntry.entry!!)
                 viewModelScope.launch { snackBarHostState.showSnackbar("Game in library updated!") }
             } else {
@@ -135,7 +136,8 @@ class GameViewViewModel @Inject constructor(
                     gameId = game!!.id.toInt(),
                     status = libraryEntry.status!!,
                     rating = libraryEntry.rating.intValue,
-                    notes = libraryEntry.notes
+                    notes = libraryEntry.notes,
+                    lastModified = Instant.now().epochSecond
                 )
                 libraryRepository.insertEntry(libraryEntry.entry!!)
                 viewModelScope.launch { snackBarHostState.showSnackbar("Game added to library!") }
