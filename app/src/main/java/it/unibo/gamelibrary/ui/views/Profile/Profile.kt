@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +31,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material.icons.outlined.PersonRemoveAlt1
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -166,7 +166,9 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
         Text(text = "Publisher info:", fontWeight = FontWeight.Bold)
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(4.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(4.dp)
+                .fillMaxWidth()
         ){
             Text(text = "Name: ")
             Text(text = viewModel.publisher?.name.toString())
@@ -174,7 +176,9 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
 
         if(viewModel.publisher?.country != 0){
             Row (horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(4.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth()
             ){
                 Text(text = "Country: " )
                 Text(text = viewModel.publisher?.let { CountryCode.getByCode(it.country).getName() }.toString())
@@ -183,7 +187,9 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
         }
         if(viewModel.publisher?.logo != null){
             Row (horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(4.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth()
             ){
                 Text(text = "Company logo: ")
                 CoilImage(
@@ -197,7 +203,9 @@ private fun PublisherInfo(viewModel: ProfileViewModel){
         }
         if(viewModel.publisher?.websites?.isNotEmpty() == true){
             Row (horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(4.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth()
             ){
                 Text(text = "Website: ")
                 Text(text = viewModel.publisher?.websites?.get(0)?.url.toString())
@@ -353,7 +361,11 @@ private fun EditButton(
                     },
                     shape = RoundedCornerShape(50.dp),
                 ) {
-                    Text(text = "Save")
+                    if(viewModel.saveImageLoading){
+                        CircularProgressIndicator()
+                    }else{
+                        Text(text = "Save")
+                    }
                 }
             }
         ) {

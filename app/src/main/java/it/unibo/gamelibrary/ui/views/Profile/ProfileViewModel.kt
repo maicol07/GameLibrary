@@ -60,6 +60,8 @@ class ProfileViewModel @Inject constructor(
     var publisherGames = mutableStateListOf<Game>()
     var publisher by mutableStateOf<Company?>(null)
 
+    var saveImageLoading by mutableStateOf(false)
+
     fun setUser(uid: String) {
         viewModelScope.launch {
             user = repository.getUserByUid(uid).first()
@@ -148,6 +150,7 @@ class ProfileViewModel @Inject constructor(
     fun applyChanges(context: Context) {
 
         viewModelScope.launch {
+            saveImageLoading = true
             var savedUri = Uri.EMPTY
             if(newImage.value != Uri.EMPTY){ //save image to internal storage
                 val inputStream: InputStream? = context.contentResolver.openInputStream(newImage.value)
@@ -173,6 +176,7 @@ class ProfileViewModel @Inject constructor(
                         e.printStackTrace()
                     }
                 }
+                saveImageLoading = false
             }
 
             if (newImage.value != Uri.EMPTY) {
